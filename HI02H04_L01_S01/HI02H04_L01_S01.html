@@ -6757,5 +6757,62 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   if(now) schedule(now, PLAN_BY_SLIDE[cur]);
 })();
 </script>
+<script id="P5-CORRECT-SFX-JS">
+/* [P5-CORRECT-SFX] page 5 (G1 = ?slide=3, "बिल्ली दूध पी रही है"): when the child taps the CORRECT picture, the green
+   mark shows at once and assets/Audio/sfx_cat_drinking.mp3 (2.0s lapping cut, 1.5s-3.5s of the user's Downloads
+   'freesound_community-dog-drinking-20232.mp3', +4.9dB, faded) plays on its own Audio element for hold_ms; other taps
+   are swallowed meanwhile. Then the SAME tap is handed to the engine (cell.click()), so mountTapOptions' correct branch
+   runs exactly as shipped: kit correct-select, ding, confetti, happy mascot, the word VO, then completeSlide 700ms later.
+   Works as a capture-phase click listener (the engine's handler is cell.onclick; stopPropagation in capture keeps it
+   from firing). The correct cell is found from the card data (the option with correct:true -> its img). Wrong taps and
+   the reveal-after-two-wrong path are untouched. Leaving the page during the hold stops the sound and drops the tap. */
+(function(){ "use strict";
+  var VOL = 0.7;
+  // slide index -> {src, hold_ms} (the user counts pages from the landing page: ?slide=N is page N+2)
+  var CORRECT_SFX_BY_SLIDE = {
+    3: { src: "assets/Audio/sfx_cat_drinking.mp3", hold_ms: 2000 }   // page 5: the cat drinking milk
+  };
+  var holding = false, passthrough = false, timer = null, sfx = null;
+  function cancel(){
+    if(timer){ clearTimeout(timer); timer = null; }
+    if(sfx){ try{ sfx.pause(); }catch(e){} sfx = null; }
+    holding = false;
+  }
+  function correctImg(slide){
+    var opts = slide && slide.data && slide.data.options || [];
+    for(var i = 0; i < opts.length; i++){ if(opts[i].correct === true) return opts[i].img || null; }
+    return null;
+  }
+  document.addEventListener("click", function(e){
+    if(passthrough) return;
+    var idx = (typeof state === "object" && state) ? state.idx : -1;
+    if(!Object.prototype.hasOwnProperty.call(CORRECT_SFX_BY_SLIDE, idx)) return;
+    var cell = (e.target && e.target.closest) ? e.target.closest("#slideHost .opt-cell") : null;
+    if(!cell) return;
+    if(holding){ e.stopPropagation(); e.preventDefault(); return; }          // nothing lands while the sound plays
+    if(state.locked || state.hintActive || cell.classList.contains("crossed") || cell.classList.contains("correct")) return;
+    var key = correctImg(CARD.slides[idx]); if(!key) return;
+    var img = cell.querySelector("img");
+    if(!img || (img.getAttribute("src") || "").indexOf("/" + key + ".") < 0) return;   // a wrong option: the engine handles it
+    var cfg = CORRECT_SFX_BY_SLIDE[idx];
+    e.stopPropagation(); e.preventDefault();
+    holding = true; state.locked = true; cell.classList.add("correct");        // immediate tap feedback, taps blocked
+    try{ stopNudge(); }catch(x){}
+    try{ sfx = new Audio(cfg.src); sfx.volume = VOL; sfx.play().catch(function(){}); }catch(x){}
+    timer = setTimeout(function(){
+      timer = null; holding = false;
+      if(!cell.isConnected || state.idx !== idx) return;                     // the page was left during the hold
+      cell.classList.remove("correct"); state.locked = false;                 // hand the tap over exactly as it arrived
+      passthrough = true;
+      try{ cell.click(); } finally { passthrough = false; }
+    }, cfg.hold_ms);
+  }, true);
+  // leaving the page during the hold: stop the sound and drop the pending tap
+  var origMount = window.mountSlide;
+  if(typeof origMount === "function"){
+    window.mountSlide = function(){ cancel(); return origMount.apply(this, arguments); };
+  }
+})();
+</script>
 </body>
 </html>
