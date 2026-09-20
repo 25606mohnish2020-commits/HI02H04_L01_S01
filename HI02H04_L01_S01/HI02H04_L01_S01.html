@@ -6658,9 +6658,9 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    'loswin23-morning-bird-song-597463.mp3' from 16.0s). Scheduled by #P2-BIRD-POP-JS below. */
 @keyframes p2BirdPop{
   0%{transform:scale(1);animation-timing-function:cubic-bezier(.2,.8,.3,1);}      /* pop out: 0 -> 0.20s */
-  10%{transform:scale(1.11);animation-timing-function:ease-in-out;}               /* slight overshoot */
-  16%{transform:scale(1.08);animation-timing-function:linear;}                    /* settle by 0.32s ... */
-  86%{transform:scale(1.08);animation-timing-function:ease-in-out;}               /* ... HOLD until 1.72s */
+  10%{transform:scale(1.045);animation-timing-function:ease-in-out;}              /* slight overshoot */
+  16%{transform:scale(1.03);animation-timing-function:linear;}                    /* settle by 0.32s ... */
+  86%{transform:scale(1.03);animation-timing-function:ease-in-out;}               /* ... HOLD until 1.72s */
   100%{transform:scale(1);}                                                       /* ease back by 2.0s */
 }
 .stage.tut .story-frame.p2-pop{animation:p2BirdPop 2s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
