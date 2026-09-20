@@ -6657,6 +6657,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    HOLDS (2s total) while that page's SFX plays under the narration on its own player. Page 2: sfx_morning_birds.mp3
    (2.4s faded cut, +4dB, of the user's Downloads 'loswin23-morning-bird-song-597463.mp3' from 16.0s). Page 3:
    sfx_bicycle_bell.mp3 (faded cut of the user's Downloads 'freesound_community-bicycle-ring-bell-70138.mp3').
+   On these pages the आगे button appears no earlier than 1s after the pop ends (6s after the page opens).
    Scheduled by #P2-BIRD-POP-JS below, where the page -> SFX map lives. */
 @keyframes p2BirdPop{
   0%{transform:scale(1);animation-timing-function:cubic-bezier(.2,.8,.3,1);}      /* pop out: 0 -> 0.20s */
@@ -6672,21 +6673,28 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    (the same pattern the kit uses for confettiCannon): once such a slide has mounted, wait 3s, then pop-and-hold the framed
    picture for 2s and play that page's SFX on its OWN Audio element (never via play(), which would cut the narration VO).
    The timer and the SFX are tied to the frame captured at mount and cancelled on the next mount, so leaving the page
-   early can never fire on a later page (#slideHost is reused). */
+   early can never fire on a later page (#slideHost is reused).
+   आगे: on these pages setNavActive(true) is held until NAV_AFTER_MS after the pop ends (mount + 3s + 2s + 1s = 6s);
+   a later activation (e.g. a long narration VO) passes through untouched, and setNavActive(false) or leaving the page
+   drops a held reveal. Inactive .nav-btn is visibility:hidden, so "appear" == activate. */
 (function(){ "use strict";
-  var DELAY_MS = 3000, POP_MS = 2000, VOL = 0.7;
+  var DELAY_MS = 3000, POP_MS = 2000, VOL = 0.7, NAV_AFTER_MS = 1000;
   // slide index -> background SFX (the user counts pages from the landing page, so ?slide=N is page N+2)
   var SFX_BY_SLIDE = {
     0: "assets/Audio/sfx_morning_birds.mp3",   // page 2: boy under the tree -> morning birds
     1: "assets/Audio/sfx_bicycle_bell.mp3"     // page 3: girl on the bicycle -> bicycle bell
   };
   var timer = null, sfx = null;
+  var gateFrame = null, navRevealAt = 0, navTimer = null;   // आगे gate for the page currently popping
   function cancel(){
     if(timer){ clearTimeout(timer); timer = null; }
     if(sfx){ try{ sfx.pause(); }catch(e){} sfx = null; }
+    if(navTimer){ clearTimeout(navTimer); navTimer = null; }
+    gateFrame = null; navRevealAt = 0;
   }
   function schedule(frame, src){
     cancel();
+    gateFrame = frame; navRevealAt = Date.now() + DELAY_MS + POP_MS + NAV_AFTER_MS;
     timer = setTimeout(function(){
       timer = null;
       if(!frame || !frame.isConnected) return;                       // the page was left before the 3s
@@ -6702,6 +6710,19 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   function frameOf(idx){
     if(!Object.prototype.hasOwnProperty.call(SFX_BY_SLIDE, idx)) return null;
     return document.querySelector("#slideHost .story-frame");
+  }
+  var origNav = window.setNavActive;
+  if(typeof origNav === "function"){
+    window.setNavActive = function(on){
+      var wait = navRevealAt - Date.now();
+      if(on === true && gateFrame && gateFrame.isConnected && wait > 0){
+        if(navTimer) clearTimeout(navTimer);                       // too early on a popping page: hold it
+        navTimer = setTimeout(function(){ navTimer = null; if(gateFrame && gateFrame.isConnected) origNav(true); }, wait);
+        return;
+      }
+      if(!on && navTimer){ clearTimeout(navTimer); navTimer = null; }   // a disable drops a held reveal
+      return origNav.apply(this, arguments);
+    };
   }
   var orig = window.mountSlide;
   if(typeof orig !== "function") return;
