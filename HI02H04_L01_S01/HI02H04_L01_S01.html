@@ -6762,7 +6762,8 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 })();
 </script>
 <script id="P5-CORRECT-SFX-JS">
-/* [P5-CORRECT-SFX] pages listed in CORRECT_SFX_BY_SLIDE (page 5 = G1 = ?slide=3, page 6 = G2 = ?slide=4): when the child
+/* [P5-CORRECT-SFX] pages listed in CORRECT_SFX_BY_SLIDE (page 5 = G1 = ?slide=3, page 6 = G2 = ?slide=4, page 7 = G3 =
+   ?slide=5): when the child
    taps the CORRECT option, the green mark shows at once, that page's SFX plays on its own Audio element for hold_ms and,
    where cfg.pop names an element, it gets the page-2 pop-and-hold (.p2-pop, keyframes in #P2-BIRD-POP-CSS); other taps
    are swallowed meanwhile. Then the SAME tap is handed to the engine (cell.click()), so mountTapOptions' correct branch
@@ -6770,6 +6771,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    Page 5: sfx_cat_drinking.mp3 (2.0s, 1.5s-3.5s of the user's Downloads 'freesound_community-dog-drinking-20232.mp3').
    Page 6: sfx_drinking_water.mp3 (2.0s, 6.4s-8.4s of 'hasin2004-drinking-water-sound-effect-247452.mp3') and the recall
    picture (.story-q-thumb, the boy drinking water) pops.
+   Page 7: sfx_newspaper.mp3 (2.0s cut of 'freesound_community-newspaper-108054.mp3'), sound only.
    Works as a capture-phase click listener (the engine's handler is cell.onclick; stopPropagation in capture keeps it
    from firing). The correct cell is found from the card data: the option with correct:true, matched by its img (picture
    options) or its label_hi (sentence pills). Wrong taps, the option speaker chips and the reveal-after-two-wrong path
@@ -6779,7 +6781,8 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   // slide index -> {src, hold_ms, pop?} (the user counts pages from the landing page: ?slide=N is page N+2)
   var CORRECT_SFX_BY_SLIDE = {
     3: { src: "assets/Audio/sfx_cat_drinking.mp3",   hold_ms: 2000 },                                    // page 5: the cat drinking milk
-    4: { src: "assets/Audio/sfx_drinking_water.mp3", hold_ms: 2000, pop: "#slideHost .story-q-thumb" }   // page 6: the boy drinking water
+    4: { src: "assets/Audio/sfx_drinking_water.mp3", hold_ms: 2000, pop: "#slideHost .story-q-thumb" },  // page 6: the boy drinking water
+    5: { src: "assets/Audio/sfx_newspaper.mp3",      hold_ms: 2000 }                                     // page 7: mom reading the newspaper
   };
   var holding = false, passthrough = false, timer = null, sfx = null;
   function cancel(){
