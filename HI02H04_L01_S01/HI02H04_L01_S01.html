@@ -6792,7 +6792,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     6: { src: "assets/Audio/sfx_children.mp3",       hold_ms: 2000, pop: "#slideHost .story-q-thumb" },  // page 8: children sitting in the field
     7: { src: "assets/Audio/sfx_hand_pump.mp3",      hold_ms: 2000, vol: 0.1225 },                       // page 9: the boy filling water at the pump (0.7 -> 0.42 -> 0.25 -> 0.175 -> 0.1225: cuts of 40%, 40%, 30%, 30% asked by the user)
     8: { src: "assets/Audio/sfx_grazing.mp3",        hold_ms: 2000, pop: "#slideHost .story-q-thumb" },  // page 10: the goat eating grass
-    9: { src: "assets/Audio/sfx_kitten_snore.mp3",   hold_ms: 2000 }                                     // page 11: the cat sleeping
+    9: { src: "assets/Audio/sfx_kitten_snore.mp3",   hold_ms: 2000, vol: 0.21 }                          // page 11: the cat sleeping (70% quieter than the 0.7 default, asked by the user)
   };
   var holding = false, passthrough = false, timer = null, sfx = null;
   function cancel(){
