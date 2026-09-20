@@ -6787,7 +6787,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     4: { src: "assets/Audio/sfx_drinking_water.mp3", hold_ms: 2000, pop: "#slideHost .story-q-thumb" },  // page 6: the boy drinking water
     5: { src: "assets/Audio/sfx_newspaper.mp3",      hold_ms: 2000 },                                    // page 7: mom reading the newspaper
     6: { src: "assets/Audio/sfx_children.mp3",       hold_ms: 2000, pop: "#slideHost .story-q-thumb" },  // page 8: children sitting in the field
-    7: { src: "assets/Audio/sfx_hand_pump.mp3",      hold_ms: 2000, vol: 0.42 }                          // page 9: the boy filling water at the pump (40% quieter than the others)
+    7: { src: "assets/Audio/sfx_hand_pump.mp3",      hold_ms: 2000, vol: 0.25 }                          // page 9: the boy filling water at the pump (0.7 -> 0.42 -> 0.25: two 40% cuts asked by the user)
   };
   var holding = false, passthrough = false, timer = null, sfx = null;
   function cancel(){
