@@ -6653,12 +6653,14 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 /* ===== FLN ANIMATION KIT: sky-burst END ===== */
 </script>
 <style id="P2-BIRD-POP-CSS">
-/* [P2-BIRD-POP] pages 2 and 3 (T1 = ?slide=0, T2 = ?slide=1): 3s after the page opens, the framed picture pops out and
-   HOLDS (2s total) while that page's SFX plays under the narration on its own player. Page 2: sfx_morning_birds.mp3
-   (2.4s faded cut, +4dB, of the user's Downloads 'loswin23-morning-bird-song-597463.mp3' from 16.0s). Page 3:
-   sfx_bicycle_bell.mp3 (faded cut of the user's Downloads 'freesound_community-bicycle-ring-bell-70138.mp3').
-   On these pages the आगे button appears no earlier than 1s after the pop ends (6s after the page opens).
-   Scheduled by #P2-BIRD-POP-JS below, where the page -> SFX map lives. */
+/* [P2-BIRD-POP] pages 2, 3 and 4 (T1 = ?slide=0, T2 = ?slide=1, T3 = ?slide=2): 3s after the page opens, the picture
+   pops out and HOLDS (2s total) while that step's SFX plays under the narration on its own player. Page 2 (whole frame):
+   sfx_morning_birds.mp3 (2.4s faded cut, +4dB, of the user's Downloads 'loswin23-morning-bird-song-597463.mp3' from
+   16.0s). Page 3 (whole frame): sfx_bicycle_bell.mp3 (faded cut of 'freesound_community-bicycle-ring-bell-70138.mp3').
+   Page 4 (two pictures, one after the other): picture 1 at 3s with sfx_plucking_grass.mp3, picture 2 at 5s with
+   sfx_watering_garden.mp3 (both faded 2.4s cuts of the user's Downloads freesound clips of the same names).
+   On these pages the आगे button appears no earlier than 1s after the LAST pop ends (6s on pages 2-3, 8s on page 4).
+   Scheduled by #P2-BIRD-POP-JS below, where the page -> steps map lives. */
 @keyframes p2BirdPop{
   0%{transform:scale(1);animation-timing-function:cubic-bezier(.2,.8,.3,1);}      /* pop out: 0 -> 0.20s */
   10%{transform:scale(1.045);animation-timing-function:ease-in-out;}              /* slight overshoot */
@@ -6667,48 +6669,64 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   100%{transform:scale(1);}                                                       /* ease back by 2.0s */
 }
 .stage.tut .story-frame.p2-pop{animation:p2BirdPop 2s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
+/* page 4: the pair frame's pictures pop one at a time (beats .stage.tut .story-img{animation:none;transform:none}) */
+.stage.tut .story-frame-pair .story-img.p2-pop{animation:p2BirdPop 2s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
 </style>
 <script id="P2-BIRD-POP-JS">
-/* [P2-BIRD-POP] pages listed in SFX_BY_SLIDE only (page 2 = T1 = ?slide=0, page 3 = T2 = ?slide=1). Re-points mountSlide
-   (the same pattern the kit uses for confettiCannon): once such a slide has mounted, wait 3s, then pop-and-hold the framed
-   picture for 2s and play that page's SFX on its OWN Audio element (never via play(), which would cut the narration VO).
-   The timer and the SFX are tied to the frame captured at mount and cancelled on the next mount, so leaving the page
+/* [P2-BIRD-POP] pages listed in PLAN_BY_SLIDE only (page 2 = T1 = ?slide=0, page 3 = T2 = ?slide=1, page 4 = T3 = ?slide=2).
+   Re-points mountSlide (the same pattern the kit uses for confettiCannon): once such a slide has mounted, wait 3s, then
+   pop-and-hold the picture for 2s while that step's SFX plays on its OWN Audio element (never via play(), which would cut
+   the narration VO). A page with several steps (page 4's two pictures) runs them back to back: picture 1 at 3s, picture 2
+   at 5s. Timers and SFX are tied to the frame captured at mount and cancelled on the next mount, so leaving the page
    early can never fire on a later page (#slideHost is reused).
-   आगे: on these pages setNavActive(true) is held until NAV_AFTER_MS after the pop ends (mount + 3s + 2s + 1s = 6s);
+   आगे: on these pages setNavActive(true) is held until NAV_AFTER_MS after the LAST pop ends (mount + 3s + n*2s + 1s);
    a later activation (e.g. a long narration VO) passes through untouched, and setNavActive(false) or leaving the page
    drops a held reveal. Inactive .nav-btn is visibility:hidden, so "appear" == activate. */
 (function(){ "use strict";
   var DELAY_MS = 3000, POP_MS = 2000, VOL = 0.7, NAV_AFTER_MS = 1000;
-  // slide index -> background SFX (the user counts pages from the landing page, so ?slide=N is page N+2)
-  var SFX_BY_SLIDE = {
-    0: "assets/Audio/sfx_morning_birds.mp3",   // page 2: boy under the tree -> morning birds
-    1: "assets/Audio/sfx_bicycle_bell.mp3"     // page 3: girl on the bicycle -> bicycle bell
+  // slide index -> one SFX per pop step, in picture order (the user counts pages from the landing page: ?slide=N is page N+2)
+  var PLAN_BY_SLIDE = {
+    0: ["assets/Audio/sfx_morning_birds.mp3"],                                           // page 2: boy under the tree
+    1: ["assets/Audio/sfx_bicycle_bell.mp3"],                                            // page 3: girl on the bicycle
+    2: ["assets/Audio/sfx_plucking_grass.mp3", "assets/Audio/sfx_watering_garden.mp3"]   // page 4: picking flowers, then watering plants
   };
-  var timer = null, sfx = null;
+  var timers = [], sfx = null;
   var gateFrame = null, navRevealAt = 0, navTimer = null;   // आगे gate for the page currently popping
   function cancel(){
-    if(timer){ clearTimeout(timer); timer = null; }
+    timers.forEach(function(t){ clearTimeout(t); }); timers = [];
     if(sfx){ try{ sfx.pause(); }catch(e){} sfx = null; }
     if(navTimer){ clearTimeout(navTimer); navTimer = null; }
     gateFrame = null; navRevealAt = 0;
   }
-  function schedule(frame, src){
+  function pop(el, src){
+    var still = !!(window.FLNMotion && FLNMotion.still && FLNMotion.still());   // reduced-motion: sound only
+    if(!still){
+      el.classList.add("p2-pop");
+      el.addEventListener("animationend", function(){ el.classList.remove("p2-pop"); }, { once:true });
+      setTimeout(function(){ el.classList.remove("p2-pop"); }, POP_MS + 250);   // fallback tidy-up
+    }
+    if(sfx){ try{ sfx.pause(); }catch(e){} }
+    try{ sfx = new Audio(src); sfx.volume = VOL; sfx.play().catch(function(){}); }catch(e){}
+  }
+  function schedule(frame, plan){
     cancel();
-    gateFrame = frame; navRevealAt = Date.now() + DELAY_MS + POP_MS + NAV_AFTER_MS;
-    timer = setTimeout(function(){
-      timer = null;
-      if(!frame || !frame.isConnected) return;                       // the page was left before the 3s
-      var still = !!(window.FLNMotion && FLNMotion.still && FLNMotion.still());   // reduced-motion: sound only
-      if(!still){
-        frame.classList.add("p2-pop");
-        frame.addEventListener("animationend", function(){ frame.classList.remove("p2-pop"); }, { once:true });
-        setTimeout(function(){ frame.classList.remove("p2-pop"); }, POP_MS + 250);   // fallback tidy-up
-      }
-      try{ sfx = new Audio(src); sfx.volume = VOL; sfx.play().catch(function(){}); }catch(e){}
-    }, DELAY_MS);
+    // a pair frame pops its pictures one by one, in DOM order; a single-picture frame pops as a whole
+    var targets = frame.classList.contains("story-frame-pair")
+      ? Array.prototype.slice.call(frame.querySelectorAll(".story-img")) : [frame];
+    var steps = Math.min(targets.length, plan.length);
+    if(!steps) return;
+    gateFrame = frame; navRevealAt = Date.now() + DELAY_MS + steps * POP_MS + NAV_AFTER_MS;
+    for(var i = 0; i < steps; i++){
+      (function(el, src, at){
+        timers.push(setTimeout(function(){
+          if(!frame.isConnected || !el.isConnected) return;            // the page was left before this step
+          pop(el, src);
+        }, at));
+      })(targets[i], plan[i], DELAY_MS + i * POP_MS);
+    }
   }
   function frameOf(idx){
-    if(!Object.prototype.hasOwnProperty.call(SFX_BY_SLIDE, idx)) return null;
+    if(!Object.prototype.hasOwnProperty.call(PLAN_BY_SLIDE, idx)) return null;
     return document.querySelector("#slideHost .story-frame");
   }
   var origNav = window.setNavActive;
@@ -6730,13 +6748,13 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     cancel();
     var r = orig.apply(this, arguments);
     var f = frameOf(idx);
-    if(f) schedule(f, SFX_BY_SLIDE[idx]);
+    if(f) schedule(f, PLAN_BY_SLIDE[idx]);
     return r;
   };
   // a ?slide=N dev load mounts inside the engine script, before this block runs
   var cur = (typeof state === "object" && state) ? state.idx : -1;
   var now = frameOf(cur);
-  if(now) schedule(now, SFX_BY_SLIDE[cur]);
+  if(now) schedule(now, PLAN_BY_SLIDE[cur]);
 })();
 </script>
 </body>
