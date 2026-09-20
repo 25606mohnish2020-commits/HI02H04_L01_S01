@@ -6660,7 +6660,9 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    Page 4 (two pictures, one after the other): picture 1 at 3s with sfx_plucking_grass.mp3, picture 2 at 5s with
    sfx_watering_garden.mp3 (both faded 2.4s cuts of the user's Downloads freesound clips of the same names).
    On these pages the आगे button appears no earlier than 1s after the LAST pop ends (6s on pages 2-3, 8s on page 4).
-   Scheduled by #P2-BIRD-POP-JS below, where the page -> steps map lives. */
+   Scheduled by #P2-BIRD-POP-JS below, where the page -> steps map lives.
+   Page 6 (G2 = ?slide=4) reuses the same pop on its recall picture (.story-q-thumb) when the CORRECT sentence is
+   tapped; that one is driven by #P5-CORRECT-SFX-JS. */
 @keyframes p2BirdPop{
   0%{transform:scale(1);animation-timing-function:cubic-bezier(.2,.8,.3,1);}      /* pop out: 0 -> 0.20s */
   10%{transform:scale(1.045);animation-timing-function:ease-in-out;}              /* slight overshoot */
@@ -6671,6 +6673,8 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 .stage.tut .story-frame.p2-pop{animation:p2BirdPop 2s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
 /* page 4: the pair frame's pictures pop one at a time (beats .stage.tut .story-img{animation:none;transform:none}) */
 .stage.tut .story-frame-pair .story-img.p2-pop{animation:p2BirdPop 2s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
+/* page 6: the recall picture above the sentence pills pops on the correct tap (#P5-CORRECT-SFX-JS adds .p2-pop) */
+.story-q-stim .story-q-thumb.p2-pop{animation:p2BirdPop 2s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
 </style>
 <script id="P2-BIRD-POP-JS">
 /* [P2-BIRD-POP] pages listed in PLAN_BY_SLIDE only (page 2 = T1 = ?slide=0, page 3 = T2 = ?slide=1, page 4 = T3 = ?slide=2).
@@ -6758,19 +6762,24 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 })();
 </script>
 <script id="P5-CORRECT-SFX-JS">
-/* [P5-CORRECT-SFX] page 5 (G1 = ?slide=3, "बिल्ली दूध पी रही है"): when the child taps the CORRECT picture, the green
-   mark shows at once and assets/Audio/sfx_cat_drinking.mp3 (2.0s lapping cut, 1.5s-3.5s of the user's Downloads
-   'freesound_community-dog-drinking-20232.mp3', +4.9dB, faded) plays on its own Audio element for hold_ms; other taps
+/* [P5-CORRECT-SFX] pages listed in CORRECT_SFX_BY_SLIDE (page 5 = G1 = ?slide=3, page 6 = G2 = ?slide=4): when the child
+   taps the CORRECT option, the green mark shows at once, that page's SFX plays on its own Audio element for hold_ms and,
+   where cfg.pop names an element, it gets the page-2 pop-and-hold (.p2-pop, keyframes in #P2-BIRD-POP-CSS); other taps
    are swallowed meanwhile. Then the SAME tap is handed to the engine (cell.click()), so mountTapOptions' correct branch
    runs exactly as shipped: kit correct-select, ding, confetti, happy mascot, the word VO, then completeSlide 700ms later.
+   Page 5: sfx_cat_drinking.mp3 (2.0s, 1.5s-3.5s of the user's Downloads 'freesound_community-dog-drinking-20232.mp3').
+   Page 6: sfx_drinking_water.mp3 (2.0s, 6.4s-8.4s of 'hasin2004-drinking-water-sound-effect-247452.mp3') and the recall
+   picture (.story-q-thumb, the boy drinking water) pops.
    Works as a capture-phase click listener (the engine's handler is cell.onclick; stopPropagation in capture keeps it
-   from firing). The correct cell is found from the card data (the option with correct:true -> its img). Wrong taps and
-   the reveal-after-two-wrong path are untouched. Leaving the page during the hold stops the sound and drops the tap. */
+   from firing). The correct cell is found from the card data: the option with correct:true, matched by its img (picture
+   options) or its label_hi (sentence pills). Wrong taps, the option speaker chips and the reveal-after-two-wrong path
+   are untouched. Leaving the page during the hold stops the sound and drops the tap. */
 (function(){ "use strict";
-  var VOL = 0.7;
-  // slide index -> {src, hold_ms} (the user counts pages from the landing page: ?slide=N is page N+2)
+  var VOL = 0.7, POP_MS = 2000;
+  // slide index -> {src, hold_ms, pop?} (the user counts pages from the landing page: ?slide=N is page N+2)
   var CORRECT_SFX_BY_SLIDE = {
-    3: { src: "assets/Audio/sfx_cat_drinking.mp3", hold_ms: 2000 }   // page 5: the cat drinking milk
+    3: { src: "assets/Audio/sfx_cat_drinking.mp3",   hold_ms: 2000 },                                    // page 5: the cat drinking milk
+    4: { src: "assets/Audio/sfx_drinking_water.mp3", hold_ms: 2000, pop: "#slideHost .story-q-thumb" }   // page 6: the boy drinking water
   };
   var holding = false, passthrough = false, timer = null, sfx = null;
   function cancel(){
@@ -6778,10 +6787,23 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     if(sfx){ try{ sfx.pause(); }catch(e){} sfx = null; }
     holding = false;
   }
-  function correctImg(slide){
+  function correctOption(slide){
     var opts = slide && slide.data && slide.data.options || [];
-    for(var i = 0; i < opts.length; i++){ if(opts[i].correct === true) return opts[i].img || null; }
+    for(var i = 0; i < opts.length; i++){ if(opts[i].correct === true) return opts[i]; }
     return null;
+  }
+  function isCorrectCell(cell, opt){
+    if(!opt) return false;
+    if(opt.img){ var img = cell.querySelector("img"); return !!img && (img.getAttribute("src") || "").indexOf("/" + opt.img + ".") >= 0; }
+    if(opt.label_hi){ var pill = cell.querySelector(".so-pill") || cell; return (pill.textContent || "").trim() === String(opt.label_hi).trim(); }
+    return false;
+  }
+  function popEl(el){
+    if(!el) return;
+    if(window.FLNMotion && FLNMotion.still && FLNMotion.still()) return;   // reduced-motion: sound only
+    el.classList.add("p2-pop");
+    el.addEventListener("animationend", function(){ el.classList.remove("p2-pop"); }, { once:true });
+    setTimeout(function(){ el.classList.remove("p2-pop"); }, POP_MS + 250);   // fallback tidy-up
   }
   document.addEventListener("click", function(e){
     if(passthrough) return;
@@ -6790,14 +6812,14 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     var cell = (e.target && e.target.closest) ? e.target.closest("#slideHost .opt-cell") : null;
     if(!cell) return;
     if(holding){ e.stopPropagation(); e.preventDefault(); return; }          // nothing lands while the sound plays
+    if(e.target.closest(".so-spk")) return;                                    // the option's speaker chip only speaks
     if(state.locked || state.hintActive || cell.classList.contains("crossed") || cell.classList.contains("correct")) return;
-    var key = correctImg(CARD.slides[idx]); if(!key) return;
-    var img = cell.querySelector("img");
-    if(!img || (img.getAttribute("src") || "").indexOf("/" + key + ".") < 0) return;   // a wrong option: the engine handles it
+    if(!isCorrectCell(cell, correctOption(CARD.slides[idx]))) return;         // a wrong option: the engine handles it
     var cfg = CORRECT_SFX_BY_SLIDE[idx];
     e.stopPropagation(); e.preventDefault();
     holding = true; state.locked = true; cell.classList.add("correct");        // immediate tap feedback, taps blocked
     try{ stopNudge(); }catch(x){}
+    if(cfg.pop) popEl(document.querySelector(cfg.pop));
     try{ sfx = new Audio(cfg.src); sfx.volume = VOL; sfx.play().catch(function(){}); }catch(x){}
     timer = setTimeout(function(){
       timer = null; holding = false;
