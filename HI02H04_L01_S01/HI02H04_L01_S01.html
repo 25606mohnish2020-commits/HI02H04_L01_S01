@@ -6783,8 +6783,16 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    snaps-feeder-notl-191224-19643.mp3') and the recall picture (the bird pecking grain) pops.
    Works as a capture-phase click listener (the engine's handler is cell.onclick; stopPropagation in capture keeps it
    from firing). The correct cell is found from the card data: the option with correct:true, matched by its img (picture
-   options) or its label_hi (sentence pills). Wrong taps, the option speaker chips and the reveal-after-two-wrong path
-   are untouched. Leaving the page during the hold stops the sound and drops the tap. */
+   options) or its label_hi (sentence pills). Wrong taps and the option speaker chips are untouched. Leaving the page
+   during the hold stops the sound and drops the tap.
+   [P5-GUIDED-TAP] The reveal after max_attempts (3 wrong taps: revealAnswer blurs the decoys with .opt-dim, puts
+   .opt-guided + the pointing .reveal-hand on the answer and sets state.locked = true) used to bypass all of this: the
+   state.locked gate below dropped the tap, and the engine's cell.onclick dropped it too, so only revealAnswer's own
+   onGuidedTap listener ran - kit correct-select, happy mascot, the word VO, completeSlide - with no page SFX, no pop, no
+   ding and no confetti. Now a tap on the guided option gets the same beat as a first-try correct tap: the hand goes and
+   the guide-pulse becomes the green mark at once, the page SFX (and pop) play for hold_ms, then the tap is handed over
+   with state.locked still true (so cell.onclick's correct branch stays out and onGuidedTap runs exactly as shipped) and
+   the ding + confetti are fired alongside it. The slide is still recorded as a revealed answer (completeSlide(false)). */
 (function(){ "use strict";
   var VOL = 0.7, POP_MS = 2000;
   // slide index -> {src, hold_ms, pop?, vol?} (the user counts pages from the landing page: ?slide=N is page N+2); vol defaults to VOL
@@ -6830,20 +6838,28 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     if(!cell) return;
     if(holding){ e.stopPropagation(); e.preventDefault(); return; }          // nothing lands while the sound plays
     if(e.target.closest(".so-spk")) return;                                    // the option's speaker chip only speaks
-    if(state.locked || state.hintActive || cell.classList.contains("crossed") || cell.classList.contains("correct")) return;
+    var guided = cell.classList.contains("opt-guided");                       // the reveal after 3 wrong taps: the hand points here, the decoys are blurred, state.locked is true
+    if(state.hintActive || cell.classList.contains("crossed") || cell.classList.contains("correct")) return;
+    if(state.locked && !guided) return;
     if(!isCorrectCell(cell, correctOption(CARD.slides[idx]))) return;         // a wrong option: the engine handles it
     var cfg = CORRECT_SFX_BY_SLIDE[idx];
     e.stopPropagation(); e.preventDefault();
     holding = true; state.locked = true; cell.classList.add("correct");        // immediate tap feedback, taps blocked
     try{ stopNudge(); }catch(x){}
+    if(guided){                                                                // onGuidedTap's first beat, brought forward to the tap: the pointing hand goes, the guide-pulse becomes the green mark
+      document.querySelectorAll(".reveal-hand").forEach(function(x){ x.remove(); });
+      cell.classList.remove("opt-guided");
+    }
     if(cfg.pop) popEl(document.querySelector(cfg.pop));
     try{ sfx = new Audio(cfg.src); sfx.volume = (cfg.vol != null) ? cfg.vol : VOL; sfx.play().catch(function(){}); }catch(x){}
     timer = setTimeout(function(){
       timer = null; holding = false;
       if(!cell.isConnected || state.idx !== idx) return;                     // the page was left during the hold
-      cell.classList.remove("correct"); state.locked = false;                 // hand the tap over exactly as it arrived
+      cell.classList.remove("correct");                                       // hand the tap over exactly as it arrived
+      if(!guided) state.locked = false;                                       // guided: locked stays true, so cell.onclick bows out and revealAnswer's onGuidedTap takes the tap
       passthrough = true;
       try{ cell.click(); } finally { passthrough = false; }
+      if(guided){ try{ sfxCorrect(); }catch(x){} try{ confettiCannon(); }catch(x){} }   // the ding + confetti of the normal correct branch; onGuidedTap already plays kit correct-select, happy mascot, the word VO, then completeSlide
     }, cfg.hold_ms);
   }, true);
   // leaving the page during the hold: stop the sound and drop the pending tap
