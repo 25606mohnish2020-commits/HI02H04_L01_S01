@@ -1,0 +1,202 @@
+{
+ "schema": "swiftpal-build-report/1",
+ "generated_at": "2026-09-10T09:51:15",
+ "skill_code": "HI02H04_L01_S01",
+ "engine_expected": "2026.07.16i-r4-unified",
+ "engine_file_sha256": {
+  "HI02H04_L01_S01.html": "c5135129c39fdf0f3a66a76f1b68f92939a4c4546148e398f86d9b37e63d032b"
+ },
+ "receipt": {
+  "counts": "15 pass / 3 FAIL / 7 warn",
+  "delivery_mode": false,
+  "rows": [
+   {
+    "ok": true,
+    "label": "Playable HTML present",
+    "detail": "HI02H04_L01_S01.html"
+   },
+   {
+    "ok": true,
+    "label": "Card data loads",
+    "detail": "from card.json"
+   },
+   {
+    "ok": true,
+    "label": "Slides present",
+    "detail": "15 slides"
+   },
+   {
+    "ok": true,
+    "label": "phase_distribution == #slides",
+    "detail": "15 vs 15"
+   },
+   {
+    "ok": null,
+    "label": "Mechanic variety: >=2 gesture families + >=1 produce, pick not dominant",
+    "detail": "PICK dominates (10/10 test slides) — MCQ-in-costume ({'pick': 10}). Swap some for produce (make/build/trace/sort)."
+   },
+   {
+    "ok": true,
+    "label": "Speak-word: every word option has a clip (opt.audio / phonemes)",
+    "detail": "OK"
+   },
+   {
+    "ok": true,
+    "label": "HTML wires engine + card",
+    "detail": "cardData + engine (split or inlined)"
+   },
+   {
+    "ok": true,
+    "label": "Built on the CURRENT unified engine",
+    "detail": "engine 2026.07.16i-r4-unified"
+   },
+   {
+    "ok": null,
+    "label": "Engine content-sync",
+    "detail": "not checked — canonical engine app.js not alongside this bundle (stamp-only here)"
+   },
+   {
+    "ok": null,
+    "label": "style.css content-sync",
+    "detail": "not checked — canonical engine style.css not alongside this bundle"
+   },
+   {
+    "ok": true,
+    "label": "CSS token: --bg:#FAF7F1 (the ONE stage background)",
+    "detail": "OK"
+   },
+   {
+    "ok": true,
+    "label": "CSS: toybox theme keeps background:var(--bg) (no re-tint)",
+    "detail": "OK"
+   },
+   {
+    "ok": false,
+    "label": "Voice-over: all 36 lines have real audio",
+    "detail": "MISSING/empty: ['vo_pt_tutorial', 'vo_pt_guided', 'vo_pt_practice', 'vo_t1_narr', 'vo_t2_narr', 'vo_t3_narr', 'vo_t4_narr', 'vo_prompt_pic_to_sent']…"
+   },
+   {
+    "ok": false,
+    "label": "Art: all 17 images generated (not emoji-fallback)",
+    "detail": "MISSING (falls back to emoji): ['pic_boy_sit', 'pic_boy_run', 'pic_girl_play_ball', 'pic_girl_read_book', 'pic_cat_drink', 'pic_cat_sleep', 'pic_bird_tree', 'pic_bird_fly']…"
+   },
+   {
+    "ok": true,
+    "label": "No orphaned audio (every shipped clip is referenced)",
+    "detail": "OK"
+   },
+   {
+    "ok": true,
+    "label": "Numerals: display fields are Arabic digits (policy)",
+    "detail": "OK"
+   },
+   {
+    "ok": true,
+    "label": "Engine UI assets: all 7 referenced files in assets/UI",
+    "detail": "OK"
+   },
+   {
+    "ok": true,
+    "label": "start_mascot not clipped at the bottom edge (feet visible)",
+    "detail": "bottom-row opaque 0%"
+   },
+   {
+    "ok": true,
+    "label": "SME review PPT generated",
+    "detail": "HI02H04_L01_S01_review.pptx"
+   },
+   {
+    "ok": true,
+    "label": "Page-capture shots present (visual gate ran)",
+    "detail": "16 shots (expected ~16)"
+   },
+   {
+    "ok": false,
+    "label": "Voice roles: every slide SPEAKS its prompt (incl. celebration)",
+    "detail": "SILENT prompts: ['T1', 'T2', 'T3', 'T4', 'G1', 'G2', 'G3', 'G4', 'P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'CEL']"
+   },
+   {
+    "ok": null,
+    "label": "Voice roles: question slides carry a spoken HINT",
+    "detail": "silent hint button: ['G1', 'G2', 'G3', 'G4', 'P1', 'P2', 'P3', 'P4', 'P5', 'P6']"
+   },
+   {
+    "ok": null,
+    "label": "Voice roles: question slides carry a spoken REVEAL",
+    "detail": "silent reveal: ['G1', 'G2', 'G3', 'G4', 'P1', 'P2', 'P3', 'P4', 'P5', 'P6']"
+   },
+   {
+    "ok": null,
+    "label": "Voice roles: landing greeting on disk",
+    "detail": "landing is silent"
+   },
+   {
+    "ok": null,
+    "label": "Voice roles: phase-gate lines on disk",
+    "detail": "silent gates: ['vo_pt_tutorial', 'vo_pt_guided', 'vo_pt_practice']"
+   }
+  ]
+ },
+ "content": {
+  "slides": 15,
+  "mechanics": {
+   "STORY_SCENE": 4,
+   "STORY_QUESTION": 10,
+   "CELEBRATION": 1
+  },
+  "phase_distribution": {
+   "tutorial": 4,
+   "guided": 4,
+   "practice": 7
+  }
+ },
+ "assets": {
+  "images": 0,
+  "audio_files": 0,
+  "audio_lines_authored": 36,
+  "audio_silent_pending": [
+   "sfx_celebrate",
+   "vo_hint_bird",
+   "vo_hint_boy",
+   "vo_hint_cat",
+   "vo_hint_children",
+   "vo_hint_girl",
+   "vo_hint_kite",
+   "vo_hint_mom",
+   "vo_hint_sun",
+   "vo_prompt_pic_to_sent",
+   "vo_pt_guided",
+   "vo_pt_practice",
+   "vo_pt_tutorial",
+   "vo_reveal",
+   "vo_sent_bird_ok",
+   "vo_sent_bird_wrong",
+   "vo_sent_boy_ok",
+   "vo_sent_boy_wrong",
+   "vo_sent_cat_ok",
+   "vo_sent_cat_wrong",
+   "vo_sent_children_ok",
+   "vo_sent_children_wrong",
+   "vo_sent_girl_ok",
+   "vo_sent_girl_wrong",
+   "vo_sent_kite_ok",
+   "vo_sent_kite_wrong",
+   "vo_sent_mom_ok",
+   "vo_sent_mom_wrong",
+   "vo_sent_sun_ok",
+   "vo_sent_sun_wrong",
+   "vo_t1_narr",
+   "vo_t2_narr",
+   "vo_t3_narr",
+   "vo_t4_narr",
+   "vo_try_again",
+   "vo_well_done"
+  ],
+  "bytes_total": 32316936
+ },
+ "environment": {
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.10",
+  "gemini_key_present": false
+ }
+}

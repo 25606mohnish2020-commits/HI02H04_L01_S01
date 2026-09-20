@@ -1,0 +1,18 @@
+{
+  "01": "Landing. ✅ Title + start button render correctly. ⏳ Landing hero image pending real art (currently blank — 404 has no visible fallback here).",
+  "02": "T1 — TUTORIAL, matched example (boy sitting under tree). ✅ Header/caption/narration all consistent, shown text == spoken. ⏳ Emoji placeholder; real scene art pending.",
+  "03": "T2 — TUTORIAL, verb-mismatch demo (same picture, wrong sentence 'running'). ✅ Teaches 'check the whole sentence, not just the noun' directly, per the curriculum's own misconception #1. ⏳ Art pending.",
+  "04": "T3 — TUTORIAL, fresh matched example (girl playing ball). ✅ Reinforces the concept with a new scene before testing begins. ⏳ Art pending.",
+  "05": "T4 — TUTORIAL, subject-mismatch demo (same ball picture, wrong subject 'boy' instead of 'girl'). ✅ Teaches the second misconception (picking a familiar-looking picture without reading who's in it). ⏳ Art pending.",
+  "06": "G1 — GUIDED, sentence→picture (cat). ✅ Tap-to-answer verified live: wrong tap buzzes+crosses+locks, correct tap confetti-checks. Distractor is a close one (drinking vs. sleeping). ⏳ Art + VO pending.",
+  "07": "G2 — GUIDED, picture→sentence (bird). ✅ Sentence-chip option cells wrap cleanly, no overflow, verified in-browser. ❓ Recall picture will only appear once real art exists — right now this direction is not human-testable at all (no emoji fallback on this thumb). Flagging so it isn't mistaken for a bug once art lands and the picture suddenly appears.",
+  "08": "G3 — GUIDED, sentence→picture (mother). ✅ Close distractor (cooking vs. reading), gender-agreed Hindi ('माँ ... रही है').",
+  "09": "G4 — GUIDED, picture→sentence (children). ✅ Same chip pattern as G2; plural agreement correct ('बच्चे ... रहे हैं').",
+  "10": "P1 — PRACTICE, picture→sentence (boy, first re-test of a tutorial scene from the untested direction). ✅ By design — the boy scene was only taught, never tested, in tutorial; this is its first genuine test.",
+  "11": "P2 — PRACTICE, sentence→picture (girl, same logic as P1).",
+  "12": "P3 — PRACTICE, picture→sentence (cat).",
+  "13": "P4 — PRACTICE, sentence→picture (bird), first MASTERY-scored item (first-try scoring begins here).",
+  "14": "P5 — PRACTICE, sentence→picture (sun/moon) — MASTERY. Hardest ramp: distractor swaps the SUBJECT noun (सूरज/चाँद), not just the verb, per the LO's 'check the whole sentence' misconception in a new flavour.",
+  "15": "P6 — PRACTICE, picture→sentence (kite flying/making) — MASTERY. Hardest ramp: distractor is a close verb pair (उड़ाना/बनाना).",
+  "16": "CEL — Celebration. ✅ Verified live: star-burst, headline, end button all fire correctly, no console errors."
+}

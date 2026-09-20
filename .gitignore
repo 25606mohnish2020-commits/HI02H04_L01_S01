@@ -1,0 +1,20 @@
+# --- Not part of the deployed site ---
+# Editor backups of the lesson HTML (*.bak, *.bak2, *.bak22 ...)
+*.bak
+*.bak[0-9]*
+
+# SME review deck and review screenshots
+*.pptx
+*.ppt
+_review_shots/
+
+# Animation toolkit source (dev-only; the page does not load anything from it)
+fln-animation-toolkit-main/
+
+# --- Tooling / OS noise ---
+.vercel/
+node_modules/
+__pycache__/
+.DS_Store
+Thumbs.db
+desktop.ini

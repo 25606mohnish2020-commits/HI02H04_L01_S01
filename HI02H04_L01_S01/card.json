@@ -1,0 +1,563 @@
+{
+  "version": "0.1",
+  "skill_code": "HI02H04_L01_S01",
+  "lo_code": "HI02H04_L01",
+  "grade": "G2",
+  "attribute": "H04",
+  "skill_type": "CORE",
+  "part_label": "",
+  "theme": "toybox",
+  "landing_hero": {
+    "kind": "image",
+    "src": "assets/Images/pic_girl_play_ball.png"
+  },
+  "title": {
+    "hi": "चित्र-वाक्य मिलान",
+    "en": "Picture-Sentence Matching"
+  },
+  "subtitle_hi": "पढ़िए · देखिए · चुनिए",
+  "skill_description_hi": "चित्र के लिए सही वाक्य चुनता है और वाक्य के लिए सही चित्र चुनता है।",
+  "dt_fallback": null,
+  "phase_distribution": {
+    "tutorial": 4,
+    "guided": 4,
+    "practice": 7
+  },
+  "scaffold_rules": {
+    "nudge_timeout_ms": {
+      "guided": 5000,
+      "independent": 8000
+    },
+    "max_attempts": 3
+  },
+  "signals_expected": [
+    "slide_entered",
+    "slide_completed",
+    "phase_transition",
+    "sent_to_pic_first_try",
+    "pic_to_sent_first_try",
+    "mastery_score",
+    "lesson_completed"
+  ],
+  "_emoji_fallback": {
+    "ui_sentence_chip": "📝",
+    "pic_boy_sit": "🧒",
+    "pic_boy_run": "🏃",
+    "pic_girl_play_ball": "⚽",
+    "pic_girl_read_book": "📖",
+    "pic_cat_drink": "🐱",
+    "pic_cat_sleep": "😴",
+    "pic_bird_tree": "🐦",
+    "pic_bird_fly": "🕊️",
+    "pic_mom_cook": "🍳",
+    "pic_mom_read": "📚",
+    "pic_children_run": "🏃",
+    "pic_children_sit": "🧍",
+    "pic_sun_shine": "☀️",
+    "pic_moon_shine": "🌙",
+    "pic_kite_fly": "🪁",
+    "pic_kite_make": "✂️"
+  },
+  "slides": [
+    {
+      "id": "T1",
+      "phase": "tutorial",
+      "eis": "iconic",
+      "type": "STORY_SCENE",
+      "prompt_hi": "तस्वीर और वाक्य को ध्यान से देखिए और सुनिए।",
+      "audio": {
+        "narration": "vo_t1_narr"
+      },
+      "data": {
+        "image_id": "pic_boy_sit",
+        "alt_hi": "लड़का पेड़ के नीचे बैठा है।",
+        "caption_hi": "लड़का पेड़ के नीचे बैठा है।",
+        "emoji": "🧒"
+      }
+    },
+    {
+      "id": "T2",
+      "phase": "tutorial",
+      "eis": "iconic",
+      "type": "STORY_SCENE",
+      "prompt_hi": "क्या यह वाक्य सही है? ध्यान से सुनिए।",
+      "audio": {
+        "narration": "vo_t2_narr"
+      },
+      "data": {
+        "image_id": "pic_boy_sit",
+        "alt_hi": "लड़का पेड़ के नीचे दौड़ रहा है।",
+        "caption_hi": "लड़का पेड़ के नीचे दौड़ रहा है।",
+        "emoji": "🧒"
+      }
+    },
+    {
+      "id": "T3",
+      "phase": "tutorial",
+      "eis": "iconic",
+      "type": "STORY_SCENE",
+      "prompt_hi": "तस्वीर और वाक्य को ध्यान से देखिए और सुनिए।",
+      "audio": {
+        "narration": "vo_t3_narr"
+      },
+      "data": {
+        "image_id": "pic_girl_play_ball",
+        "alt_hi": "लड़की गेंद से खेल रही है।",
+        "caption_hi": "लड़की गेंद से खेल रही है।",
+        "emoji": "⚽"
+      }
+    },
+    {
+      "id": "T4",
+      "phase": "tutorial",
+      "eis": "iconic",
+      "type": "STORY_SCENE",
+      "prompt_hi": "क्या यह वाक्य सही है? ध्यान से सुनिए।",
+      "audio": {
+        "narration": "vo_t4_narr"
+      },
+      "data": {
+        "image_id": "pic_girl_play_ball",
+        "alt_hi": "लड़का गेंद से खेल रहा है।",
+        "caption_hi": "लड़का गेंद से खेल रहा है।",
+        "emoji": "⚽"
+      }
+    },
+    {
+      "id": "G1",
+      "phase": "guided",
+      "eis": "symbolic",
+      "type": "STORY_QUESTION",
+      "prompt_hi": "बिल्ली दूध पी रही है।",
+      "audio": {
+        "prompt": "vo_sent_cat_ok",
+        "try_again": "vo_try_again",
+        "hint": "vo_hint_cat",
+        "reveal": "vo_reveal"
+      },
+      "data": {
+        "stim_hi": "बिल्ली दूध पी रही है।",
+        "signal_name": "sent_to_pic_first_try",
+        "mastery": false,
+        "options": [
+          {
+            "img": "pic_cat_drink",
+            "emoji": "🐱",
+            "correct": true,
+            "audio": "vo_sent_cat_ok"
+          },
+          {
+            "img": "pic_cat_sleep",
+            "emoji": "😴",
+            "audio": "vo_sent_cat_wrong"
+          }
+        ]
+      }
+    },
+    {
+      "id": "G2",
+      "phase": "guided",
+      "eis": "symbolic",
+      "type": "STORY_QUESTION",
+      "prompt_hi": "इस तस्वीर के लिए सही वाक्य चुनिए।",
+      "audio": {
+        "prompt": "vo_prompt_pic_to_sent",
+        "try_again": "vo_try_again",
+        "hint": "vo_hint_bird",
+        "reveal": "vo_reveal"
+      },
+      "data": {
+        "recall_image_id": "pic_bird_tree",
+        "hide_recall": false,
+        "signal_name": "pic_to_sent_first_try",
+        "mastery": false,
+        "options": [
+          {
+            "img": "ui_sentence_chip",
+            "emoji": "📝",
+            "label_hi": "चिड़िया पेड़ पर बैठी है।",
+            "correct": true,
+            "audio": "vo_sent_bird_ok"
+          },
+          {
+            "img": "ui_sentence_chip",
+            "emoji": "📝",
+            "label_hi": "चिड़िया उड़ रही है।",
+            "audio": "vo_sent_bird_wrong"
+          }
+        ]
+      }
+    },
+    {
+      "id": "G3",
+      "phase": "guided",
+      "eis": "symbolic",
+      "type": "STORY_QUESTION",
+      "prompt_hi": "माँ खाना बना रही है।",
+      "audio": {
+        "prompt": "vo_sent_mom_ok",
+        "try_again": "vo_try_again",
+        "hint": "vo_hint_mom",
+        "reveal": "vo_reveal"
+      },
+      "data": {
+        "stim_hi": "माँ खाना बना रही है।",
+        "signal_name": "sent_to_pic_first_try",
+        "mastery": false,
+        "options": [
+          {
+            "img": "pic_mom_cook",
+            "emoji": "🍳",
+            "correct": true,
+            "audio": "vo_sent_mom_ok"
+          },
+          {
+            "img": "pic_mom_read",
+            "emoji": "📚",
+            "audio": "vo_sent_mom_wrong"
+          }
+        ]
+      }
+    },
+    {
+      "id": "G4",
+      "phase": "guided",
+      "eis": "symbolic",
+      "type": "STORY_QUESTION",
+      "prompt_hi": "इस तस्वीर के लिए सही वाक्य चुनिए।",
+      "audio": {
+        "prompt": "vo_prompt_pic_to_sent",
+        "try_again": "vo_try_again",
+        "hint": "vo_hint_children",
+        "reveal": "vo_reveal"
+      },
+      "data": {
+        "recall_image_id": "pic_children_run",
+        "hide_recall": false,
+        "signal_name": "pic_to_sent_first_try",
+        "mastery": false,
+        "options": [
+          {
+            "img": "ui_sentence_chip",
+            "emoji": "📝",
+            "label_hi": "बच्चे मैदान में दौड़ रहे हैं।",
+            "correct": true,
+            "audio": "vo_sent_children_ok"
+          },
+          {
+            "img": "ui_sentence_chip",
+            "emoji": "📝",
+            "label_hi": "बच्चे मैदान में बैठे हैं।",
+            "audio": "vo_sent_children_wrong"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P1",
+      "phase": "guided",
+      "eis": "symbolic",
+      "type": "STORY_QUESTION",
+      "prompt_hi": "इस तस्वीर के लिए सही वाक्य चुनिए।",
+      "audio": {
+        "prompt": "vo_prompt_pic_to_sent",
+        "try_again": "vo_try_again",
+        "hint": "vo_hint_boy",
+        "reveal": "vo_reveal"
+      },
+      "data": {
+        "recall_image_id": "pic_boy_sit",
+        "hide_recall": false,
+        "signal_name": "pic_to_sent_first_try",
+        "mastery": false,
+        "options": [
+          {
+            "img": "ui_sentence_chip",
+            "emoji": "📝",
+            "label_hi": "लड़का पेड़ के नीचे बैठा है।",
+            "correct": true,
+            "audio": "vo_sent_boy_ok"
+          },
+          {
+            "img": "ui_sentence_chip",
+            "emoji": "📝",
+            "label_hi": "लड़का पेड़ के नीचे दौड़ रहा है।",
+            "audio": "vo_sent_boy_wrong"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P2",
+      "phase": "guided",
+      "eis": "symbolic",
+      "type": "STORY_QUESTION",
+      "prompt_hi": "लड़की गेंद से खेल रही है।",
+      "audio": {
+        "prompt": "vo_sent_girl_ok",
+        "try_again": "vo_try_again",
+        "hint": "vo_hint_girl",
+        "reveal": "vo_reveal"
+      },
+      "data": {
+        "stim_hi": "लड़की गेंद से खेल रही है।",
+        "signal_name": "sent_to_pic_first_try",
+        "mastery": false,
+        "options": [
+          {
+            "img": "pic_girl_play_ball",
+            "emoji": "⚽",
+            "correct": true,
+            "audio": "vo_sent_girl_ok"
+          },
+          {
+            "img": "pic_girl_read_book",
+            "emoji": "📖",
+            "audio": "vo_sent_girl_wrong"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P3",
+      "phase": "guided",
+      "eis": "symbolic",
+      "type": "STORY_QUESTION",
+      "prompt_hi": "इस तस्वीर के लिए सही वाक्य चुनिए।",
+      "audio": {
+        "prompt": "vo_prompt_pic_to_sent",
+        "try_again": "vo_try_again",
+        "hint": "vo_hint_cat",
+        "reveal": "vo_reveal"
+      },
+      "data": {
+        "recall_image_id": "pic_cat_drink",
+        "hide_recall": false,
+        "signal_name": "pic_to_sent_first_try",
+        "mastery": false,
+        "options": [
+          {
+            "img": "ui_sentence_chip",
+            "emoji": "📝",
+            "label_hi": "बिल्ली दूध पी रही है।",
+            "correct": true,
+            "audio": "vo_sent_cat_ok"
+          },
+          {
+            "img": "ui_sentence_chip",
+            "emoji": "📝",
+            "label_hi": "बिल्ली सो रही है।",
+            "audio": "vo_sent_cat_wrong"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P4",
+      "phase": "practice",
+      "eis": "symbolic",
+      "type": "STORY_QUESTION",
+      "prompt_hi": "चिड़िया पेड़ पर बैठी है।",
+      "audio": {
+        "prompt": "vo_sent_bird_ok",
+        "try_again": "vo_try_again",
+        "hint": "vo_hint_bird",
+        "reveal": "vo_reveal"
+      },
+      "data": {
+        "stim_hi": "चिड़िया पेड़ पर बैठी है।",
+        "signal_name": "sent_to_pic_first_try",
+        "mastery": true,
+        "options": [
+          {
+            "img": "pic_bird_tree",
+            "emoji": "🐦",
+            "correct": true,
+            "audio": "vo_sent_bird_ok"
+          },
+          {
+            "img": "pic_bird_fly",
+            "emoji": "🕊️",
+            "audio": "vo_sent_bird_wrong"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P5",
+      "phase": "practice",
+      "eis": "symbolic",
+      "type": "STORY_QUESTION",
+      "prompt_hi": "सूरज आसमान में चमक रहा है।",
+      "audio": {
+        "prompt": "vo_sent_sun_ok",
+        "try_again": "vo_try_again",
+        "hint": "vo_hint_sun",
+        "reveal": "vo_reveal"
+      },
+      "data": {
+        "stim_hi": "सूरज आसमान में चमक रहा है।",
+        "signal_name": "sent_to_pic_first_try",
+        "mastery": true,
+        "options": [
+          {
+            "img": "pic_sun_shine",
+            "emoji": "☀️",
+            "correct": true,
+            "audio": "vo_sent_sun_ok"
+          },
+          {
+            "img": "pic_moon_shine",
+            "emoji": "🌙",
+            "audio": "vo_sent_sun_wrong"
+          }
+        ]
+      }
+    },
+    {
+      "id": "P6",
+      "phase": "practice",
+      "eis": "symbolic",
+      "type": "STORY_QUESTION",
+      "prompt_hi": "इस तस्वीर के लिए सही वाक्य चुनिए।",
+      "audio": {
+        "prompt": "vo_prompt_pic_to_sent",
+        "try_again": "vo_try_again",
+        "hint": "vo_hint_kite",
+        "reveal": "vo_reveal"
+      },
+      "data": {
+        "recall_image_id": "pic_kite_fly",
+        "hide_recall": false,
+        "signal_name": "pic_to_sent_first_try",
+        "mastery": true,
+        "options": [
+          {
+            "img": "ui_sentence_chip",
+            "emoji": "📝",
+            "label_hi": "भाई पतंग उड़ा रहा है।",
+            "correct": true,
+            "audio": "vo_sent_kite_ok"
+          },
+          {
+            "img": "ui_sentence_chip",
+            "emoji": "📝",
+            "label_hi": "भाई पतंग बना रहा है।",
+            "audio": "vo_sent_kite_wrong"
+          }
+        ]
+      }
+    },
+    {
+      "id": "CEL",
+      "phase": "practice",
+      "eis": "enactive",
+      "type": "CELEBRATION",
+      "prompt_hi": "शाबाश! आपने तस्वीर और वाक्य का सही जोड़ा बनाना सीख लिया!",
+      "audio": {
+        "prompt": "vo_well_done",
+        "sfx": "sfx_celebrate"
+      },
+      "data": {}
+    }
+  ],
+  "assets": {
+    "audio": {
+      "vo_pt_tutorial": "assets/Audio/vo_pt_tutorial.ogg",
+      "vo_pt_guided": "assets/Audio/vo_pt_guided.ogg",
+      "vo_pt_practice": "assets/Audio/vo_pt_practice.ogg",
+      "vo_t1_narr": "assets/Audio/vo_t1_narr.ogg",
+      "vo_t2_narr": "assets/Audio/vo_t2_narr.ogg",
+      "vo_t3_narr": "assets/Audio/vo_t3_narr.ogg",
+      "vo_t4_narr": "assets/Audio/vo_t4_narr.ogg",
+      "vo_prompt_pic_to_sent": "assets/Audio/vo_prompt_pic_to_sent.ogg",
+      "vo_try_again": "assets/Audio/vo_try_again.ogg",
+      "vo_reveal": "assets/Audio/vo_reveal.ogg",
+      "vo_well_done": "assets/Audio/vo_well_done.ogg",
+      "sfx_celebrate": "assets/Audio/sfx_celebrate.ogg",
+      "vo_sent_boy_ok": "assets/Audio/vo_sent_boy_ok.ogg",
+      "vo_sent_boy_wrong": "assets/Audio/vo_sent_boy_wrong.ogg",
+      "vo_hint_boy": "assets/Audio/vo_hint_boy.ogg",
+      "vo_sent_girl_ok": "assets/Audio/vo_sent_girl_ok.ogg",
+      "vo_sent_girl_wrong": "assets/Audio/vo_sent_girl_wrong.ogg",
+      "vo_hint_girl": "assets/Audio/vo_hint_girl.ogg",
+      "vo_sent_cat_ok": "assets/Audio/vo_sent_cat_ok.ogg",
+      "vo_sent_cat_wrong": "assets/Audio/vo_sent_cat_wrong.ogg",
+      "vo_hint_cat": "assets/Audio/vo_hint_cat.ogg",
+      "vo_sent_bird_ok": "assets/Audio/vo_sent_bird_ok.ogg",
+      "vo_sent_bird_wrong": "assets/Audio/vo_sent_bird_wrong.ogg",
+      "vo_hint_bird": "assets/Audio/vo_hint_bird.ogg",
+      "vo_sent_mom_ok": "assets/Audio/vo_sent_mom_ok.ogg",
+      "vo_sent_mom_wrong": "assets/Audio/vo_sent_mom_wrong.ogg",
+      "vo_hint_mom": "assets/Audio/vo_hint_mom.ogg",
+      "vo_sent_children_ok": "assets/Audio/vo_sent_children_ok.ogg",
+      "vo_sent_children_wrong": "assets/Audio/vo_sent_children_wrong.ogg",
+      "vo_hint_children": "assets/Audio/vo_hint_children.ogg",
+      "vo_sent_sun_ok": "assets/Audio/vo_sent_sun_ok.ogg",
+      "vo_sent_sun_wrong": "assets/Audio/vo_sent_sun_wrong.ogg",
+      "vo_hint_sun": "assets/Audio/vo_hint_sun.ogg",
+      "vo_sent_kite_ok": "assets/Audio/vo_sent_kite_ok.ogg",
+      "vo_sent_kite_wrong": "assets/Audio/vo_sent_kite_wrong.ogg",
+      "vo_hint_kite": "assets/Audio/vo_hint_kite.ogg"
+    },
+    "audio_text": {
+      "vo_pt_tutorial": "ध्यान से देखिए और मेरे साथ जानिए। चलिए, शुरू करें!",
+      "vo_pt_guided": "बहुत बढ़िया! अब हम साथ मिलकर शुरू करते हैं। चलिए, साथ में करें!",
+      "vo_pt_practice": "वाह! अब आपकी बारी।",
+      "vo_t1_narr": "नमस्ते! आज हम सीखेंगे — तस्वीर के लिए सही वाक्य चुनना, और वाक्य के लिए सही तस्वीर चुनना। यह तस्वीर देखिए। इसके लिए सही वाक्य है — लड़का पेड़ के नीचे बैठा है। तस्वीर और वाक्य, दोनों एक जैसे हैं।",
+      "vo_t2_narr": "अब यह वाक्य सुनिए — लड़का पेड़ के नीचे दौड़ रहा है। क्या यह वाक्य इस तस्वीर के लिए सही है? नहीं! तस्वीर में लड़का बैठा है, दौड़ नहीं रहा। इसलिए पूरा वाक्य ध्यान से पढ़िए, हर शब्द जाँचिए।",
+      "vo_t3_narr": "अब एक और तस्वीर देखिए। इसके लिए सही वाक्य है — लड़की गेंद से खेल रही है। तस्वीर में लड़की गेंद से खेल रही है, इसलिए यह वाक्य सही है।",
+      "vo_t4_narr": "अब यह वाक्य सुनिए — लड़का गेंद से खेल रहा है। क्या यह सही है? नहीं! तस्वीर में लड़का नहीं, लड़की है। इसलिए यह वाक्य इस तस्वीर से मेल नहीं खाता।",
+      "vo_prompt_pic_to_sent": "इस तस्वीर के लिए सही वाक्य चुनिए।",
+      "vo_try_again": "फिर से कोशिश कीजिए।",
+      "vo_reveal": "यह सही जोड़ा है।",
+      "vo_well_done": "शाबाश! आपने तस्वीर और वाक्य का सही जोड़ा बनाना सीख लिया।",
+      "sfx_celebrate": "celebration sound",
+      "vo_sent_boy_ok": "लड़का पेड़ के नीचे बैठा है।",
+      "vo_sent_boy_wrong": "लड़का पेड़ के नीचे दौड़ रहा है।",
+      "vo_hint_boy": "ध्यान से देखिए — तस्वीर में लड़का बैठा है या दौड़ रहा है?",
+      "vo_sent_girl_ok": "लड़की गेंद से खेल रही है।",
+      "vo_sent_girl_wrong": "लड़की किताब पढ़ रही है।",
+      "vo_hint_girl": "ध्यान से देखिए — तस्वीर में लड़की गेंद से खेल रही है या किताब पढ़ रही है?",
+      "vo_sent_cat_ok": "बिल्ली दूध पी रही है।",
+      "vo_sent_cat_wrong": "बिल्ली सो रही है।",
+      "vo_hint_cat": "ध्यान से देखिए — तस्वीर में बिल्ली दूध पी रही है या सो रही है?",
+      "vo_sent_bird_ok": "चिड़िया पेड़ पर बैठी है।",
+      "vo_sent_bird_wrong": "चिड़िया उड़ रही है।",
+      "vo_hint_bird": "ध्यान से देखिए — तस्वीर में चिड़िया पेड़ पर बैठी है या उड़ रही है?",
+      "vo_sent_mom_ok": "माँ खाना बना रही है।",
+      "vo_sent_mom_wrong": "माँ किताब पढ़ रही है।",
+      "vo_hint_mom": "ध्यान से देखिए — तस्वीर में माँ खाना बना रही है या किताब पढ़ रही है?",
+      "vo_sent_children_ok": "बच्चे मैदान में दौड़ रहे हैं।",
+      "vo_sent_children_wrong": "बच्चे मैदान में बैठे हैं।",
+      "vo_hint_children": "ध्यान से देखिए — तस्वीर में बच्चे दौड़ रहे हैं या बैठे हैं?",
+      "vo_sent_sun_ok": "सूरज आसमान में चमक रहा है।",
+      "vo_sent_sun_wrong": "चाँद आसमान में चमक रहा है।",
+      "vo_hint_sun": "ध्यान से सुनिए — वाक्य में सूरज है या चाँद?",
+      "vo_sent_kite_ok": "भाई पतंग उड़ा रहा है।",
+      "vo_sent_kite_wrong": "भाई पतंग बना रहा है।",
+      "vo_hint_kite": "ध्यान से सुनिए — भाई पतंग उड़ा रहा है या बना रहा है?"
+    },
+    "image": {
+      "pic_boy_sit": "assets/Images/pic_boy_sit.png",
+      "pic_boy_run": "assets/Images/pic_boy_run.png",
+      "pic_girl_play_ball": "assets/Images/pic_girl_play_ball.png",
+      "pic_girl_read_book": "assets/Images/pic_girl_read_book.png",
+      "pic_cat_drink": "assets/Images/pic_cat_drink.png",
+      "pic_cat_sleep": "assets/Images/pic_cat_sleep.png",
+      "pic_bird_tree": "assets/Images/pic_bird_tree.png",
+      "pic_bird_fly": "assets/Images/pic_bird_fly.png",
+      "pic_mom_cook": "assets/Images/pic_mom_cook.png",
+      "pic_mom_read": "assets/Images/pic_mom_read.png",
+      "pic_children_run": "assets/Images/pic_children_run.png",
+      "pic_children_sit": "assets/Images/pic_children_sit.png",
+      "pic_sun_shine": "assets/Images/pic_sun_shine.png",
+      "pic_moon_shine": "assets/Images/pic_moon_shine.png",
+      "pic_kite_fly": "assets/Images/pic_kite_fly.png",
+      "pic_kite_make": "assets/Images/pic_kite_make.png",
+      "ui_sentence_chip": "assets/Images/ui_sentence_chip.png"
+    },
+    "audio_ext": "ogg",
+    "img_ext": "png"
+  }
+}
