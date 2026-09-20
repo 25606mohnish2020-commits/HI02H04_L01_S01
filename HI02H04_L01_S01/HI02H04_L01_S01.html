@@ -6653,24 +6653,21 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 /* ===== FLN ANIMATION KIT: sky-burst END ===== */
 </script>
 <style id="P2-BIRD-POP-CSS">
-/* [P2-BIRD-POP] page 2 (T1, ?slide=0): 3s after the page opens, the framed picture gives a little 2s pop while
+/* [P2-BIRD-POP] page 2 (T1, ?slide=0): 3s after the page opens, the framed picture pops out and HOLDS (2s total) while
    assets/Audio/sfx_morning_birds.mp3 plays under the narration (2.4s faded cut, +4dB, of the user's Downloads
    'loswin23-morning-bird-song-597463.mp3' from 16.0s). Scheduled by #P2-BIRD-POP-JS below. */
 @keyframes p2BirdPop{
-  0%{transform:scale(1);}
-  12%{transform:scale(1.09);}
-  26%{transform:scale(.965);}
-  40%{transform:scale(1.045);}
-  54%{transform:scale(.985);}
-  68%{transform:scale(1.02);}
-  82%{transform:scale(.995);}
-  100%{transform:scale(1);}
+  0%{transform:scale(1);animation-timing-function:cubic-bezier(.2,.8,.3,1);}      /* pop out: 0 -> 0.20s */
+  10%{transform:scale(1.11);animation-timing-function:ease-in-out;}               /* slight overshoot */
+  16%{transform:scale(1.08);animation-timing-function:linear;}                    /* settle by 0.32s ... */
+  86%{transform:scale(1.08);animation-timing-function:ease-in-out;}               /* ... HOLD until 1.72s */
+  100%{transform:scale(1);}                                                       /* ease back by 2.0s */
 }
 .stage.tut .story-frame.p2-pop{animation:p2BirdPop 2s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
 </style>
 <script id="P2-BIRD-POP-JS">
 /* [P2-BIRD-POP] page 2 (T1, ?slide=0) only. Re-points mountSlide (the same pattern the kit uses for confettiCannon):
-   once slide 0 has mounted, wait 3s, then pop the framed picture for 2s and play the bird SFX on its OWN Audio element
+   once slide 0 has mounted, wait 3s, then pop-and-hold the framed picture for 2s and play the bird SFX on its OWN Audio element
    (never via play(), which would cut the narration VO). The timer and the SFX are tied to the frame captured at mount
    and cancelled on the next mount, so leaving the page early can never fire on a later page (#slideHost is reused). */
 (function(){ "use strict";
