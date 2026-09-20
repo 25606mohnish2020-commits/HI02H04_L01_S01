@@ -6763,7 +6763,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 </script>
 <script id="P5-CORRECT-SFX-JS">
 /* [P5-CORRECT-SFX] pages listed in CORRECT_SFX_BY_SLIDE (page 5 = G1 = ?slide=3, page 6 = G2 = ?slide=4, page 7 = G3 =
-   ?slide=5, page 8 = G4 = ?slide=6, page 9 = P1 = ?slide=7, page 10 = P2 = ?slide=8): when the child
+   ?slide=5, page 8 = G4 = ?slide=6, page 9 = P1 = ?slide=7, page 10 = P2 = ?slide=8, page 11 = P3 = ?slide=9): when the child
    taps the CORRECT option, the green mark shows at once, that page's SFX plays on its own Audio element for hold_ms and,
    where cfg.pop names an element, it gets the page-2 pop-and-hold (.p2-pop, keyframes in #P2-BIRD-POP-CSS); other taps
    are swallowed meanwhile. Then the SAME tap is handed to the engine (cell.click()), so mountTapOptions' correct branch
@@ -6777,6 +6777,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    Page 9: sfx_hand_pump.mp3 (2.0s cut of 'audiopapkin-old-hand-pump-2-329810.mp3'), sound only.
    Page 10: sfx_grazing.mp3 (2.0s cut of 'cartoon_music-cow-eating-grass-pasture-521750.mp3') and the recall picture (the
    goat eating grass) pops.
+   Page 11: sfx_kitten_snore.mp3 (2.0s cut of 'u_1i3msyu21c-kitten-snore-438557.mp3'), sound only.
    Works as a capture-phase click listener (the engine's handler is cell.onclick; stopPropagation in capture keeps it
    from firing). The correct cell is found from the card data: the option with correct:true, matched by its img (picture
    options) or its label_hi (sentence pills). Wrong taps, the option speaker chips and the reveal-after-two-wrong path
@@ -6790,7 +6791,8 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     5: { src: "assets/Audio/sfx_newspaper.mp3",      hold_ms: 2000 },                                    // page 7: mom reading the newspaper
     6: { src: "assets/Audio/sfx_children.mp3",       hold_ms: 2000, pop: "#slideHost .story-q-thumb" },  // page 8: children sitting in the field
     7: { src: "assets/Audio/sfx_hand_pump.mp3",      hold_ms: 2000, vol: 0.1225 },                       // page 9: the boy filling water at the pump (0.7 -> 0.42 -> 0.25 -> 0.175 -> 0.1225: cuts of 40%, 40%, 30%, 30% asked by the user)
-    8: { src: "assets/Audio/sfx_grazing.mp3",        hold_ms: 2000, pop: "#slideHost .story-q-thumb" }   // page 10: the goat eating grass
+    8: { src: "assets/Audio/sfx_grazing.mp3",        hold_ms: 2000, pop: "#slideHost .story-q-thumb" },  // page 10: the goat eating grass
+    9: { src: "assets/Audio/sfx_kitten_snore.mp3",   hold_ms: 2000 }                                     // page 11: the cat sleeping
   };
   var holding = false, passthrough = false, timer = null, sfx = null;
   function cancel(){
