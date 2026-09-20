@@ -6661,8 +6661,8 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    sfx_watering_garden.mp3 (both faded 2.4s cuts of the user's Downloads freesound clips of the same names).
    On these pages the आगे button appears no earlier than 1s after the LAST pop ends (6s on pages 2-3, 8s on page 4).
    Scheduled by #P2-BIRD-POP-JS below, where the page -> steps map lives.
-   Page 6 (G2 = ?slide=4) reuses the same pop on its recall picture (.story-q-thumb) when the CORRECT sentence is
-   tapped; that one is driven by #P5-CORRECT-SFX-JS. */
+   Pages 6 and 8 (G2 = ?slide=4, G4 = ?slide=6) reuse the same pop on their recall picture (.story-q-thumb) when the
+   CORRECT sentence is tapped; those are driven by #P5-CORRECT-SFX-JS. */
 @keyframes p2BirdPop{
   0%{transform:scale(1);animation-timing-function:cubic-bezier(.2,.8,.3,1);}      /* pop out: 0 -> 0.20s */
   10%{transform:scale(1.045);animation-timing-function:ease-in-out;}              /* slight overshoot */
@@ -6673,7 +6673,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 .stage.tut .story-frame.p2-pop{animation:p2BirdPop 2s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
 /* page 4: the pair frame's pictures pop one at a time (beats .stage.tut .story-img{animation:none;transform:none}) */
 .stage.tut .story-frame-pair .story-img.p2-pop{animation:p2BirdPop 2s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
-/* page 6: the recall picture above the sentence pills pops on the correct tap (#P5-CORRECT-SFX-JS adds .p2-pop) */
+/* pages 6 and 8: the recall picture above the sentence pills pops on the correct tap (#P5-CORRECT-SFX-JS adds .p2-pop) */
 .story-q-stim .story-q-thumb.p2-pop{animation:p2BirdPop 2s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
 </style>
 <script id="P2-BIRD-POP-JS">
@@ -6763,7 +6763,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 </script>
 <script id="P5-CORRECT-SFX-JS">
 /* [P5-CORRECT-SFX] pages listed in CORRECT_SFX_BY_SLIDE (page 5 = G1 = ?slide=3, page 6 = G2 = ?slide=4, page 7 = G3 =
-   ?slide=5): when the child
+   ?slide=5, page 8 = G4 = ?slide=6): when the child
    taps the CORRECT option, the green mark shows at once, that page's SFX plays on its own Audio element for hold_ms and,
    where cfg.pop names an element, it gets the page-2 pop-and-hold (.p2-pop, keyframes in #P2-BIRD-POP-CSS); other taps
    are swallowed meanwhile. Then the SAME tap is handed to the engine (cell.click()), so mountTapOptions' correct branch
@@ -6772,6 +6772,8 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    Page 6: sfx_drinking_water.mp3 (2.0s, 6.4s-8.4s of 'hasin2004-drinking-water-sound-effect-247452.mp3') and the recall
    picture (.story-q-thumb, the boy drinking water) pops.
    Page 7: sfx_newspaper.mp3 (2.0s cut of 'freesound_community-newspaper-108054.mp3'), sound only.
+   Page 8: sfx_children.mp3 (2.0s cut of 'freesound_community-children-74190.mp3') and the recall picture (the children
+   sitting in the field) pops.
    Works as a capture-phase click listener (the engine's handler is cell.onclick; stopPropagation in capture keeps it
    from firing). The correct cell is found from the card data: the option with correct:true, matched by its img (picture
    options) or its label_hi (sentence pills). Wrong taps, the option speaker chips and the reveal-after-two-wrong path
@@ -6782,7 +6784,8 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   var CORRECT_SFX_BY_SLIDE = {
     3: { src: "assets/Audio/sfx_cat_drinking.mp3",   hold_ms: 2000 },                                    // page 5: the cat drinking milk
     4: { src: "assets/Audio/sfx_drinking_water.mp3", hold_ms: 2000, pop: "#slideHost .story-q-thumb" },  // page 6: the boy drinking water
-    5: { src: "assets/Audio/sfx_newspaper.mp3",      hold_ms: 2000 }                                     // page 7: mom reading the newspaper
+    5: { src: "assets/Audio/sfx_newspaper.mp3",      hold_ms: 2000 },                                    // page 7: mom reading the newspaper
+    6: { src: "assets/Audio/sfx_children.mp3",       hold_ms: 2000, pop: "#slideHost .story-q-thumb" }   // page 8: children sitting in the field
   };
   var holding = false, passthrough = false, timer = null, sfx = null;
   function cancel(){
