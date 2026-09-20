@@ -6781,13 +6781,13 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    are untouched. Leaving the page during the hold stops the sound and drops the tap. */
 (function(){ "use strict";
   var VOL = 0.7, POP_MS = 2000;
-  // slide index -> {src, hold_ms, pop?} (the user counts pages from the landing page: ?slide=N is page N+2)
+  // slide index -> {src, hold_ms, pop?, vol?} (the user counts pages from the landing page: ?slide=N is page N+2); vol defaults to VOL
   var CORRECT_SFX_BY_SLIDE = {
     3: { src: "assets/Audio/sfx_cat_drinking.mp3",   hold_ms: 2000 },                                    // page 5: the cat drinking milk
     4: { src: "assets/Audio/sfx_drinking_water.mp3", hold_ms: 2000, pop: "#slideHost .story-q-thumb" },  // page 6: the boy drinking water
     5: { src: "assets/Audio/sfx_newspaper.mp3",      hold_ms: 2000 },                                    // page 7: mom reading the newspaper
     6: { src: "assets/Audio/sfx_children.mp3",       hold_ms: 2000, pop: "#slideHost .story-q-thumb" },  // page 8: children sitting in the field
-    7: { src: "assets/Audio/sfx_hand_pump.mp3",      hold_ms: 2000 }                                     // page 9: the boy filling water at the pump
+    7: { src: "assets/Audio/sfx_hand_pump.mp3",      hold_ms: 2000, vol: 0.42 }                          // page 9: the boy filling water at the pump (40% quieter than the others)
   };
   var holding = false, passthrough = false, timer = null, sfx = null;
   function cancel(){
@@ -6828,7 +6828,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     holding = true; state.locked = true; cell.classList.add("correct");        // immediate tap feedback, taps blocked
     try{ stopNudge(); }catch(x){}
     if(cfg.pop) popEl(document.querySelector(cfg.pop));
-    try{ sfx = new Audio(cfg.src); sfx.volume = VOL; sfx.play().catch(function(){}); }catch(x){}
+    try{ sfx = new Audio(cfg.src); sfx.volume = (cfg.vol != null) ? cfg.vol : VOL; sfx.play().catch(function(){}); }catch(x){}
     timer = setTimeout(function(){
       timer = null; holding = false;
       if(!cell.isConnected || state.idx !== idx) return;                     // the page was left during the hold
