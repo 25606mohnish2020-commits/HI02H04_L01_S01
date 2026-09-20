@@ -6652,5 +6652,66 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 })();
 /* ===== FLN ANIMATION KIT: sky-burst END ===== */
 </script>
+<style id="P2-BIRD-POP-CSS">
+/* [P2-BIRD-POP] page 2 (T1, ?slide=0): 3s after the page opens, the framed picture gives a little 2s pop while
+   assets/Audio/sfx_morning_birds.mp3 plays under the narration (2.4s faded cut, +4dB, of the user's Downloads
+   'loswin23-morning-bird-song-597463.mp3' from 16.0s). Scheduled by #P2-BIRD-POP-JS below. */
+@keyframes p2BirdPop{
+  0%{transform:scale(1);}
+  12%{transform:scale(1.09);}
+  26%{transform:scale(.965);}
+  40%{transform:scale(1.045);}
+  54%{transform:scale(.985);}
+  68%{transform:scale(1.02);}
+  82%{transform:scale(.995);}
+  100%{transform:scale(1);}
+}
+.stage.tut .story-frame.p2-pop{animation:p2BirdPop 2s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
+</style>
+<script id="P2-BIRD-POP-JS">
+/* [P2-BIRD-POP] page 2 (T1, ?slide=0) only. Re-points mountSlide (the same pattern the kit uses for confettiCannon):
+   once slide 0 has mounted, wait 3s, then pop the framed picture for 2s and play the bird SFX on its OWN Audio element
+   (never via play(), which would cut the narration VO). The timer and the SFX are tied to the frame captured at mount
+   and cancelled on the next mount, so leaving the page early can never fire on a later page (#slideHost is reused). */
+(function(){ "use strict";
+  var DELAY_MS = 3000, POP_MS = 2000, SFX = "assets/Audio/sfx_morning_birds.mp3", VOL = 0.7;
+  var timer = null, sfx = null;
+  function cancel(){
+    if(timer){ clearTimeout(timer); timer = null; }
+    if(sfx){ try{ sfx.pause(); }catch(e){} sfx = null; }
+  }
+  function schedule(frame){
+    cancel();
+    timer = setTimeout(function(){
+      timer = null;
+      if(!frame || !frame.isConnected) return;                       // page 2 was left before the 3s
+      var still = !!(window.FLNMotion && FLNMotion.still && FLNMotion.still());   // reduced-motion: sound only
+      if(!still){
+        frame.classList.add("p2-pop");
+        frame.addEventListener("animationend", function(){ frame.classList.remove("p2-pop"); }, { once:true });
+        setTimeout(function(){ frame.classList.remove("p2-pop"); }, POP_MS + 250);   // fallback tidy-up
+      }
+      try{ sfx = new Audio(SFX); sfx.volume = VOL; sfx.play().catch(function(){}); }catch(e){}
+    }, DELAY_MS);
+  }
+  function frameOf(idx){
+    if(idx !== 0) return null;
+    return document.querySelector("#slideHost .story-frame");
+  }
+  var orig = window.mountSlide;
+  if(typeof orig !== "function") return;
+  window.mountSlide = function(idx){
+    cancel();
+    var r = orig.apply(this, arguments);
+    var f = frameOf(idx);
+    if(f) schedule(f);
+    return r;
+  };
+  // a ?slide=0 dev load mounts inside the engine script, before this block runs
+  var cur = (typeof state === "object" && state) ? state.idx : -1;
+  var now = frameOf(cur);
+  if(now) schedule(now);
+})();
+</script>
 </body>
 </html>
