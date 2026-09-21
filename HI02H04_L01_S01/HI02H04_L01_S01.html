@@ -6669,13 +6669,14 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 /* ===== FLN ANIMATION KIT: sky-burst END ===== */
 </script>
 <style id="P2-BIRD-POP-CSS">
-/* [P2-BIRD-POP] pages 2, 3 and 4 (T1 = ?slide=0, T2 = ?slide=1, T3 = ?slide=2): 3s after the page opens, the picture
-   pops out and HOLDS (2s total) while that step's SFX plays under the narration on its own player. Page 2 (whole frame):
+/* [P2-BIRD-POP] pages 2 and 3 (T1 = ?slide=0, T2 = ?slide=1): 3s after the page opens, the picture pops out and HOLDS
+   (2s total) while that step's SFX plays under the narration on its own player. Page 2 (whole frame):
    sfx_morning_birds.mp3 (2.4s faded cut, +4dB, of the user's Downloads 'loswin23-morning-bird-song-597463.mp3' from
    16.0s). Page 3 (whole frame): sfx_bicycle_bell.mp3 (faded cut of 'freesound_community-bicycle-ring-bell-70138.mp3').
-   Page 4 (two pictures, one after the other): picture 1 at 3s with sfx_plucking_grass.mp3, picture 2 at 5s with
-   sfx_watering_garden.mp3 (both faded 2.4s cuts of the user's Downloads freesound clips of the same names).
-   On these pages the आगे button appears no earlier than 1s after the LAST pop ends (6s on pages 2-3, 8s on page 4).
+   Page 4 (T3 = ?slide=2, the two-picture pair) had the same pop picture by picture with sfx_plucking_grass.mp3 /
+   sfx_watering_garden.mp3; it was taken out on 2026-09-21 at the user's request - its pictures now stay still and silent
+   and its आगे is no longer held (the two SFX files remain in assets/Audio, unused).
+   On pages 2-3 the आगे button appears no earlier than 1s after the pop ends (6s after the page opens).
    Scheduled by #P2-BIRD-POP-JS below, where the page -> steps map lives.
    Pages 6, 8, 10 and 12 (G2 = ?slide=4, G4 = ?slide=6, P2 = ?slide=8, P4 = ?slide=10) reuse the same pop on their recall
    picture (.story-q-thumb) when the CORRECT sentence is tapped; those are driven by #P5-CORRECT-SFX-JS. */
@@ -6687,17 +6688,16 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   100%{transform:scale(1);}                                                       /* ease back by 2.0s */
 }
 .stage.tut .story-frame.p2-pop{animation:p2BirdPop 2s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
-/* page 4: the pair frame's pictures pop one at a time (beats .stage.tut .story-img{animation:none;transform:none}) */
-.stage.tut .story-frame-pair .story-img.p2-pop{animation:p2BirdPop 2s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
 /* pages 6, 8, 10 and 12: the recall picture above the sentence pills pops on the correct tap (#P5-CORRECT-SFX-JS adds .p2-pop) */
 .story-q-stim .story-q-thumb.p2-pop{animation:p2BirdPop 2s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
 </style>
 <script id="P2-BIRD-POP-JS">
-/* [P2-BIRD-POP] pages listed in PLAN_BY_SLIDE only (page 2 = T1 = ?slide=0, page 3 = T2 = ?slide=1, page 4 = T3 = ?slide=2).
+/* [P2-BIRD-POP] pages listed in PLAN_BY_SLIDE only (page 2 = T1 = ?slide=0, page 3 = T2 = ?slide=1; page 4 was removed 2026-09-21).
    Re-points mountSlide (the same pattern the kit uses for confettiCannon): once such a slide has mounted, wait 3s, then
    pop-and-hold the picture for 2s while that step's SFX plays on its OWN Audio element (never via play(), which would cut
-   the narration VO). A page with several steps (page 4's two pictures) runs them back to back: picture 1 at 3s, picture 2
-   at 5s. Timers and SFX are tied to the frame captured at mount and cancelled on the next mount, so leaving the page
+   the narration VO). A page with several steps (a pair frame, one SFX per picture) would run them back to back: picture 1
+   at 3s, picture 2 at 5s - no page uses that today, and the pair-picture pop rule was removed from #P2-BIRD-POP-CSS with
+   page 4. Timers and SFX are tied to the frame captured at mount and cancelled on the next mount, so leaving the page
    early can never fire on a later page (#slideHost is reused).
    आगे: on these pages setNavActive(true) is held until NAV_AFTER_MS after the LAST pop ends (mount + 3s + n*2s + 1s);
    a later activation (e.g. a long narration VO) passes through untouched, and setNavActive(false) or leaving the page
@@ -6707,8 +6707,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   // slide index -> one SFX per pop step, in picture order (the user counts pages from the landing page: ?slide=N is page N+2)
   var PLAN_BY_SLIDE = {
     0: ["assets/Audio/sfx_morning_birds.mp3"],                                           // page 2: boy under the tree
-    1: ["assets/Audio/sfx_bicycle_bell.mp3"],                                            // page 3: girl on the bicycle
-    2: ["assets/Audio/sfx_plucking_grass.mp3", "assets/Audio/sfx_watering_garden.mp3"]   // page 4: picking flowers, then watering plants
+    1: ["assets/Audio/sfx_bicycle_bell.mp3"]                                             // page 3: girl on the bicycle
   };
   var timers = [], sfx = null;
   var gateFrame = null, navRevealAt = 0, navTimer = null;   // आगे gate for the page currently popping
