@@ -1050,7 +1050,7 @@ body.loaded .sg-icon{animation-play-state:running;}
 <!-- ============ CARD DATA (embedded; in prod the compiler does this) ============ -->
 
 <script type="application/json" id="cardData">
-{"version": "0.1", "skill_code": "HI02H04_L01_S01", "lo_code": "HI02H04_L01", "grade": "G2", "attribute": "H04", "skill_type": "CORE", "part_label": "", "theme": "toybox", "landing_hero": {"kind": "image", "src": "assets/Images/pic_girl_play_ball.png"}, "title": {"hi": "चित्र देखकर वाक्य मिलाओ!", "en": "Picture-Sentence Matching"}, "subtitle_hi": "पढ़िए · देखिए · चुनिए", "skill_description_hi": "चित्र के लिए सही वाक्य चुनता है और वाक्य के लिए सही चित्र चुनता है।", "dt_fallback": null, "phase_distribution": {"tutorial": 4, "guided": 4, "practice": 7}, "scaffold_rules": {"nudge_timeout_ms": {"guided": 5000, "independent": 8000}, "max_attempts": 3}, "signals_expected": ["slide_entered", "slide_completed", "phase_transition", "sent_to_pic_first_try", "pic_to_sent_first_try", "mastery_score", "lesson_completed"], "_emoji_fallback": {"ui_sentence_chip": "📝", "pic_boy_sit": "🧒", "pic_boy_run": "🏃", "pic_girl_play_ball": "⚽", "pic_girl_read_book": "📖", "pic_cat_drink": "🐱", "pic_cat_sleep": "😴", "pic_bird_tree": "🐦", "pic_bird_fly": "🕊️", "pic_mom_cook": "🍳", "pic_mom_read": "📚", "pic_children_run": "🏃", "pic_children_sit": "🧍", "pic_sun_shine": "☀️", "pic_moon_shine": "🌙", "pic_kite_fly": "🪁", "pic_kite_make": "✂️"}, "slides": [{"id": "T1", "phase": "tutorial", "eis": "iconic", "type": "STORY_SCENE", "caption_chip": true, "prompt_hi": "चित्र देखिए और वाक्य पढ़िए।", "audio": {"narration": "vo_t1_narr"}, "data": {"image_id": "pic_boy_sit", "alt_hi": "लड़का पेड़ के नीचे बैठा है।", "caption_hi": "लड़का पेड़ के नीचे बैठा है।", "emoji": "🧒"}}, {"id": "T2", "phase": "tutorial", "eis": "iconic", "type": "STORY_SCENE", "caption_chip": true, "prompt_hi": "क्या यह वाक्य सही है?", "audio": {"narration": "vo_t2_narr"}, "data": {"image_id": "pic_girl_cycle", "alt_hi": "लड़का पेड़ के नीचे दौड़ रहा है।", "caption_hi": "लड़की साइकिल चला रही है।", "emoji": "🧒"}}, {"id": "T3", "phase": "tutorial", "eis": "iconic", "type": "STORY_SCENE", "caption_chip": true, "prompt_hi": "वाक्य के लिए सही चित्र चुनिए।", "audio": {"narration": "vo_t3_narr"}, "data": {"image_ids": ["pic_girl_pick_flowers", "pic_girl_water_plants"], "image_id": "pic_girl_play_ball", "alt_hi": "लड़की गेंद से खेल रही है।", "caption_hi": "लड़की पौधों को पानी दे रही है।", "emoji": "⚽"}}, {"id": "G1", "phase": "guided", "eis": "symbolic", "type": "STORY_QUESTION", "sentence_box": true, "hide_header_chip": true, "pic_options": true, "prompt_hi": "वाक्य के लिए सही चित्र चुनिए।", "audio": {"prompt": "vo_sent_cat_ok", "try_again": "vo_try_again", "hint": "vo_hint_cat", "reveal": "vo_reveal"}, "data": {"stim_hi": "बिल्ली दूध पी रही है।", "signal_name": "sent_to_pic_first_try", "mastery": false, "options": [{"img": "pic_bird_tree_ylw", "emoji": "🐦", "audio": "vo_sent_cat_wrong"}, {"img": "pic_children_run_ylw", "emoji": "🏃", "audio": "vo_sent_cat_wrong"}, {"img": "pic_cat_drink_ylw", "emoji": "🐱", "correct": true, "audio": "vo_sent_cat_ok"}]}}, {"id": "G2", "phase": "guided", "eis": "symbolic", "type": "STORY_QUESTION", "hide_header_chip": true, "bare_recall": true, "sentence_options": true, "prompt_hi": "चित्र के लिए सही वाक्य चुनिए।", "audio": {"prompt": "vo_prompt_pic_to_sent", "try_again": "vo_try_again", "hint": "vo_hint_bird", "reveal": "vo_reveal"}, "data": {"recall_image_id": "pic_boy_drink_water_ylw", "hide_recall": false, "signal_name": "pic_to_sent_first_try", "mastery": false, "options": [{"label_hi": "लड़का पानी पी रहा है।", "correct": true, "audio": "vo_sent_boy_drink_ok"}, {"label_hi": "लड़का पेड़ के नीचे बैठा है।", "audio": "vo_sent_boy_sit"}, {"label_hi": "लड़की साइकिल चला रही है।", "audio": "vo_sent_girl_cycle"}]}}, {"id": "G3", "phase": "guided", "eis": "symbolic", "type": "STORY_QUESTION", "sentence_box": true, "hide_header_chip": true, "pic_options": true, "prompt_hi": "वाक्य के लिए सही चित्र चुनिए।", "audio": {"prompt": "vo_sent_mom_ok", "try_again": "vo_try_again", "hint": "vo_hint_mom", "reveal": "vo_reveal"}, "data": {"stim_hi": "माँ अखबार पढ़ रही है।", "signal_name": "sent_to_pic_first_try", "mastery": false, "options": [{"img": "pic_girl_read_book_ylw", "emoji": "📖", "audio": "vo_sent_mom_wrong"}, {"img": "pic_mom_water_plants_ylw", "emoji": "🪴", "audio": "vo_sent_mom_wrong"}, {"img": "pic_mom_read_ylw", "emoji": "📰", "correct": true, "audio": "vo_sent_mom_ok"}]}}, {"id": "G4", "phase": "guided", "eis": "symbolic", "type": "STORY_QUESTION", "hide_header_chip": true, "bare_recall": true, "sentence_options": true, "prompt_hi": "चित्र के लिए सही वाक्य चुनिए।", "audio": {"prompt": "vo_prompt_pic_to_sent", "try_again": "vo_try_again", "hint": "vo_hint_children", "reveal": "vo_reveal"}, "data": {"recall_image_id": "pic_children_circle_ylw", "hide_recall": false, "signal_name": "pic_to_sent_first_try", "mastery": false, "options": [{"label_hi": "बच्चे मैदान में बैठे हैं।", "correct": true, "audio": "vo_sent_children_sit_ok"}, {"label_hi": "लड़की साइकिल चला रही है।", "audio": "vo_sent_girl_cycle"}, {"label_hi": "बच्चे मैदान में दौड़ रहे हैं।", "audio": "vo_sent_children_ok"}]}}, {"id": "P1", "phase": "guided", "eis": "symbolic", "type": "STORY_QUESTION", "sentence_box": true, "hide_header_chip": true, "pic_options": true, "prompt_hi": "वाक्य के लिए सही चित्र चुनिए।", "audio": {"prompt": "vo_prompt_pic_to_sent", "try_again": "vo_try_again", "hint": "vo_hint_boy", "reveal": "vo_reveal"}, "data": {"stim_hi": "लड़का पानी भर रहा है।", "signal_name": "pic_to_sent_first_try", "mastery": false, "options": [{"img": "pic_boy_drink_water_ylw", "emoji": "🥤", "audio": "vo_sent_boy_wrong"}, {"img": "pic_boy_eat_ylw", "emoji": "🍽️", "audio": "vo_sent_boy_wrong"}, {"img": "pic_boy_fill_water_ylw", "emoji": "🚰", "correct": true, "audio": "vo_sent_boy_fill_ok"}]}}, {"id": "P2", "phase": "guided", "eis": "symbolic", "type": "STORY_QUESTION", "hide_header_chip": true, "bare_recall": true, "sentence_options": true, "prompt_hi": "चित्र के लिए सही वाक्य चुनिए।", "audio": {"prompt": "vo_sent_girl_ok", "try_again": "vo_try_again", "hint": "vo_hint_girl", "reveal": "vo_reveal"}, "data": {"recall_image_id": "pic_goat_eat_ylw", "stim_hi": "लड़की गेंद से खेल रही है।", "signal_name": "sent_to_pic_first_try", "mastery": false, "options": [{"label_hi": "बकरी पानी पी रही है।", "audio": "vo_sent_goat_wrong"}, {"label_hi": "बकरी घास खा रही है।", "correct": true, "audio": "vo_sent_goat_ok"}, {"label_hi": "बकरी घास पर बैठी है।", "audio": "vo_sent_goat_wrong"}]}}, {"id": "P3", "phase": "guided", "eis": "symbolic", "type": "STORY_QUESTION", "sentence_box": true, "hide_header_chip": true, "pic_options": true, "prompt_hi": "वाक्य के लिए सही चित्र चुनिए।", "audio": {"prompt": "vo_prompt_pic_to_sent", "try_again": "vo_try_again", "hint": "vo_hint_cat", "reveal": "vo_reveal"}, "data": {"stim_hi": "बिल्ली सो रही है।", "signal_name": "pic_to_sent_first_try", "mastery": false, "options": [{"img": "pic_cat_drink_sq_ylw", "emoji": "🥛", "audio": "vo_sent_cat_wrong"}, {"img": "pic_cat_sleep_ylw", "emoji": "😴", "correct": true, "audio": "vo_sent_cat_sleep_ok"}, {"img": "pic_cat_eat_ylw", "emoji": "🍽️", "audio": "vo_sent_cat_wrong"}]}}, {"id": "P4", "phase": "guided", "eis": "symbolic", "type": "STORY_QUESTION", "hide_header_chip": true, "bare_recall": true, "sentence_options": true, "prompt_hi": "चित्र के लिए सही वाक्य चुनिए।", "audio": {"prompt": "vo_sent_bird_ok", "try_again": "vo_try_again", "hint": "vo_hint_bird", "reveal": "vo_reveal"}, "data": {"recall_image_id": "pic_bird_peck_ylw", "stim_hi": "चिड़िया पेड़ पर बैठी है।", "signal_name": "sent_to_pic_first_try", "mastery": true, "options": [{"label_hi": "चिड़िया पेड़ पर बैठी है।", "audio": "vo_sent_bird_wrong"}, {"label_hi": "चिड़िया उड़ रही है।", "audio": "vo_sent_bird_wrong"}, {"label_hi": "चिड़िया दाना चुग रही है।", "correct": true, "audio": "vo_sent_bird_peck_ok"}]}}, {"id": "P5", "phase": "practice", "eis": "symbolic", "type": "BLANK_PANEL", "ref_frame": true, "hide_header_chip": true, "prompt_hi": "हर वाक्य को सही चित्र से मिलाइए ।", "audio": {}, "data": {"train": "train_wagons2", "cargo": ["train_cargo_cat", "train_cargo_goat", "train_cargo_bird"], "sentences": ["बिल्ली दूध पी रही है ।", "चिड़िया पेड़ पर बैठी है।", "बकरी घास खा रही है ।"], "auto_drag": {"pill": 0, "coach": 0, "after_ms": 2000, "repeat_ms": 4000}, "answers": [0, 2, 1]}}, {"id": "P6", "phase": "practice", "eis": "symbolic", "type": "BLANK_PANEL", "ref_frame": true, "hide_header_chip": true, "prompt_hi": "हर चित्र को सही वाक्य से मिलाइए ।", "audio": {}, "data": {"train": "train_wagons2_p14", "box_texts": ["दादाजी अखबार पढ़ रहे हैं ।", "बच्चे पतंग उड़ा रहे हैं ।", "कुत्ता गेंद से खेल रहा है ।"], "pictures": ["pic_dog_ball_ylw", "pic_children_kite_ylw", "pic_grandpa_newspaper_ylw"], "pic_cargo": ["train_cargo_dog", "train_cargo_kite", "train_cargo_grandpa"], "pic_answers": [2, 1, 0], "auto_drag": {"pill": 0, "after_ms": 2000, "repeat_ms": 4000}}}, {"id": "CEL", "phase": "practice", "eis": "enactive", "type": "CELEBRATION", "prompt_hi": "शाबाश! आपने तस्वीर और वाक्य का सही जोड़ा बनाना सीख लिया!", "audio": {"prompt": "vo_well_done", "sfx": "sfx_celebrate"}, "data": {}}], "assets": {"audio": {"vo_pt_tutorial": "assets/Audio/vo_pt_tutorial.ogg", "vo_pt_guided": "assets/Audio/vo_pt_guided.ogg", "vo_pt_practice": "assets/Audio/vo_pt_practice.ogg", "vo_t1_narr": "assets/Audio/vo_t1_narr.ogg", "vo_t2_narr": "assets/Audio/vo_t2_narr.ogg", "vo_t3_narr": "assets/Audio/vo_t3_narr.ogg", "vo_t4_narr": "assets/Audio/vo_t4_narr.ogg", "vo_prompt_pic_to_sent": "assets/Audio/vo_prompt_pic_to_sent.ogg", "vo_try_again": "assets/Audio/vo_try_again.ogg", "vo_reveal": "assets/Audio/vo_reveal.ogg", "vo_well_done": "assets/Audio/vo_well_done.ogg", "sfx_celebrate": "assets/Audio/sfx_celebrate.ogg", "vo_sent_boy_ok": "assets/Audio/vo_sent_boy_ok.ogg", "vo_sent_boy_wrong": "assets/Audio/vo_sent_boy_wrong.ogg", "vo_hint_boy": "assets/Audio/vo_hint_boy.ogg", "vo_sent_girl_ok": "assets/Audio/vo_sent_girl_ok.ogg", "vo_sent_girl_wrong": "assets/Audio/vo_sent_girl_wrong.ogg", "vo_hint_girl": "assets/Audio/vo_hint_girl.ogg", "vo_sent_cat_ok": "assets/Audio/vo_sent_cat_ok.ogg", "vo_sent_cat_wrong": "assets/Audio/vo_sent_cat_wrong.ogg", "vo_hint_cat": "assets/Audio/vo_hint_cat.ogg", "vo_sent_bird_ok": "assets/Audio/vo_sent_bird_ok.ogg", "vo_sent_bird_wrong": "assets/Audio/vo_sent_bird_wrong.ogg", "vo_hint_bird": "assets/Audio/vo_hint_bird.ogg", "vo_sent_mom_ok": "assets/Audio/vo_sent_mom_ok.ogg", "vo_sent_mom_wrong": "assets/Audio/vo_sent_mom_wrong.ogg", "vo_hint_mom": "assets/Audio/vo_hint_mom.ogg", "vo_sent_children_ok": "assets/Audio/vo_sent_children_ok.ogg", "vo_sent_children_wrong": "assets/Audio/vo_sent_children_wrong.ogg", "vo_hint_children": "assets/Audio/vo_hint_children.ogg", "vo_sent_sun_ok": "assets/Audio/vo_sent_sun_ok.ogg", "vo_sent_sun_wrong": "assets/Audio/vo_sent_sun_wrong.ogg", "vo_hint_sun": "assets/Audio/vo_hint_sun.ogg", "vo_sent_kite_ok": "assets/Audio/vo_sent_kite_ok.ogg", "vo_sent_kite_wrong": "assets/Audio/vo_sent_kite_wrong.ogg", "vo_hint_kite": "assets/Audio/vo_hint_kite.ogg"}, "audio_text": {"vo_pt_tutorial": "ध्यान से देखिए और मेरे साथ जानिए। चलिए, शुरू करें!", "vo_pt_guided": "बहुत बढ़िया! अब हम साथ मिलकर शुरू करते हैं। चलिए, साथ में करें!", "vo_pt_practice": "वाह! अब आपकी बारी।", "vo_t1_narr": "नमस्ते! आज हम सीखेंगे — तस्वीर के लिए सही वाक्य चुनना, और वाक्य के लिए सही तस्वीर चुनना। यह तस्वीर देखिए। इसके लिए सही वाक्य है — लड़का पेड़ के नीचे बैठा है। तस्वीर और वाक्य, दोनों एक जैसे हैं।", "vo_t2_narr": "अब यह वाक्य सुनिए — लड़का पेड़ के नीचे दौड़ रहा है। क्या यह वाक्य इस तस्वीर के लिए सही है? नहीं! तस्वीर में लड़का बैठा है, दौड़ नहीं रहा। इसलिए पूरा वाक्य ध्यान से पढ़िए, हर शब्द जाँचिए।", "vo_t3_narr": "अब एक और तस्वीर देखिए। इसके लिए सही वाक्य है — लड़की गेंद से खेल रही है। तस्वीर में लड़की गेंद से खेल रही है, इसलिए यह वाक्य सही है।", "vo_t4_narr": "अब यह वाक्य सुनिए — लड़का गेंद से खेल रहा है। क्या यह सही है? नहीं! तस्वीर में लड़का नहीं, लड़की है। इसलिए यह वाक्य इस तस्वीर से मेल नहीं खाता।", "vo_prompt_pic_to_sent": "इस तस्वीर के लिए सही वाक्य चुनिए।", "vo_try_again": "फिर से कोशिश कीजिए।", "vo_reveal": "यह सही जोड़ा है।", "vo_well_done": "शाबाश! आपने तस्वीर और वाक्य का सही जोड़ा बनाना सीख लिया।", "sfx_celebrate": "celebration sound", "vo_sent_boy_ok": "लड़का पेड़ के नीचे बैठा है।", "vo_sent_boy_wrong": "लड़का पेड़ के नीचे दौड़ रहा है।", "vo_hint_boy": "ध्यान से देखिए — तस्वीर में लड़का बैठा है या दौड़ रहा है?", "vo_sent_girl_ok": "लड़की गेंद से खेल रही है।", "vo_sent_girl_wrong": "लड़की किताब पढ़ रही है।", "vo_hint_girl": "ध्यान से देखिए — तस्वीर में लड़की गेंद से खेल रही है या किताब पढ़ रही है?", "vo_sent_cat_ok": "बिल्ली दूध पी रही है।", "vo_sent_cat_wrong": "बिल्ली सो रही है।", "vo_hint_cat": "ध्यान से देखिए — तस्वीर में बिल्ली दूध पी रही है या सो रही है?", "vo_sent_bird_ok": "चिड़िया पेड़ पर बैठी है।", "vo_sent_bird_wrong": "चिड़िया उड़ रही है।", "vo_hint_bird": "ध्यान से देखिए — तस्वीर में चिड़िया पेड़ पर बैठी है या उड़ रही है?", "vo_sent_mom_ok": "माँ खाना बना रही है।", "vo_sent_mom_wrong": "माँ किताब पढ़ रही है।", "vo_hint_mom": "ध्यान से देखिए — तस्वीर में माँ खाना बना रही है या किताब पढ़ रही है?", "vo_sent_children_ok": "बच्चे मैदान में दौड़ रहे हैं।", "vo_sent_children_wrong": "बच्चे मैदान में बैठे हैं।", "vo_hint_children": "ध्यान से देखिए — तस्वीर में बच्चे दौड़ रहे हैं या बैठे हैं?", "vo_sent_sun_ok": "सूरज आसमान में चमक रहा है।", "vo_sent_sun_wrong": "चाँद आसमान में चमक रहा है।", "vo_hint_sun": "ध्यान से सुनिए — वाक्य में सूरज है या चाँद?", "vo_sent_kite_ok": "भाई पतंग उड़ा रहा है।", "vo_sent_kite_wrong": "भाई पतंग बना रहा है।", "vo_hint_kite": "ध्यान से सुनिए — भाई पतंग उड़ा रहा है या बना रहा है?"}, "image": {"pic_boy_sit": "assets/Images/pic_boy_sit.png", "pic_boy_run": "assets/Images/pic_boy_run.png", "pic_girl_play_ball": "assets/Images/pic_girl_play_ball.png", "pic_girl_read_book": "assets/Images/pic_girl_read_book.png", "pic_cat_drink": "assets/Images/pic_cat_drink.png", "pic_cat_sleep": "assets/Images/pic_cat_sleep.png", "pic_bird_tree": "assets/Images/pic_bird_tree.png", "pic_bird_fly": "assets/Images/pic_bird_fly.png", "pic_mom_cook": "assets/Images/pic_mom_cook.png", "pic_mom_read": "assets/Images/pic_mom_read.png", "pic_children_run": "assets/Images/pic_children_run.png", "pic_children_sit": "assets/Images/pic_children_sit.png", "pic_sun_shine": "assets/Images/pic_sun_shine.png", "pic_moon_shine": "assets/Images/pic_moon_shine.png", "pic_kite_fly": "assets/Images/pic_kite_fly.png", "pic_kite_make": "assets/Images/pic_kite_make.png", "ui_sentence_chip": "assets/Images/ui_sentence_chip.png"}, "audio_ext": "ogg", "img_ext": "png"}}
+{"version": "0.1", "skill_code": "HI02H04_L01_S01", "lo_code": "HI02H04_L01", "grade": "G2", "attribute": "H04", "skill_type": "CORE", "part_label": "", "theme": "toybox", "landing_hero": {"kind": "image", "src": "assets/Images/pic_girl_play_ball.png"}, "title": {"hi": "चित्र देखकर वाक्य मिलाओ!", "en": "Picture-Sentence Matching"}, "subtitle_hi": "पढ़िए · देखिए · चुनिए", "skill_description_hi": "चित्र के लिए सही वाक्य चुनता है और वाक्य के लिए सही चित्र चुनता है।", "dt_fallback": null, "phase_distribution": {"tutorial": 4, "guided": 4, "practice": 7}, "scaffold_rules": {"nudge_timeout_ms": {"guided": 5000, "independent": 8000}, "max_attempts": 3}, "signals_expected": ["slide_entered", "slide_completed", "phase_transition", "sent_to_pic_first_try", "pic_to_sent_first_try", "mastery_score", "lesson_completed"], "_emoji_fallback": {"ui_sentence_chip": "📝", "pic_boy_sit": "🧒", "pic_boy_run": "🏃", "pic_girl_play_ball": "⚽", "pic_girl_read_book": "📖", "pic_cat_drink": "🐱", "pic_cat_sleep": "😴", "pic_bird_tree": "🐦", "pic_bird_fly": "🕊️", "pic_mom_cook": "🍳", "pic_mom_read": "📚", "pic_children_run": "🏃", "pic_children_sit": "🧍", "pic_sun_shine": "☀️", "pic_moon_shine": "🌙", "pic_kite_fly": "🪁", "pic_kite_make": "✂️"}, "slides": [{"id": "T1", "phase": "tutorial", "eis": "iconic", "type": "STORY_SCENE", "caption_chip": true, "prompt_hi": "चित्र देखिए और वाक्य पढ़िए।", "audio": {"narration": "vo_t1_narr"}, "data": {"image_id": "pic_boy_sit", "alt_hi": "लड़का पेड़ के नीचे बैठा है।", "caption_hi": "लड़का पेड़ के नीचे बैठा है।", "emoji": "🧒"}}, {"id": "T2", "phase": "tutorial", "eis": "iconic", "type": "STORY_SCENE", "caption_chip": true, "prompt_hi": "क्या यह वाक्य सही है?", "audio": {"narration": "vo_t2_narr"}, "data": {"image_id": "pic_girl_cycle", "alt_hi": "लड़का पेड़ के नीचे दौड़ रहा है।", "caption_hi": "लड़की साइकिल चला रही है।", "emoji": "🧒"}}, {"id": "T3", "phase": "tutorial", "eis": "iconic", "type": "STORY_SCENE", "caption_chip": true, "prompt_hi": "वाक्य के लिए सही चित्र चुनिए।", "audio": {"narration": "vo_t3_narr"}, "data": {"image_ids": ["pic_girl_pick_flowers", "pic_girl_water_plants"], "image_id": "pic_girl_play_ball", "alt_hi": "लड़की गेंद से खेल रही है।", "caption_hi": "लड़की पौधों को पानी दे रही है।", "emoji": "⚽"}}, {"id": "G1", "phase": "guided", "eis": "symbolic", "type": "STORY_QUESTION", "sentence_box": true, "hide_header_chip": true, "pic_options": true, "prompt_hi": "वाक्य के लिए सही चित्र चुनिए।", "audio": {"prompt": "vo_sent_cat_ok", "try_again": "vo_try_again", "hint": "vo_hint_cat", "reveal": "vo_reveal"}, "data": {"stim_hi": "बिल्ली दूध पी रही है।", "signal_name": "sent_to_pic_first_try", "mastery": false, "options": [{"img": "pic_bird_tree_ylw", "emoji": "🐦", "audio": "vo_sent_cat_wrong"}, {"img": "pic_children_run_ylw", "emoji": "🏃", "audio": "vo_sent_cat_wrong"}, {"img": "pic_cat_drink_ylw", "emoji": "🐱", "correct": true, "audio": "vo_sent_cat_ok"}]}}, {"id": "G2", "phase": "guided", "eis": "symbolic", "type": "STORY_QUESTION", "hide_header_chip": true, "bare_recall": true, "sentence_options": true, "prompt_hi": "चित्र के लिए सही वाक्य चुनिए।", "audio": {"prompt": "vo_prompt_pic_to_sent", "try_again": "vo_try_again", "hint": "vo_hint_bird", "reveal": "vo_reveal"}, "data": {"recall_image_id": "pic_boy_drink_water_ylw", "hide_recall": false, "signal_name": "pic_to_sent_first_try", "mastery": false, "options": [{"label_hi": "लड़का पानी पी रहा है।", "correct": true, "audio": "vo_sent_boy_drink_ok"}, {"label_hi": "लड़का पेड़ के नीचे बैठा है।", "audio": "vo_sent_boy_sit"}, {"label_hi": "लड़की साइकिल चला रही है।", "audio": "vo_sent_girl_cycle"}]}}, {"id": "G3", "phase": "guided", "eis": "symbolic", "type": "STORY_QUESTION", "sentence_box": true, "hide_header_chip": true, "pic_options": true, "prompt_hi": "वाक्य के लिए सही चित्र चुनिए।", "audio": {"prompt": "vo_sent_mom_ok", "try_again": "vo_try_again", "hint": "vo_hint_mom", "reveal": "vo_reveal"}, "data": {"stim_hi": "माँ अखबार पढ़ रही है।", "signal_name": "sent_to_pic_first_try", "mastery": false, "options": [{"img": "pic_girl_read_book_ylw", "emoji": "📖", "audio": "vo_sent_mom_wrong"}, {"img": "pic_mom_water_plants_ylw", "emoji": "🪴", "audio": "vo_sent_mom_wrong"}, {"img": "pic_mom_read_ylw", "emoji": "📰", "correct": true, "audio": "vo_sent_mom_ok"}]}}, {"id": "G4", "phase": "guided", "eis": "symbolic", "type": "STORY_QUESTION", "hide_header_chip": true, "bare_recall": true, "sentence_options": true, "prompt_hi": "चित्र के लिए सही वाक्य चुनिए।", "audio": {"prompt": "vo_prompt_pic_to_sent", "try_again": "vo_try_again", "hint": "vo_hint_children", "reveal": "vo_reveal"}, "data": {"recall_image_id": "pic_children_circle_ylw", "hide_recall": false, "signal_name": "pic_to_sent_first_try", "mastery": false, "options": [{"label_hi": "बच्चे मैदान में बैठे हैं।", "correct": true, "audio": "vo_sent_children_sit_ok"}, {"label_hi": "लड़की साइकिल चला रही है।", "audio": "vo_sent_girl_cycle"}, {"label_hi": "बच्चे मैदान में दौड़ रहे हैं।", "audio": "vo_sent_children_ok"}]}}, {"id": "P1", "phase": "guided", "eis": "symbolic", "type": "STORY_QUESTION", "sentence_box": true, "hide_header_chip": true, "pic_options": true, "prompt_hi": "वाक्य के लिए सही चित्र चुनिए।", "audio": {"prompt": "vo_prompt_pic_to_sent", "try_again": "vo_try_again", "hint": "vo_hint_boy", "reveal": "vo_reveal"}, "data": {"stim_hi": "लड़का पानी भर रहा है।", "signal_name": "pic_to_sent_first_try", "mastery": false, "options": [{"img": "pic_boy_drink_water_ylw", "emoji": "🥤", "audio": "vo_sent_boy_wrong"}, {"img": "pic_boy_eat_ylw", "emoji": "🍽️", "audio": "vo_sent_boy_wrong"}, {"img": "pic_boy_fill_water_ylw", "emoji": "🚰", "correct": true, "audio": "vo_sent_boy_fill_ok"}]}}, {"id": "P2", "phase": "guided", "eis": "symbolic", "type": "STORY_QUESTION", "hide_header_chip": true, "bare_recall": true, "sentence_options": true, "prompt_hi": "चित्र के लिए सही वाक्य चुनिए।", "audio": {"prompt": "vo_sent_girl_ok", "try_again": "vo_try_again", "hint": "vo_hint_girl", "reveal": "vo_reveal"}, "data": {"recall_image_id": "pic_goat_eat_ylw", "stim_hi": "लड़की गेंद से खेल रही है।", "signal_name": "sent_to_pic_first_try", "mastery": false, "options": [{"label_hi": "बकरी पानी पी रही है।", "audio": "vo_sent_goat_wrong"}, {"label_hi": "बकरी घास खा रही है।", "correct": true, "audio": "vo_sent_goat_ok"}, {"label_hi": "बकरी घास पर बैठी है।", "audio": "vo_sent_goat_wrong"}]}}, {"id": "P3", "phase": "guided", "eis": "symbolic", "type": "STORY_QUESTION", "sentence_box": true, "hide_header_chip": true, "pic_options": true, "prompt_hi": "वाक्य के लिए सही चित्र चुनिए।", "audio": {"prompt": "vo_prompt_pic_to_sent", "try_again": "vo_try_again", "hint": "vo_hint_cat", "reveal": "vo_reveal"}, "data": {"stim_hi": "बिल्ली सो रही है।", "signal_name": "pic_to_sent_first_try", "mastery": false, "options": [{"img": "pic_cat_drink_sq_ylw", "emoji": "🥛", "audio": "vo_sent_cat_wrong"}, {"img": "pic_cat_sleep_ylw", "emoji": "😴", "correct": true, "audio": "vo_sent_cat_sleep_ok"}, {"img": "pic_cat_eat_ylw", "emoji": "🍽️", "audio": "vo_sent_cat_wrong"}]}}, {"id": "P4", "phase": "guided", "eis": "symbolic", "type": "STORY_QUESTION", "hide_header_chip": true, "bare_recall": true, "sentence_options": true, "prompt_hi": "चित्र के लिए सही वाक्य चुनिए।", "audio": {"prompt": "vo_sent_bird_ok", "try_again": "vo_try_again", "hint": "vo_hint_bird", "reveal": "vo_reveal"}, "data": {"recall_image_id": "pic_bird_peck_ylw", "stim_hi": "चिड़िया पेड़ पर बैठी है।", "signal_name": "sent_to_pic_first_try", "mastery": true, "options": [{"label_hi": "चिड़िया पेड़ पर बैठी है।", "audio": "vo_sent_bird_wrong"}, {"label_hi": "चिड़िया उड़ रही है।", "audio": "vo_sent_bird_wrong"}, {"label_hi": "चिड़िया दाना चुग रही है।", "correct": true, "audio": "vo_sent_bird_peck_ok"}]}}, {"id": "P5", "phase": "practice", "eis": "symbolic", "type": "BLANK_PANEL", "ref_frame": true, "hide_header_chip": true, "prompt_hi": "हर वाक्य को सही चित्र से मिलाइए ।", "audio": {}, "data": {"train": "train_wagons", "cargo": ["train_cargo_cat", "train_cargo_goat", "train_cargo_bird"], "sentences": ["बिल्ली दूध पी रही है ।", "चिड़िया पेड़ पर बैठी है।", "बकरी घास खा रही है ।"], "auto_drag": {"pill": 0, "coach": 0, "after_ms": 2000, "repeat_ms": 4000}, "answers": [0, 2, 1]}}, {"id": "P6", "phase": "practice", "eis": "symbolic", "type": "BLANK_PANEL", "ref_frame": true, "hide_header_chip": true, "prompt_hi": "हर चित्र को सही वाक्य से मिलाइए ।", "audio": {}, "data": {"train": "train_wagons_p14", "cargo_box": {"x": [[331, 488], [516, 673], [701, 858]], "y": [20, 116]}, "box_texts": ["दादाजी अखबार पढ़ रहे हैं ।", "बच्चे पतंग उड़ा रहे हैं ।", "कुत्ता गेंद से खेल रहा है ।"], "pictures": ["pic_dog_ball_ylw", "pic_children_kite_ylw", "pic_grandpa_newspaper_ylw"], "pic_cargo": ["train_cargo_dog", "train_cargo_kite", "train_cargo_grandpa"], "pic_answers": [2, 1, 0], "auto_drag": {"pill": 0, "after_ms": 2000, "repeat_ms": 4000}}}, {"id": "CEL", "phase": "practice", "eis": "enactive", "type": "CELEBRATION", "prompt_hi": "शाबाश! आपने तस्वीर और वाक्य का सही जोड़ा बनाना सीख लिया!", "audio": {"prompt": "vo_well_done", "sfx": "sfx_celebrate"}, "data": {}}], "assets": {"audio": {"vo_pt_tutorial": "assets/Audio/vo_pt_tutorial.ogg", "vo_pt_guided": "assets/Audio/vo_pt_guided.ogg", "vo_pt_practice": "assets/Audio/vo_pt_practice.ogg", "vo_t1_narr": "assets/Audio/vo_t1_narr.ogg", "vo_t2_narr": "assets/Audio/vo_t2_narr.ogg", "vo_t3_narr": "assets/Audio/vo_t3_narr.ogg", "vo_t4_narr": "assets/Audio/vo_t4_narr.ogg", "vo_prompt_pic_to_sent": "assets/Audio/vo_prompt_pic_to_sent.ogg", "vo_try_again": "assets/Audio/vo_try_again.ogg", "vo_reveal": "assets/Audio/vo_reveal.ogg", "vo_well_done": "assets/Audio/vo_well_done.ogg", "sfx_celebrate": "assets/Audio/sfx_celebrate.ogg", "vo_sent_boy_ok": "assets/Audio/vo_sent_boy_ok.ogg", "vo_sent_boy_wrong": "assets/Audio/vo_sent_boy_wrong.ogg", "vo_hint_boy": "assets/Audio/vo_hint_boy.ogg", "vo_sent_girl_ok": "assets/Audio/vo_sent_girl_ok.ogg", "vo_sent_girl_wrong": "assets/Audio/vo_sent_girl_wrong.ogg", "vo_hint_girl": "assets/Audio/vo_hint_girl.ogg", "vo_sent_cat_ok": "assets/Audio/vo_sent_cat_ok.ogg", "vo_sent_cat_wrong": "assets/Audio/vo_sent_cat_wrong.ogg", "vo_hint_cat": "assets/Audio/vo_hint_cat.ogg", "vo_sent_bird_ok": "assets/Audio/vo_sent_bird_ok.ogg", "vo_sent_bird_wrong": "assets/Audio/vo_sent_bird_wrong.ogg", "vo_hint_bird": "assets/Audio/vo_hint_bird.ogg", "vo_sent_mom_ok": "assets/Audio/vo_sent_mom_ok.ogg", "vo_sent_mom_wrong": "assets/Audio/vo_sent_mom_wrong.ogg", "vo_hint_mom": "assets/Audio/vo_hint_mom.ogg", "vo_sent_children_ok": "assets/Audio/vo_sent_children_ok.ogg", "vo_sent_children_wrong": "assets/Audio/vo_sent_children_wrong.ogg", "vo_hint_children": "assets/Audio/vo_hint_children.ogg", "vo_sent_sun_ok": "assets/Audio/vo_sent_sun_ok.ogg", "vo_sent_sun_wrong": "assets/Audio/vo_sent_sun_wrong.ogg", "vo_hint_sun": "assets/Audio/vo_hint_sun.ogg", "vo_sent_kite_ok": "assets/Audio/vo_sent_kite_ok.ogg", "vo_sent_kite_wrong": "assets/Audio/vo_sent_kite_wrong.ogg", "vo_hint_kite": "assets/Audio/vo_hint_kite.ogg"}, "audio_text": {"vo_pt_tutorial": "ध्यान से देखिए और मेरे साथ जानिए। चलिए, शुरू करें!", "vo_pt_guided": "बहुत बढ़िया! अब हम साथ मिलकर शुरू करते हैं। चलिए, साथ में करें!", "vo_pt_practice": "वाह! अब आपकी बारी।", "vo_t1_narr": "नमस्ते! आज हम सीखेंगे — तस्वीर के लिए सही वाक्य चुनना, और वाक्य के लिए सही तस्वीर चुनना। यह तस्वीर देखिए। इसके लिए सही वाक्य है — लड़का पेड़ के नीचे बैठा है। तस्वीर और वाक्य, दोनों एक जैसे हैं।", "vo_t2_narr": "अब यह वाक्य सुनिए — लड़का पेड़ के नीचे दौड़ रहा है। क्या यह वाक्य इस तस्वीर के लिए सही है? नहीं! तस्वीर में लड़का बैठा है, दौड़ नहीं रहा। इसलिए पूरा वाक्य ध्यान से पढ़िए, हर शब्द जाँचिए।", "vo_t3_narr": "अब एक और तस्वीर देखिए। इसके लिए सही वाक्य है — लड़की गेंद से खेल रही है। तस्वीर में लड़की गेंद से खेल रही है, इसलिए यह वाक्य सही है।", "vo_t4_narr": "अब यह वाक्य सुनिए — लड़का गेंद से खेल रहा है। क्या यह सही है? नहीं! तस्वीर में लड़का नहीं, लड़की है। इसलिए यह वाक्य इस तस्वीर से मेल नहीं खाता।", "vo_prompt_pic_to_sent": "इस तस्वीर के लिए सही वाक्य चुनिए।", "vo_try_again": "फिर से कोशिश कीजिए।", "vo_reveal": "यह सही जोड़ा है।", "vo_well_done": "शाबाश! आपने तस्वीर और वाक्य का सही जोड़ा बनाना सीख लिया।", "sfx_celebrate": "celebration sound", "vo_sent_boy_ok": "लड़का पेड़ के नीचे बैठा है।", "vo_sent_boy_wrong": "लड़का पेड़ के नीचे दौड़ रहा है।", "vo_hint_boy": "ध्यान से देखिए — तस्वीर में लड़का बैठा है या दौड़ रहा है?", "vo_sent_girl_ok": "लड़की गेंद से खेल रही है।", "vo_sent_girl_wrong": "लड़की किताब पढ़ रही है।", "vo_hint_girl": "ध्यान से देखिए — तस्वीर में लड़की गेंद से खेल रही है या किताब पढ़ रही है?", "vo_sent_cat_ok": "बिल्ली दूध पी रही है।", "vo_sent_cat_wrong": "बिल्ली सो रही है।", "vo_hint_cat": "ध्यान से देखिए — तस्वीर में बिल्ली दूध पी रही है या सो रही है?", "vo_sent_bird_ok": "चिड़िया पेड़ पर बैठी है।", "vo_sent_bird_wrong": "चिड़िया उड़ रही है।", "vo_hint_bird": "ध्यान से देखिए — तस्वीर में चिड़िया पेड़ पर बैठी है या उड़ रही है?", "vo_sent_mom_ok": "माँ खाना बना रही है।", "vo_sent_mom_wrong": "माँ किताब पढ़ रही है।", "vo_hint_mom": "ध्यान से देखिए — तस्वीर में माँ खाना बना रही है या किताब पढ़ रही है?", "vo_sent_children_ok": "बच्चे मैदान में दौड़ रहे हैं।", "vo_sent_children_wrong": "बच्चे मैदान में बैठे हैं।", "vo_hint_children": "ध्यान से देखिए — तस्वीर में बच्चे दौड़ रहे हैं या बैठे हैं?", "vo_sent_sun_ok": "सूरज आसमान में चमक रहा है।", "vo_sent_sun_wrong": "चाँद आसमान में चमक रहा है।", "vo_hint_sun": "ध्यान से सुनिए — वाक्य में सूरज है या चाँद?", "vo_sent_kite_ok": "भाई पतंग उड़ा रहा है।", "vo_sent_kite_wrong": "भाई पतंग बना रहा है।", "vo_hint_kite": "ध्यान से सुनिए — भाई पतंग उड़ा रहा है या बना रहा है?"}, "image": {"pic_boy_sit": "assets/Images/pic_boy_sit.png", "pic_boy_run": "assets/Images/pic_boy_run.png", "pic_girl_play_ball": "assets/Images/pic_girl_play_ball.png", "pic_girl_read_book": "assets/Images/pic_girl_read_book.png", "pic_cat_drink": "assets/Images/pic_cat_drink.png", "pic_cat_sleep": "assets/Images/pic_cat_sleep.png", "pic_bird_tree": "assets/Images/pic_bird_tree.png", "pic_bird_fly": "assets/Images/pic_bird_fly.png", "pic_mom_cook": "assets/Images/pic_mom_cook.png", "pic_mom_read": "assets/Images/pic_mom_read.png", "pic_children_run": "assets/Images/pic_children_run.png", "pic_children_sit": "assets/Images/pic_children_sit.png", "pic_sun_shine": "assets/Images/pic_sun_shine.png", "pic_moon_shine": "assets/Images/pic_moon_shine.png", "pic_kite_fly": "assets/Images/pic_kite_fly.png", "pic_kite_make": "assets/Images/pic_kite_make.png", "ui_sentence_chip": "assets/Images/ui_sentence_chip.png"}, "audio_ext": "ogg", "img_ext": "png"}}
 </script>
 
 <script id="FLN-ANIMATION-KIT-CORE">
@@ -4014,35 +4014,11 @@ const SlideModules = {
     // grey stroke — nothing else: no options, no आगे, no VO. Content is added later. CSS: .ref-panel + .stage.ref-frame
     mount(host, slide){
       const d = slide.data || {};
-      // ---- the train art's geometry, in picture px of the 987x244 train_wagons2*.png (page 13: train_wagons2, page 14:
-      // train_wagons2_p14 — the same geometry, different dashes), measured by the scratchpad build script (make_train2.py):
-      // the coach interiors (the white inside the coloured frames; the drop hit areas), the cream sentence box in each
-      // coach (rows 111-159, 5px inside the interior sides) and the picture box above it (rows 26-106, same x). The picture
-      // is shown at the panel's 1025px inner width (x1.0385) with its bottom 4px under the panel's bottom border; rows 214+
-      // are the rail band (CSS clip-paths .ref-rail / .ref-train). data.cargo_box {x:[[x0,x1] per coach], y:[y0,y1]} may
-      // override the picture box for art with its own.
-      const PIC_H = 244, PIC_S = 1025 / 987;
-      const COACH_X = [[342,498],[527,690],[713,877]], COACH_Y = [20,165], BOX_X = [[347,493],[532,685],[718,872]], BOX_Y = [111,159];
-      const cb = d.cargo_box && Array.isArray(d.cargo_box.x) && Array.isArray(d.cargo_box.y) ? d.cargo_box : null;
-      const CARGO_X = cb ? cb.x : BOX_X, CARGO_Y = cb ? cb.y : [26,106];
-      const CARGO_L = CARGO_X.map(([x0]) => x0 * PIC_S), CARGO_W = CARGO_X.map(([x0, x1]) => (x1 - x0) * PIC_S);
-      const CARGO_H = (CARGO_Y[1] - CARGO_Y[0]) * PIC_S, CARGO_B = -4 + (PIC_H - CARGO_Y[1]) * PIC_S;   // a coach picture's CSS height / bottom
-      // a coach picture (page 13's cargo at mount, a dropped picture on either page) fills coach c's picture box: cover-fitted
-      // by CSS .ref-cargo-img, its geometry inline from the constants above
-      const placeCargoGeom = (im, c)=>{ im.style.left = CARGO_L[c] + 'px'; im.style.width = CARGO_W[c] + 'px';
-        im.style.bottom = CARGO_B + 'px'; im.style.height = CARGO_H + 'px'; };
-      // the loco's two spoked wheels, so they turn while the train runs (the coach wheels are plain discs: a turn would not
-      // show). Each is a 68x68 box of the art (origin bx/by, picture px) holding two layers laid over the painted wheel: a
-      // static backplate (train_wheel_bg_1/2.png: what is behind the wheel, rebuilt row by row from the art - the green body,
-      // its outline, the grey chassis, its outline, the white panel) and the wheel alone cut out of the art
-      // (train_wheel_1/2.png), turning about its true centre cx/cy. Built
-      // by the scratchpad make_wheels.py from train_wagons2.png; CSS .ref-wheels / .ref-wheel (refWheelIn / refWheelOut)
-      const WHEELS = [{ bx:177, by:148, side:68, cx:211.25, cy:182.25, src:'train_wheel_1', bg:'train_wheel_bg_1' }, { bx:245, by:148, side:68, cx:279.25, cy:182.25, src:'train_wheel_2', bg:'train_wheel_bg_2' }];
       const panel = document.createElement("div"); panel.className = "ref-panel";
       // [PORT] data.train (image id): the train picture (train + its own rail band, transparent) shown at the panel's full
       // inner width, bottom-aligned to the panel's outer edge like the reference. TWO copies of the same picture: .ref-rail
       // keeps only the rail band (static, full width) and .ref-train keeps only the train, which slides in from the right
-      // and stops centred (CSS: refTrainIn). Rows split at 214/244 of the picture (see PIC_H above).
+      // and stops centred (CSS: refTrainIn). Rows split at 218/234 of the picture.
       if(d.train){
         const src = 'assets/Images/' + d.train + '.png';
         ['ref-rail','ref-train'].forEach(cls => {
@@ -4050,24 +4026,13 @@ const SlideModules = {
           im.onerror = ()=>{ im.style.display = 'none'; };
           panel.appendChild(im);
         });
-        // rolling wheels (WHEELS above): backplate + turning copy per wheel, in one layer that rides the train's runs
-        const wheels = document.createElement('div'); wheels.className = 'ref-wheels';
-        WHEELS.forEach(w => {
-          const geom = im => { im.style.left = (w.bx * PIC_S) + 'px'; im.style.bottom = (-4 + (PIC_H - (w.by + w.side)) * PIC_S) + 'px';
-            im.style.width = im.style.height = (w.side * PIC_S) + 'px'; im.alt = ''; im.onerror = ()=>{ im.style.display = 'none'; }; };
-          const bg = document.createElement('img'); bg.className = 'ref-wheel-bg'; geom(bg); bg.src = 'assets/Images/' + w.bg + '.png';
-          const im = document.createElement('img'); im.className = 'ref-wheel'; geom(im);
-          im.style.transformOrigin = ((w.cx - w.bx) / w.side * 100) + '% ' + ((w.cy - w.by) / w.side * 100) + '%';
-          im.src = 'assets/Images/' + w.src + '.png';
-          wheels.appendChild(bg); wheels.appendChild(im); });
-        panel.appendChild(wheels);
         // smoke over the engine's chimney: four puffs rising and fading, riding the same slide-in as the train
         // (CSS: .ref-smoke / .ref-puff); the steam-whistle SFX plays as the train appears (assets/Audio/sfx_train_whistle)
-        // data.cargo (image ids): one picture per coach, filling the coach's picture box above its sentence box; the layer
-        // rides the same slide-in as the train (CSS: .ref-cargo / .ref-cargo-img, geometry from placeCargoGeom)
+        // data.cargo (image ids): one picture per coach, in the empty space above each coach's dashed box; the layer
+        // rides the same slide-in as the train (CSS: .ref-cargo / .ref-cargo-img, coach boxes measured on the picture)
         if(Array.isArray(d.cargo) && d.cargo.length){
           const cargo = document.createElement('div'); cargo.className = 'ref-cargo';
-          d.cargo.forEach((id, c) => { const im = document.createElement('img'); im.className = 'ref-cargo-img'; im.alt = ''; placeCargoGeom(im, c);
+          d.cargo.forEach(id => { const im = document.createElement('img'); im.className = 'ref-cargo-img'; im.alt = '';
             im.src = 'assets/Images/' + id + '.png'; im.onerror = ()=>{ im.style.display = 'none'; }; cargo.appendChild(im); });
           panel.appendChild(cargo);
         }
@@ -4103,20 +4068,30 @@ const SlideModules = {
       }
       // ---- drag-and-drop onto the coaches: ONE system for the page-13 sentence pills (data.sentences + data.answers) and
       // the page-14 picture cards (data.pictures + data.pic_answers); answers[i] = the coach of item i. Unlocked once the
-      // FIRST auto-drag pass has ended. A drop on the matching coach flies the item into that coach — a pill into the
-      // sentence box, where the sentence is then written (writeInBox); a picture into the coach's picture box, which it
+      // FIRST auto-drag pass has ended. A drop on the matching coach flies the item into that coach — a pill into the dashed
+      // box, where the sentence is then written (writeInBox); a picture into the coach's interior above the box, which it
       // then fills exactly like page 13's cargo (placeCargo) — and a drop anywhere else shakes red and snaps back. Coach
-      // interiors / sentence boxes / picture boxes: the geometry constants at the top of mount (picture px of the 987x244 art).
+      // interiors / dashed boxes / cargo boxes in picture px of the 987x234 art.
       const sentences = Array.isArray(d.sentences) ? d.sentences : [], pictures = Array.isArray(d.pictures) ? d.pictures : [];
       const kind = sentences.length ? 'text' : (pictures.length ? 'pic' : null), items = kind === 'text' ? sentences : pictures;
       const answers = kind === 'text' ? (Array.isArray(d.answers) ? d.answers : null) : (kind === 'pic' && Array.isArray(d.pic_answers) ? d.pic_answers : null);
-      const placed = [], placedEl = [];
-      // over a coach a picture card shrinks to its landing size (CSS .ref-over reads --ref-land-*): the picture box's height,
-      // the card's 1410x1188 aspect, margins that keep its 190x160 slot in the row
-      if(picRow){ const w = CARGO_H * 1410 / 1188; picRow.style.setProperty('--ref-land-h', CARGO_H + 'px');
+      const placed = [], placedEl = [], COACH_X = [[324,494],[510,678],[695,860]], COACH_Y = [13,182], BOX_X = [[331,487],[516,672],[701,857]], BOX_Y = [122,174];
+      const PIC_S = 1025 / 987;
+      // where a dropped picture lands, in picture px: by default the coach interior above the dashed box (page 13's cargo
+      // boxes, as CSS .ref-cargo-img). data.cargo_box {x:[[x0,x1] per coach], y:[y0,y1]} overrides it for art with its own
+      // drop box — page 14's train_wagons_p14 has a dashed drop box ABOVE the plain cream sentence strip (x 331-488 /
+      // 516-673 / 701-858, y 20-116); the picture then fills that box edge to edge, dashes included (inline bottom/height)
+      const cb = d.cargo_box && Array.isArray(d.cargo_box.x) && Array.isArray(d.cargo_box.y) ? d.cargo_box : null;
+      const CARGO_Y = cb ? cb.y : [13,118];
+      const CARGO_L = cb ? cb.x.map(([x0]) => x0 * PIC_S) : [336.5, 529.6, 721.8], CARGO_W = cb ? cb.x.map(([x0, x1]) => (x1 - x0) * PIC_S) : [177.6, 175.5, 172.4];
+      const CARGO_H = (CARGO_Y[1] - CARGO_Y[0]) * PIC_S, CARGO_B = -4 + (234 - CARGO_Y[1]) * PIC_S;   // a placed picture's CSS height / bottom
+      // over a coach a picture card shrinks to its landing size (CSS .ref-over reads --ref-land-*; defaults = the 109px
+      // interior): with a drop box, that box's height, the card's 1410x1188 aspect, margins that keep its 190x160 slot
+      if(cb && picRow){ const w = CARGO_H * 1410 / 1188; picRow.style.setProperty('--ref-land-h', CARGO_H + 'px');
         picRow.style.setProperty('--ref-land-my', ((160 - CARGO_H) / 2) + 'px'); picRow.style.setProperty('--ref-land-mx', ((190 - w) / 2) + 'px'); }
-      // where item i lands in coach c (picture px): the sentence box's centre for a sentence, the picture box's for a picture
-      const targetOf = c => kind === 'pic' ? { x: (CARGO_X[c][0] + CARGO_X[c][1]) / 2, y: (CARGO_Y[0] + CARGO_Y[1]) / 2 }
+      // where item i lands in coach c (picture px): the dashed box's centre for a sentence, the drop box's (else the
+      // interior's) centre for a picture
+      const targetOf = c => kind === 'pic' ? { x: cb ? (cb.x[c][0] + cb.x[c][1]) / 2 : (COACH_X[c][0] + COACH_X[c][1]) / 2, y: (CARGO_Y[0] + CARGO_Y[1]) / 2 }
                                            : { x: (BOX_X[c][0] + BOX_X[c][1]) / 2,     y: (BOX_Y[0] + BOX_Y[1]) / 2 };
       let dragReady = false, dragging = null;
       const railEl = ()=> panel.querySelector('.ref-rail');
@@ -4134,29 +4109,30 @@ const SlideModules = {
       const playCorrect = ()=>{ try{
         if(!correctSfx){ correctSfx = new Audio('assets/Audio/' + (d.correct_sfx || 'sfx_correct.mp3')); correctSfx.volume = 0.7; }
         correctSfx.currentTime = 0; correctSfx.play().catch(()=>{}); }catch(e){} };
-      // one sentence written inside a coach's sentence box, in the written-sentence style (.ref-slot-text: 17px, navy). The
+      // one sentence written inside a coach's dashed box, in the written-sentence style (.ref-slot-text: 17px, navy). The
       // labels sit in ONE full-width, 0-height layer (.ref-slots: the panel's own coordinates) so they can ride the train
       const writeInBox = (coach, text)=>{
         const label = document.createElement('div'); label.className = 'ref-slot-text'; label.textContent = text; label.dataset.coach = coach;
         label.style.left = (BOX_X[coach][0] * PIC_S) + 'px'; label.style.width = ((BOX_X[coach][1] - BOX_X[coach][0]) * PIC_S) + 'px';
-        label.style.bottom = (-4 + (PIC_H - BOX_Y[1]) * PIC_S) + 'px'; label.style.height = ((BOX_Y[1] - BOX_Y[0]) * PIC_S) + 'px';
+        label.style.bottom = (-4 + (234 - BOX_Y[1]) * PIC_S) + 'px'; label.style.height = ((BOX_Y[1] - BOX_Y[0]) * PIC_S) + 'px';
         let slots = panel.querySelector('.ref-slots');
         if(!slots){ slots = document.createElement('div'); slots.className = 'ref-slots'; panel.appendChild(slots); }
         slots.appendChild(label); return label; };
-      // one picture placed in a coach: its picture box, filled exactly like page 13's cargo (.ref-cargo-img, cover-fitted;
-      // geometry inline per coach since drops come in any order). The layer is created on the first placement WITHOUT the
-      // slide-in (.ref-static: the train has long stopped) and still rides the departure.
+      // one picture placed in a coach: the interior above the dashed box, filled exactly like page 13's cargo (.ref-cargo-img,
+      // cover-fitted, 6px top corners; position/size inline per coach since drops come in any order). The layer is created
+      // on the first placement WITHOUT the slide-in (.ref-static: the train has long stopped) and still rides the departure.
       const placeCargo = (coach, id)=>{
         let cargo = panel.querySelector('.ref-cargo');
         if(!cargo){ cargo = document.createElement('div'); cargo.className = 'ref-cargo ref-static'; panel.appendChild(cargo); }
         const im = document.createElement('img'); im.className = 'ref-cargo-img ref-cargo-in'; im.alt = ''; im.dataset.coach = coach;
-        placeCargoGeom(im, coach);
+        im.style.left = CARGO_L[coach] + 'px'; im.style.width = CARGO_W[coach] + 'px';
+        if(cb){ im.style.bottom = CARGO_B + 'px'; im.style.height = CARGO_H + 'px'; im.style.borderRadius = '5px'; }   // the drop box, its r5 corners on all four sides
         im.src = 'assets/Images/' + id + '.png'; im.onerror = ()=>{ im.style.display = 'none'; }; cargo.appendChild(im); return im; };
       // item i placed in coach c: the sentence written in the box, or the picture (its data.pic_cargo coach version, else the
       // card's own picture) filling the interior
       const placeItem = (coach, i)=> placedEl[coach] = (kind === 'pic'
         ? placeCargo(coach, (Array.isArray(d.pic_cargo) && d.pic_cargo[i]) || pictures[i]) : writeInBox(coach, sentences[i]));
-      // data.box_texts (one sentence per coach, in coach order; "" leaves a coach empty): written into the sentence boxes at
+      // data.box_texts (one sentence per coach, in coach order; "" leaves a coach empty): written into the dashed boxes at
       // mount, exactly as page 13 writes a dropped sentence, and riding the train's slide-in with it (.ref-slots.ref-ride,
       // the cargo's own animation) — page 14's pre-filled coaches
       if(Array.isArray(d.box_texts) && d.box_texts.length){
@@ -4164,7 +4140,7 @@ const SlideModules = {
         const slots = panel.querySelector('.ref-slots'); if(slots) slots.classList.add('ref-ride');
       }
       // data.auto_drag {after_ms, repeat_ms}: 2s after the train has stopped, the first still-unplaced item lifts and glides to
-      // where it belongs — a pill to its coach's sentence box, a picture to its coach's picture box — pauses, and glides back
+      // where it belongs — a pill to its coach's dashed box, a picture to its coach's interior — pauses, and glides back
       // (CSS: .ref-autodrag / refAutoDrag). After each pass it re-arms: it plays again after repeat_ms (4s) of inactivity —
       // any tap or key press restarts that idle clock. The path is read from the live layout: the item's box and the rail
       // picture's box.
@@ -4187,7 +4163,7 @@ const SlideModules = {
           const coach = answers ? answers[idx] : (g.coach || 0), t = targetOf(coach);
           const sc = stageScale(), pr = el.getBoundingClientRect(), rr = rail.getBoundingClientRect();
           if(!(rr.width > 0 && rr.height > 0)){ dragReady = true; schedule(repeatMs); return; }   // rail not measurable (yet): no glide to nowhere
-          const tx = rr.left + rr.width * (t.x / 987), ty = rr.top + rr.height * (t.y / PIC_H);
+          const tx = rr.left + rr.width * (t.x / 987), ty = rr.top + rr.height * (t.y / 234);
           el.style.setProperty('--gdx', ((tx - (pr.left + pr.width / 2)) / sc) + 'px');
           el.style.setProperty('--gdy', ((ty - (pr.top + pr.height / 2)) / sc) + 'px');
           el.classList.add('ref-autodrag');
@@ -4202,7 +4178,7 @@ const SlideModules = {
       } else { dragReady = true; }
       if(answers && items.length){
         const coachAt = (cx, cy)=>{ const rr = railEl().getBoundingClientRect();
-          const px = (cx - rr.left) / rr.width * 987, py = (cy - rr.top) / rr.height * PIC_H;
+          const px = (cx - rr.left) / rr.width * 987, py = (cy - rr.top) / rr.height * 234;
           if(py < COACH_Y[0] || py > COACH_Y[1]) return -1;
           return COACH_X.findIndex(([x0, x1])=> px >= x0 && px <= x1); };
         const allDone = ()=>{
@@ -4242,7 +4218,7 @@ const SlideModules = {
           el.addEventListener('pointermove', e=>{
             if(!active) return; const sc = stageScale(); dx = (e.clientX - sx) / sc; dy = (e.clientY - sy) / sc;
             // over a coach (the drop's own test, on the item's centre) the item shrinks to its landing size (.ref-over: a pill
-            // to the sentence box, a picture to the picture box's height; at scale 1 so it IS that size); anywhere else it rides
+            // to the dashed box, a picture to the interior's height; at scale 1 so it IS that size); anywhere else it rides
             // lifted at 1.04 and grows back to its own size
             const now = coachAt(bcx + dx * sc, bcy + dy * sc) >= 0;
             if(now !== over){ over = now; el.classList.toggle('ref-over', over); }
@@ -4258,7 +4234,7 @@ const SlideModules = {
             // glide from the (untransformed) slot to where it lands, at the landing size (the item is already shrunk to it,
             // .ref-over stays on), then place it there
             const rr = railEl().getBoundingClientRect(), t = targetOf(coach);
-            const bx = rr.left + rr.width * (t.x / 987), by = rr.top + rr.height * (t.y / PIC_H);
+            const bx = rr.left + rr.width * (t.x / 987), by = rr.top + rr.height * (t.y / 234);
             const baseCx = cx - dx * sc, baseCy = cy - dy * sc;
             el.classList.add('ref-over'); el.classList.add('ref-placing');
             requestAnimationFrame(()=>{ el.style.transform = 'translate(' + ((bx - baseCx) / sc) + 'px,' + ((by - baseCy) / sc) + 'px) scale(1)'; });
@@ -5575,35 +5551,24 @@ body.tota-landing-in .start-gate .sg-caption{animation:totaIconReveal .52s cubic
 .stage.ref-frame .nav-btn{bottom:80px;}
 .ref-panel{flex:0 0 auto;width:100%;height:274px;margin-top:27px;box-sizing:border-box;
   background:#FFFFFF;border:4px solid #D5D8DF;border-radius:18px;position:relative;overflow:hidden;}
-/* train page: picture (train_wagons2*.png, 987x244) at the panel's inner width (1025px -> 987px art x1.0385), its bottom
-   on the panel's OUTER bottom edge (bottom:-4px; the art's last 4 rows are transparent, so the whole rail shows). The rail
-   copy is clipped to the picture's rail band (rows 214-243 of 244: 87.7049%); the train copy is clipped to the rows above it
-   (the wheels end at row 213) and slides in from beyond the right edge to rest centred (the art is centred in the picture) */
+/* train page: picture at the panel's inner width (1025px -> 987px art x1.0385), its bottom on the panel's OUTER bottom edge
+   (bottom:-4px; the border/overflow hide the last rows of the rail), exactly as measured on the reference. The rail copy is
+   clipped to the picture's rail band (rows 218-233 of 234); the train copy is clipped to the rows above it and slides in
+   from beyond the right edge to rest centred (the art is centred in the picture) */
 .ref-panel .ref-rail,.ref-panel .ref-train{position:absolute;left:0;bottom:-4px;width:100%;height:auto;display:block;pointer-events:none;}
-.ref-panel .ref-rail{clip-path:inset(87.7049% 0 0 0);}
-.ref-panel .ref-train{clip-path:inset(0 0 12.2951% 0);animation:refTrainIn 6.001s cubic-bezier(.2,.75,.25,1) .3s both;   /* 2.8s x 1.25 x 1.25 x 1.111 x 1.111 x 1.111: slowed 20%, 20%, 10%, 10%, 10% (user requests) */will-change:transform;}
+.ref-panel .ref-rail{clip-path:inset(93.1624% 0 0 0);}
+.ref-panel .ref-train{clip-path:inset(0 0 6.8376% 0);animation:refTrainIn 6.001s cubic-bezier(.2,.75,.25,1) .3s both;   /* 2.8s x 1.25 x 1.25 x 1.111 x 1.111 x 1.111: slowed 20%, 20%, 10%, 10%, 10% (user requests) */will-change:transform;}
 @keyframes refTrainIn{from{transform:translateX(92%);}to{transform:translateX(0);}}
-/* coach cargo: each picture fills its coach's picture box (train_wagons2*.png: rows 26-106 of 244, x 347-493 / 532-685 /
-   718-872 picture px, 5px inside the white interior) — left/width/bottom/height are set inline by the module from its
-   geometry constants (x1.0385: 151.6 / 158.9 / 159.9px wide, 83.1px tall, bottoms 139.3px above the panel's inner bottom);
-   cover-fitted (centred crop), 5px corners like the box; the layer rides the train's slide-in */
+/* coach cargo: each picture fills its coach's whole interior above the dashed box — interior x 324-494 / 510-678 / 695-860
+   picture px (inside the 2-3px frame strokes), y 13-118 (frame top to 2px above the dashed box at y 120). x1.0385 ->
+   boxes 177.6 / 175.5 / 172.4px wide, 109px tall, bottoms 116.5px above the panel's inner bottom; cover-fitted (centred
+   crop) with 6px top corners to sit inside the frame's rounded corners; the layer rides the train's slide-in */
 .ref-panel .ref-cargo{position:absolute;left:0;bottom:0;width:100%;height:0;pointer-events:none;
   animation:refTrainIn 6.001s cubic-bezier(.2,.75,.25,1) .3s both;}
-.ref-panel .ref-cargo-img{position:absolute;object-fit:cover;object-position:center;display:block;border-radius:5px;}
-/* rolling wheels: the loco's two spoked wheels are laid over their painted spots (module WHEELS: a static backplate of what
-   is behind the wheel + the wheel alone, cut out of the art) in a layer that rides the train's runs exactly like the cargo.
-   Each copy turns with the run's own curve, by the distance rolled: 92% of the 1025px picture = 943px over a 68.5px wheel =
-   4.379 turns — counter-clockwise on the arrival (the train rolls left), the same again on the departure — so the spokes
-   roll with the rail instead of sliding. At rest (0 turns) the copy sits exactly on the painted wheel. Under reduced motion
-   (html.no-anim) nothing turns and the art reads as painted */
-.ref-panel .ref-wheels{position:absolute;left:0;bottom:0;width:100%;height:0;pointer-events:none;
-  animation:refTrainIn 6.001s cubic-bezier(.2,.75,.25,1) .3s both;}
-.ref-panel .ref-wheel-bg,.ref-panel .ref-wheel{position:absolute;display:block;}
-.ref-panel .ref-wheel{will-change:transform;animation:refWheelIn 6.001s cubic-bezier(.2,.75,.25,1) .3s both;}
-@keyframes refWheelIn{from{transform:rotate(4.379turn);}to{transform:rotate(0turn);}}
-@keyframes refWheelOut{from{transform:rotate(0turn);}to{transform:rotate(-4.379turn);}}
-.ref-panel.ref-depart .ref-wheels{animation:refTrainOut 6.001s cubic-bezier(.75,0,.8,.25) both;}
-.ref-panel.ref-depart .ref-wheel{animation:refWheelOut 6.001s cubic-bezier(.75,0,.8,.25) both;}
+.ref-panel .ref-cargo-img{position:absolute;bottom:116.5px;height:109px;object-fit:cover;object-position:center;display:block;border-radius:6px 6px 0 0;}
+.ref-panel .ref-cargo-img:nth-child(1){left:336.5px;width:177.6px;}
+.ref-panel .ref-cargo-img:nth-child(2){left:529.6px;width:175.5px;}
+.ref-panel .ref-cargo-img:nth-child(3){left:721.8px;width:172.4px;}
 /* a cargo layer created by a DROP (page 14): no slide-in (the train has long stopped); it still rides the departure (the
    .ref-depart rule below wins: same specificity, later). A placed picture pops in like a written sentence */
 .ref-panel .ref-cargo.ref-static{animation:none;}
@@ -5622,15 +5587,16 @@ body.tota-landing-in .start-gate .sg-caption{animation:totaIconReveal .52s cubic
 .ref-pics{display:flex;justify-content:center;align-items:center;gap:28px;margin-top:53px;flex:0 0 auto;}
 .ref-pics .ref-pic{height:160px;width:auto;display:block;border-radius:20px;box-shadow:0 8px 18px rgba(11,42,90,.20),0 2px 5px rgba(11,42,90,.10);}
 /* the cards' drag states = the pills' (page 13) value-for-value: grab cursor; lifted while dragging; over a coach the card
-   shrinks to the picture box's height (the module sets --ref-land-h/-my/-mx on the row from its geometry: 83.1px tall ->
-   98.6x83.1px of the 1410x1188 asset, 38.5/45.7px margins keep its 190x160 slot in the row so the other cards stay put);
-   a correct drop glides it into the box (.ref-placing) where the coach picture then takes over; a wrong drop shakes with a
-   red outline and eases back (.ref-wrong); the hint pass is the same glide */
+   shrinks to the interior's height (109px -> 129x109px of the 1410x1188 asset; 25.5/30.3px margins keep its 190x160 slot in
+   the row so the other cards stay put; with data.cargo_box the module sets --ref-land-h/-my/-mx on the row to that drop
+   box's size instead — page 14's dashed box, 163x99.7px); a correct drop glides it into the interior (.ref-placing) where
+   the coach picture then takes over; a wrong drop shakes with a red outline and eases back (.ref-wrong); the hint pass is
+   the same glide */
 .ref-pics .ref-pic{cursor:grab;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;touch-action:none;}
 .ref-pics .ref-pic img{height:100%;width:auto;display:block;border-radius:inherit;}   /* the picture fills the card's height; the card (a div) takes the pointer */
 .ref-pics .ref-pic.ref-dragging{position:relative;z-index:40;cursor:grabbing;box-shadow:0 12px 26px rgba(11,42,90,.28);
   transition:height .2s ease,margin .2s ease,border-radius .2s ease;}
-.ref-pics .ref-pic.ref-over{height:var(--ref-land-h,83.1px);margin:var(--ref-land-my,38.5px) var(--ref-land-mx,45.7px);border-radius:12px;}
+.ref-pics .ref-pic.ref-over{height:var(--ref-land-h,109px);margin:var(--ref-land-my,25.5px) var(--ref-land-mx,30.3px);border-radius:12px;}
 .ref-pics .ref-pic.ref-placing{position:relative;z-index:40;transition:transform .35s cubic-bezier(.2,.75,.25,1);box-shadow:0 12px 26px rgba(11,42,90,.28);}
 .ref-pics .ref-pic.ref-wrong{position:relative;z-index:40;transition:transform .3s ease,height .3s ease,margin .3s ease,border-radius .3s ease;outline:6px solid rgba(249,53,68,.6);outline-offset:-1px;animation:refShake .5s ease;}
 .ref-pics .ref-pic.ref-autodrag{position:relative;z-index:30;animation:refAutoDrag 4.6s ease-in-out 1 both;will-change:transform;}
@@ -5645,22 +5611,21 @@ body.tota-landing-in .start-gate .sg-caption{animation:totaIconReveal .52s cubic
   92%{transform:translate(0,0) scale(1.04);box-shadow:0 12px 26px rgba(11,42,90,.28);}
   100%{transform:translate(0,0) scale(1);box-shadow:0 4px 14px rgba(11,42,90,.10);}}
 /* drag-and-drop on the pills: grab cursor; while dragging the pill rides above everything with a lifted shadow; a correct
-   drop transitions it into the coach's sentence box (.ref-placing) and the sentence is then written inside the box
-   (.ref-slot-text, 17px: the widest sentence measures ~141px; the narrowest box is 152px with 4px padding each side); a
-   wrong drop shakes with a red outline
+   drop transitions it into the coach's dashed box (.ref-placing) and the sentence is then written inside the box
+   (.ref-slot-text, 17px: the widest sentence measures ~141px in the 162px box); a wrong drop shakes with a red outline
    and eases back (.ref-wrong) */
 .ref-opts .ref-opt{cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;}
 .ref-opts .ref-opt.ref-dragging{position:relative;z-index:40;cursor:grabbing;box-shadow:0 12px 26px rgba(11,42,90,.28);
   transition:width .2s ease,min-height .2s ease,padding .2s ease,margin .2s ease,font-size .2s ease,border-radius .2s ease;}   /* size only: the transform follows the pointer instantly */
-/* while it is dragged over a coach the pill (yellow bar + text) shrinks to the coach's empty sentence box: 152x50px, 17px text
-   (the first coach's BOX_X/BOX_Y x1.0385 — the box the sentence is later written into, .ref-slot-text), and grows back to its
-   own size the moment it leaves the coach (.ref-over, toggled by the module on the pill's centre with the same coach test as
-   the drop). The 84/11px margins keep its 320x72 slot in the row, so the other two pills do not move while it shrinks */
-.ref-opts .ref-opt.ref-over{width:152px;min-height:50px;padding:0 3px;margin:11px 84px;font-size:17px;border-radius:14px;}
+/* while it is dragged over a coach the pill (yellow bar + text) shrinks to the coach's empty dashed box: 162x54px, 17px text
+   (BOX_X/BOX_Y x1.0385 — the box the sentence is later written into, .ref-slot-text), and grows back to its own size the moment
+   it leaves the coach (.ref-over, toggled by the module on the pill's centre with the same coach test as the drop). The 79/9px
+   margins keep its 320x72 slot in the row, so the other two pills do not move while it shrinks */
+.ref-opts .ref-opt.ref-over{width:162px;min-height:54px;padding:0 3px;margin:9px 79px;font-size:17px;border-radius:14px;}
 .ref-opts .ref-opt.ref-placing{position:relative;z-index:40;transition:transform .35s cubic-bezier(.2,.75,.25,1);box-shadow:0 12px 26px rgba(11,42,90,.28);}
 .ref-opts .ref-opt.ref-wrong{position:relative;z-index:40;transition:transform .3s ease,width .3s ease,min-height .3s ease,padding .3s ease,margin .3s ease,font-size .3s ease,border-radius .3s ease;outline:6px solid rgba(249,53,68,.6);outline-offset:-1px;animation:refShake .5s ease;}
 @keyframes refShake{0%,100%{left:0;}20%{left:-9px;}40%{left:9px;}60%{left:-6px;}80%{left:6px;}}
-.ref-panel .ref-slot-text{position:absolute;display:flex;align-items:center;justify-content:center;padding:0 4px;box-sizing:border-box;
+.ref-panel .ref-slot-text{position:absolute;display:flex;align-items:center;justify-content:center;padding:0 6px;box-sizing:border-box;
   font-family:var(--font-hi);font-weight:800;font-size:17px;line-height:1.2;color:var(--navy);white-space:nowrap;text-align:center;
   pointer-events:none;animation:refSlotIn .3s cubic-bezier(.34,1.5,.6,1) both;}
 @keyframes refSlotIn{from{transform:scale(.7);opacity:0;}to{transform:scale(1);opacity:1;}}
@@ -5671,10 +5636,9 @@ body.tota-landing-in .start-gate .sg-caption{animation:totaIconReveal .52s cubic
    (.ref-smoke) riding along; the rail (.ref-rail) stays */
 .ref-panel .ref-slots{position:absolute;left:0;bottom:0;width:100%;height:0;pointer-events:none;}
 .ref-panel .ref-slots.ref-ride{animation:refTrainIn 6.001s cubic-bezier(.2,.75,.25,1) .3s both;}   /* sentences written at mount ride in with the train */
-/* the sentences written at mount keep the 17px navy face but may run onto a second line inside the 50px box (two 20.4px
-   lines fit): page 14's "दादाजी अखबार पढ़ रहे हैं ।" is 168px wide, its box offers ~146px on one line; 3px side padding
-   (not 4px) gives the 150px "कुत्ता गेंद से खेल रहा है ।" a margin on its single line in the third coach's 160px box.
-   Page 13's dropped sentences are untouched */
+/* the sentences written at mount keep the 17px navy face but may run onto a second line inside the 54px box (two 20.4px
+   lines fit): page 14's "दादाजी अखबार पढ़ रहे हैं ।" is 168px wide, the box offers 150px on one line; 3px side padding
+   (not 6px) gives the 150px "कुत्ता गेंद से खेल रहा है ।" a margin on its single line. Page 13's dropped sentences are untouched */
 .ref-panel .ref-slots.ref-ride .ref-slot-text{white-space:normal;padding:0 3px;}
 .ref-panel .ref-slot-text.ref-bounce,.ref-panel .ref-cargo-img.ref-bounce{animation:refSlotBounce .6s ease-in-out both;}
 @keyframes refSlotBounce{0%,100%{transform:translateY(0) scale(1);}35%{transform:translateY(-9px) scale(1.1);}65%{transform:translateY(0) scale(.97);}85%{transform:translateY(-3px) scale(1.02);}}
@@ -5682,13 +5646,13 @@ body.tota-landing-in .start-gate .sg-caption{animation:totaIconReveal .52s cubic
 .ref-panel.ref-depart .ref-smoke{animation:refTrainOut 6.001s cubic-bezier(.75,0,.8,.25) both, refSmokeWake .6s linear both;}
 @keyframes refTrainOut{from{transform:translateX(0);}to{transform:translateX(-92%);}}
 @keyframes refSmokeWake{from{opacity:0;}to{opacity:1;}}
-/* engine smoke: the chimney top sits at picture px (151.5,68.8) of 987x244 -> 157px from the panel's inner left, 178px above
-   its inner bottom at the 1.0385 display scale. The 0-size .ref-smoke anchor rides the train's slide-in (same keyframes/timing);
+/* engine smoke: the chimney top sits at picture px (172,85) of 987x234 -> 179px from the panel's inner left, 151px above its
+   inner bottom at the 1.0385 display scale. The 0-size .ref-smoke anchor rides the train's slide-in (same keyframes/timing);
    each puff grows, rises ~80px, drifts a little to the right (trailing the leftward run) and fades, staggered 0.45s apart,
    looping while the train runs; the whole plume fades out once the train has stopped */
-.ref-panel .ref-smoke{position:absolute;left:0;bottom:178px;width:100%;height:0;pointer-events:none;   /* full picture width so translateX(92%) matches the train's */
+.ref-panel .ref-smoke{position:absolute;left:0;bottom:151px;width:100%;height:0;pointer-events:none;   /* full picture width so translateX(92%) matches the train's */
   animation:refTrainIn 6.001s cubic-bezier(.2,.75,.25,1) .3s both, refSmokeLife 7.8s linear both;}
-.ref-panel .ref-puff{position:absolute;left:146px;bottom:0;width:22px;height:22px;border-radius:50%;   /* 157px chimney centre - 11px radius */
+.ref-panel .ref-puff{position:absolute;left:168px;bottom:0;width:22px;height:22px;border-radius:50%;   /* 179px chimney centre - 11px radius */
   background:radial-gradient(circle at 40% 40%, rgba(235,238,242,.95), rgba(180,186,194,.75) 60%, rgba(160,166,175,0) 100%);
   opacity:0;animation:refPuff 1.8s ease-out infinite;}
 .ref-panel .ref-puff:nth-child(2){animation-delay:.45s;}
