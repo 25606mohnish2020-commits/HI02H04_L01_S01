@@ -4672,7 +4672,32 @@ function boot(){
   // greeting lives HERE now (not on slide 0), which also kills the old overlap glitch where the
   // landing VO and slide-0 VO could talk over each other.
   const landSrc = (CARD.assets && CARD.assets.audio && CARD.assets.audio["vo_landing"]) || ("assets/Audio/vo_landing." + AUDIO_EXT);
-  const playLanding = ()=>{ if(!$("startGate").classList.contains("hidden")) play(landSrc, ()=>{}); };
+  // Page-1 rule (SME): the welcome VO plays exactly ONCE, and the शुरू करें button appears only after it has
+  // finished (#sgBtn is display:none until it carries .ready — see <style id="LANDING-START-AFTER-VO">).
+  // Outcomes: ended → reveal; file missing/unsupported → reveal after a short beat (the landing can never get
+  // stuck); autoplay refused before a gesture → wait, the first pointerdown retries; a second refusal still reveals.
+  const landingVO = { state:"idle", tapTried:false };   // state: idle | playing | done
+  const revealStart = ()=>{ const b = $("sgBtn"); if(b) b.classList.add("ready"); };
+  // Page 1 counts as OPEN only once the boot loader has begun to fade (.done) or is gone
+  const pageOneOpen = ()=>{ const bl = $("bootLoader"); return !bl || !bl.isConnected || bl.classList.contains("done"); };
+  const playLanding = ()=>{
+    if($("startGate").classList.contains("hidden") || landingVO.state !== "idle") return;   // once only: never restart / overlap
+    if(!pageOneOpen()) return;                            // the VO belongs to Page 1: never speak behind the loading screen
+    landingVO.state = "playing";
+    stopAudio(); setPlaying(true);                        // same visible state as play(): mascot mouth + speaker waves
+    let done = false;
+    const finish = (why)=>{
+      if(done) return; done = true; setPlaying(false);
+      if(why === "blocked" && !landingVO.tapTried){ landingVO.state = "idle"; return; }   // browser wants a tap first → the first tap ON PAGE 1 plays it
+      landingVO.state = "done"; revealStart();
+    };
+    const a = new Audio(landSrc); currentAudio = a;       // registered so stopAudio() (start tap / dev nav) can silence it
+    a.onended = ()=> finish("ended");
+    a.onerror = ()=>{ currentAudio = null; setTimeout(()=> finish("error"), 1200); };
+    a.play().catch((err)=>{ currentAudio = null;
+      if(err && err.name === "NotAllowedError") finish("blocked");
+      else setTimeout(()=> finish("error"), 1200); });
+  };
   const sgVo = $("sgVo"); if(sgVo) sgVo.onclick = (e)=>{ e.stopPropagation(); playLanding(); };
   // ---- BOOT LOADER (reference parity, 2s): hold the logo, fade it, THEN start the landing narration.
   // The same handler adds body.loaded (unblocks the landing icon pop-in) and fires the landing VO. ----
@@ -4687,8 +4712,10 @@ function boot(){
     };
     setTimeout(ready, 2000);
   })();
-  // landing VO best-effort on first interaction too (some browsers block autoplay pre-gesture)
-  window.addEventListener("pointerdown", function once(){ window.removeEventListener("pointerdown", once); playLanding(); }, { once:true });
+  // A tap on Page 1 plays the VO where the browser refused to start it by itself (desktop browsers before the first
+  // click). A tap during the LOADING SCREEN must not start it early: playLanding waits for Page 1, and that tap only
+  // unlocks sound, so the 2 s loader hand-over can speak. Once the VO has played this is a no-op (never a replay).
+  window.addEventListener("pointerdown", ()=>{ if(landingVO.state === "idle" && pageOneOpen()){ landingVO.tapTried = true; playLanding(); } });
 
   $("sgBtn").onclick = ()=>{
     stopAudio();          // silence the landing greeting BEFORE slide 0 speaks (no VO overlap)
@@ -6932,5 +6959,18 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   }
 })();
 </script>
+<style id="LANDING-START-AFTER-VO">
+/* ===== Page 1: शुरू करें appears only AFTER the landing VO has played once =====
+   The button is kept out of the page (display:none) until the engine adds .ready at the end of the
+   welcome line (playLanding in the engine script); it then pops in with the landing's own icon reveal.
+   Every keyframe keeps translateX(-50%): that is the pill's centring transform. One-shot, not a pulse. */
+.start-gate .sg-btn:not(.ready){display:none !important;}
+.start-gate .sg-btn.ready{animation:sgBtnReveal .52s cubic-bezier(.34,1.5,.6,1) !important;}
+@keyframes sgBtnReveal{
+  0%  {opacity:0;transform:translateX(-50%) scale(.55) translateY(14px);}
+  60% {opacity:1;transform:translateX(-50%) scale(1.08) translateY(0);}
+  100%{opacity:1;transform:translateX(-50%) scale(1)   translateY(0);}
+}
+</style>
 </body>
 </html>
