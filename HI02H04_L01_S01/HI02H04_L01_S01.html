@@ -6806,15 +6806,19 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 /* ===== FLN ANIMATION KIT: sky-burst END ===== */
 </script>
 <style id="P2-BIRD-POP-CSS">
-/* [P2-BIRD-POP] pages 2 and 3 (T1 = ?slide=0, T2 = ?slide=1): 3s after the page opens, the picture pops out and HOLDS
-   (2s total) while that step's SFX plays under the narration on its own player. Page 2 (whole frame):
+/* [P2-BIRD-POP] pages 2 and 3 (T1 = ?slide=0, T2 = ?slide=1): the picture pops out and HOLDS (2s total) while that
+   step's SFX plays on its own player. Page 3: 3s after the page opens, under the narration. Page 2 (2026-09-23,
+   [P2-VO-FIRST]): the narration VO speaks FIRST and alone ("Page 2 a.wav" = vo_t1_instr -> assets/Audio/vo_t1_instr.ogg,
+   4.7s), then 0.5s after it ends the picture pops and the SFX plays - nothing else moves or sounds before that - and
+   1.5s after that beat is over the "tap the speaker" line (vo_tap_speaker_sentence) plays while the caption pill and its
+   speaker chip breathe ([P2-SPEAKER-CUE], rules at the end of this block). Page 2 (whole frame):
    sfx_morning_birds.mp3 (2.4s faded cut, +4dB, of the user's Downloads 'loswin23-morning-bird-song-597463.mp3' from
    16.0s). Page 3 (whole frame): sfx_bicycle_bell.mp3 (faded cut of 'freesound_community-bicycle-ring-bell-70138.mp3').
    Page 4 (T3 = ?slide=2, the two-picture pair) had the same pop picture by picture with sfx_plucking_grass.mp3 /
    sfx_watering_garden.mp3; it was taken out on 2026-09-21 at the user's request - its pictures now stay still and silent
    and its आगे is no longer held (the two SFX files remain in assets/Audio, unused).
-   On pages 2-3 the आगे button appears no earlier than 1s after the pop ends (6s after the page opens).
-   Scheduled by #P2-BIRD-POP-JS below, where the page -> steps map lives.
+   On pages 2-3 the आगे button appears no earlier than 1s after the pop ends (page 3: 6s after the page opens; page 2:
+   narration end + 3.5s). Scheduled by #P2-BIRD-POP-JS below, where the page -> steps map lives.
    Pages 6, 8, 10 and 12 (G2 = ?slide=4, G4 = ?slide=6, P2 = ?slide=8, P4 = ?slide=10) reuse the same pop on their recall
    picture (.story-q-thumb) when the CORRECT sentence is tapped; those are driven by #P5-CORRECT-SFX-JS. */
 @keyframes p2BirdPop{
@@ -6827,34 +6831,65 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 .stage.tut .story-frame.p2-pop{animation:p2BirdPop 2s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
 /* pages 6, 8, 10 and 12: the recall picture above the sentence pills pops on the correct tap (#P5-CORRECT-SFX-JS adds .p2-pop) */
 .story-q-stim .story-q-thumb.p2-pop{animation:p2BirdPop 2s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
+/* [P2-SPEAKER-CUE] page 2: the caption pill (yellow bar + sentence; the speaker chip is its child and breathes with it, on top
+   of its own .playing waves) pulses for as long as the "tap the speaker" cue line plays (#P2-BIRD-POP-JS adds/removes .p2-cue) */
+@keyframes p2CuePulse{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+.stage.tut .story-caption.p2-cue{animation:p2CuePulse .8s ease-in-out infinite;transform-origin:50% 50%;will-change:transform;}
 </style>
 <script id="P2-BIRD-POP-JS">
 /* [P2-BIRD-POP] pages listed in PLAN_BY_SLIDE only (page 2 = T1 = ?slide=0, page 3 = T2 = ?slide=1; page 4 was removed 2026-09-21).
-   Re-points mountSlide (the same pattern the kit uses for confettiCannon): once such a slide has mounted, wait 3s, then
-   pop-and-hold the picture for 2s while that step's SFX plays on its OWN Audio element (never via play(), which would cut
+   Re-points mountSlide (the same pattern the kit uses for confettiCannon): once such a slide has mounted, wait DELAY_MS, then
+   pop-and-hold the picture for POP_MS while that step's SFX plays on its OWN Audio element (never via play(), which would cut
    the narration VO). A page with several steps (a pair frame, one SFX per picture) would run them back to back: picture 1
    at 3s, picture 2 at 5s - no page uses that today, and the pair-picture pop rule was removed from #P2-BIRD-POP-CSS with
    page 4. Timers and SFX are tied to the frame captured at mount and cancelled on the next mount, so leaving the page
    early can never fire on a later page (#slideHost is reused).
-   आगे: on these pages setNavActive(true) is held until NAV_AFTER_MS after the LAST pop ends (mount + 3s + n*2s + 1s);
-   a later activation (e.g. a long narration VO) passes through untouched, and setNavActive(false) or leaving the page
-   drops a held reveal. Inactive .nav-btn is visibility:hidden, so "appear" == activate. */
+   [P2-VO-FIRST] (2026-09-23) pages in AFTER_VO_BY_SLIDE (page 2) do NOT count from the mount: the narration VO plays first,
+   alone, and the sequence is timed from its END + AFTER_VO_MS. The engine's STORY_SCENE module calls setNavActive(true)
+   exactly once when the narration ends (its _armNav: onended, or 1.2s after a load error, or the 30s watchdog), so the
+   setNavActive wrapper below is the signal: the first activation on such a page starts the pop + SFX and is then held like
+   any other. A replay from the speaker chip ends silently (no setNavActive), so it never re-runs the pop.
+   [P2-SPEAKER-CUE] (2026-09-23) pages in CUE_BY_SLIDE (page 2): once the pop beat is over (the 2s pop AND its SFX have both
+   finished; a blocked or missing SFX counts as finished at once) and CUE_GAP_MS more have passed, the cue line plays through
+   the shared play() - "Tap speaker icon.wav" = vo_tap_speaker_sentence ("वाक्य सुनने के लिए यहाँ टैप करिए।", 3.4s) - and for
+   as long as it plays the caption pill (the yellow bar with the sentence; the speaker chip is its child, so it breathes with
+   it on top of its own .playing waves) carries .p2-cue (keyframes in #P2-BIRD-POP-CSS). It settles at the end of its current
+   breath when the line ends or is cut (a speaker-chip tap replays the narration through play(), which pauses the cue). A cue
+   that falls due while the child is replaying the narration (body.vo-playing) waits for it. Once per page open, no repeat;
+   आगे is not held for it (it still appears NAV_AFTER_MS after the pop). Reduced motion: the line plays, nothing moves.
+   आगे: on these pages setNavActive(true) is held until NAV_AFTER_MS after the LAST pop ends (page 3: mount + 3s + n*2s + 1s;
+   page 2: narration end + 0.5s + n*2s + 1s); a later activation (e.g. a long narration VO) passes through untouched, and
+   setNavActive(false) or leaving the page drops a held reveal. Inactive .nav-btn is visibility:hidden, so "appear" == activate. */
 (function(){ "use strict";
-  var DELAY_MS = 3000, POP_MS = 2000, VOL = 0.7, NAV_AFTER_MS = 1000;
+  var DELAY_MS = 3000, POP_MS = 2000, VOL = 0.7, NAV_AFTER_MS = 1000, AFTER_VO_MS = 500, CUE_GAP_MS = 1500;
   // slide index -> one SFX per pop step, in picture order (the user counts pages from the landing page: ?slide=N is page N+2)
   var PLAN_BY_SLIDE = {
     0: ["assets/Audio/sfx_morning_birds.mp3"],                                           // page 2: boy under the tree
     1: ["assets/Audio/sfx_bicycle_bell.mp3"]                                             // page 3: girl on the bicycle
   };
+  // slide index -> true: the pop + SFX wait for the narration VO to end and start AFTER_VO_MS later ([P2-VO-FIRST])
+  var AFTER_VO_BY_SLIDE = {
+    0: true                                                                              // page 2: "Page 2 a" (vo_t1_instr) speaks first
+  };
+  // slide index -> the spoken cue CUE_GAP_MS after the pop beat ([P2-SPEAKER-CUE]): src, and the element that breathes with it
+  var CUE_BY_SLIDE = {
+    0: { src: "assets/Audio/vo_tap_speaker_sentence.ogg", pulse: "#slideHost .story-caption" }   // page 2: "Tap speaker icon" line, the caption pill + its speaker chip
+  };
   var timers = [], sfx = null;
   var gateFrame = null, navRevealAt = 0, navTimer = null;   // आगे gate for the page currently popping
+  var voFrame = null, voPlan = null, voCue = null;          // an AFTER_VO page still waiting for its narration to end
+  var cueEl = null;                                         // the element breathing with the cue line (null when none)
   function cancel(){
     timers.forEach(function(t){ clearTimeout(t); }); timers = [];
     if(sfx){ try{ sfx.pause(); }catch(e){} sfx = null; }
     if(navTimer){ clearTimeout(navTimer); navTimer = null; }
     gateFrame = null; navRevealAt = 0;
+    voFrame = null; voPlan = null; voCue = null;
+    settleCue(true);
   }
-  function pop(el, src){
+  // pop-and-hold el while src plays on its own player. onDone(popLeftMs), when given, fires once the SOUND is over (ended,
+  // error, blocked, or a POP_MS + 3s safety) with the ms still left of the pop, so a caller can wait for both to finish.
+  function pop(el, src, onDone){
     var still = !!(window.FLNMotion && FLNMotion.still && FLNMotion.still());   // reduced-motion: sound only
     if(!still){
       el.classList.add("p2-pop");
@@ -6862,24 +6897,64 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
       setTimeout(function(){ el.classList.remove("p2-pop"); }, POP_MS + 250);   // fallback tidy-up
     }
     if(sfx){ try{ sfx.pause(); }catch(e){} }
-    try{ sfx = new Audio(src); sfx.volume = VOL; sfx.play().catch(function(){}); }catch(e){}
+    var t0 = Date.now(), done = false;
+    var fin = function(){ if(done) return; done = true; if(onDone) onDone(Math.max(0, t0 + POP_MS - Date.now())); };
+    try{
+      sfx = new Audio(src); sfx.volume = VOL;
+      sfx.addEventListener("ended", fin); sfx.addEventListener("error", fin);
+      sfx.play().catch(fin);
+    }catch(e){ sfx = null; fin(); }
+    timers.push(setTimeout(fin, POP_MS + 3000));
   }
-  function schedule(frame, plan){
-    cancel();
+  // time the steps from NOW: the first pop at startMs, then one every POP_MS; आगे is held until NAV_AFTER_MS after the last;
+  // the page's cue (if any) is armed by the last step once its sound is over
+  function run(frame, plan, startMs, cue){
     // a pair frame pops its pictures one by one, in DOM order; a single-picture frame pops as a whole
     var targets = frame.classList.contains("story-frame-pair")
       ? Array.prototype.slice.call(frame.querySelectorAll(".story-img")) : [frame];
     var steps = Math.min(targets.length, plan.length);
     if(!steps) return;
-    gateFrame = frame; navRevealAt = Date.now() + DELAY_MS + steps * POP_MS + NAV_AFTER_MS;
+    gateFrame = frame; navRevealAt = Date.now() + startMs + steps * POP_MS + NAV_AFTER_MS;
     for(var i = 0; i < steps; i++){
-      (function(el, src, at){
+      (function(el, src, at, last){
         timers.push(setTimeout(function(){
           if(!frame.isConnected || !el.isConnected) return;            // the page was left before this step
-          pop(el, src);
+          pop(el, src, (last && cue) ? function(popLeft){ armCue(frame, cue, popLeft); } : null);
         }, at));
-      })(targets[i], plan[i], DELAY_MS + i * POP_MS);
+      })(targets[i], plan[i], startMs + i * POP_MS, i === steps - 1);
     }
+  }
+  function schedule(frame, plan, afterVo, cue){
+    cancel();
+    if(afterVo){ voFrame = frame; voPlan = plan; voCue = cue; return; }   // [P2-VO-FIRST] timed by the setNavActive wrapper once the narration ends
+    run(frame, plan, DELAY_MS, cue);
+  }
+  // [P2-SPEAKER-CUE] the pop beat is over in popLeft ms: CUE_GAP_MS after that, speak the cue and breathe with it
+  function armCue(frame, cue, popLeft){
+    timers.push(setTimeout(function(){ startCue(frame, cue); }, popLeft + CUE_GAP_MS));
+  }
+  function startCue(frame, cue){
+    if(!frame.isConnected) return;                                            // the page was left
+    if(document.body.classList.contains("vo-playing")){                       // the child is replaying the narration: wait for it
+      timers.push(setTimeout(function(){ startCue(frame, cue); }, 250)); return;
+    }
+    if(typeof play !== "function") return;
+    var el = document.querySelector(cue.pulse);
+    var still = !!(window.FLNMotion && FLNMotion.still && FLNMotion.still());
+    settleCue(true);
+    if(el && !still){ cueEl = el; el.classList.add("p2-cue"); }
+    play(cue.src, function(){ settleCue(false); });                           // the line ended (or a missing file's silent beat)
+    var a = (typeof currentAudio !== "undefined") ? currentAudio : null;      // play()'s element: a pause (speaker tap -> stopAudio) cuts the line
+    if(a) a.addEventListener("pause", function(){ settleCue(false); }, { once:true });
+  }
+  // stop breathing: at once, or at the end of the current breath (animationiteration, 900ms safety)
+  function settleCue(now){
+    var el = cueEl; cueEl = null;
+    if(!el) return;
+    if(now){ el.classList.remove("p2-cue"); return; }
+    var done = false, fin = function(){ if(done) return; done = true; el.classList.remove("p2-cue"); };
+    el.addEventListener("animationiteration", fin, { once:true });
+    setTimeout(fin, 900);
   }
   function frameOf(idx){
     if(!Object.prototype.hasOwnProperty.call(PLAN_BY_SLIDE, idx)) return null;
@@ -6888,6 +6963,10 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   var origNav = window.setNavActive;
   if(typeof origNav === "function"){
     window.setNavActive = function(on){
+      if(on === true && voFrame && voFrame.isConnected){                 // [P2-VO-FIRST] the narration has ended: pop + SFX from here
+        var f = voFrame, p = voPlan, c = voCue; voFrame = null; voPlan = null; voCue = null;
+        run(f, p, AFTER_VO_MS, c);
+      }
       var wait = navRevealAt - Date.now();
       if(on === true && gateFrame && gateFrame.isConnected && wait > 0){
         if(navTimer) clearTimeout(navTimer);                       // too early on a popping page: hold it
@@ -6904,13 +6983,13 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     cancel();
     var r = orig.apply(this, arguments);
     var f = frameOf(idx);
-    if(f) schedule(f, PLAN_BY_SLIDE[idx]);
+    if(f) schedule(f, PLAN_BY_SLIDE[idx], AFTER_VO_BY_SLIDE[idx] === true, CUE_BY_SLIDE[idx] || null);
     return r;
   };
   // a ?slide=N dev load mounts inside the engine script, before this block runs
   var cur = (typeof state === "object" && state) ? state.idx : -1;
   var now = frameOf(cur);
-  if(now) schedule(now, PLAN_BY_SLIDE[cur]);
+  if(now) schedule(now, PLAN_BY_SLIDE[cur], AFTER_VO_BY_SLIDE[cur] === true, CUE_BY_SLIDE[cur] || null);
 })();
 </script>
 <script id="P5-CORRECT-SFX-JS">
