@@ -4676,25 +4676,46 @@ function boot(){
   // finished (#sgBtn is display:none until it carries .ready — see <style id="LANDING-START-AFTER-VO">).
   // Outcomes: ended → reveal; file missing/unsupported → reveal after a short beat (the landing can never get
   // stuck); autoplay refused before a gesture → wait, the first pointerdown retries; a second refusal still reveals.
-  const landingVO = { state:"idle", tapTried:false, followUpTimer:0, leaving:false };   // state: idle | playing | done
-  const revealStart = ()=>{ const b = $("sgBtn"); if(b) b.classList.add("ready"); };
+  const landingVO = { state:"idle", tapTried:false, followUpTimer:0, idleTimer:0, cue:"off", welcomeToken:0, leaving:false };   // state: idle | playing | done
+  // SME: once the Page 1 VO is over, शुरू करें pops in (.ready → one-shot sgBtnReveal) and then BREATHES (.sg-breathe →
+  // sgBtnPulse, see LANDING-START-AFTER-VO). The pulse takes over only when the pop-in has landed, so nothing jumps.
+  const revealStart = ()=>{ const b = $("sgBtn"); if(!b || b.classList.contains("ready")) return; b.classList.add("ready");
+    let on = false; const breathe = ()=>{ if(on) return; on = true; b.classList.add("sg-breathe"); };
+    b.addEventListener("animationend", breathe, { once:true }); setTimeout(breathe, 700); };   // 700 ms fallback: the pop-in is .52 s
   // Page-1 follow-up (SME): 1.5 s after the welcome has finished, the bird pulses FOR AS LONG AS the replay line plays
-  // ("फिर से सुनने के लिए मुझ पर टैप करिए" = vo_tap_swiftee_replay) and settles when it ends. Once per open; dropped if
-  // the child has already tapped शुरू करें or the landing was bypassed, so it can never talk over the phase-transition line.
+  // ("फिर से सुनने के लिए मुझ पर टैप करिए" = vo_tap_swiftee_replay) and settles when it ends. Then, for as long as the
+  // child stays on Page 1, the SAME cue (pulse + line) plays again after every 5 s WITHOUT ACTIVITY: a tap anywhere on
+  // Page 1 restarts the 5 s count; a tap while the cue is running is left alone (the cue finishes, then the count restarts).
+  // Dropped the moment the child taps शुरू करें or the landing is bypassed, so it can never talk over the phase-transition line.
+  // landingVO.cue: off (welcome not heard yet) | pending (1.5 s beat) | playing (pulse + line) | welcome (bird-tap replay of
+  // the welcome) | idle (5 s no-activity count)
+  const IDLE_REPLAY_MS = 5000;
   const replaySrc = (CARD.assets && CARD.assets.audio && CARD.assets.audio["vo_tap_swiftee_replay"]) || ("assets/Audio/vo_tap_swiftee_replay." + AUDIO_EXT);
   const birdEl = ()=> document.querySelector(".start-gate .sg-mascot");
+  const onLanding = ()=> !landingVO.leaving && !$("startGate").classList.contains("hidden");
+  // the bird's pulse and the button's breathing are mutually exclusive (SME): while the bird pulses with its line the
+  // start gate carries .sg-bird-cue, which holds शुरू करें still; the two flags always flip together
+  const setBirdCue = (on)=>{ const m = birdEl(); if(m) m.classList.toggle("sg-pulsing", on); $("startGate").classList.toggle("sg-bird-cue", on); };
   const stopBirdPulse = (atOnce)=>{ const m = birdEl(); if(!m || !m.classList.contains("sg-pulsing")) return;
-    let off = false; const settle = ()=>{ if(off) return; off = true; m.classList.remove("sg-pulsing"); };
+    let off = false; const settle = ()=>{ if(off) return; off = true; setBirdCue(false); };
     if(atOnce){ settle(); return; }
     m.addEventListener("animationiteration", settle, { once:true });   // let the current breath finish, then rest
     setTimeout(settle, 900); };
+  const runBirdCue = ()=>{                               // pulse + replay line; when the line ends the bird settles and the idle count starts
+    if(!onLanding()) return;
+    landingVO.cue = "playing";
+    setBirdCue(true);
+    play(replaySrc, ()=>{ stopBirdPulse(false); landingVO.cue = "idle"; armIdleReplay(); });   // line ended / missing / blocked → the bird settles
+  };
+  const armIdleReplay = ()=>{                            // (re)start the 5 s no-activity count → the cue plays again; no-op unless the count is live
+    clearTimeout(landingVO.idleTimer);
+    if(landingVO.cue !== "idle" || !onLanding()) return;
+    landingVO.idleTimer = setTimeout(runBirdCue, IDLE_REPLAY_MS);
+  };
   const scheduleFollowUp = ()=>{
     clearTimeout(landingVO.followUpTimer);
-    landingVO.followUpTimer = setTimeout(()=>{
-      if(landingVO.leaving || $("startGate").classList.contains("hidden")) return;
-      const m = birdEl(); if(m) m.classList.add("sg-pulsing");
-      play(replaySrc, ()=> stopBirdPulse(false));           // line ended / missing / blocked → the bird settles
-    }, 1500);
+    landingVO.cue = "pending";
+    landingVO.followUpTimer = setTimeout(runBirdCue, 1500);
   };
   // Page 1 counts as OPEN only once the boot loader has begun to fade (.done) or is gone
   const pageOneOpen = ()=>{ const bl = $("bootLoader"); return !bl || !bl.isConnected || bl.classList.contains("done"); };
@@ -4718,6 +4739,21 @@ function boot(){
       else setTimeout(()=> finish("error"), 1200); });
   };
   const sgVo = $("sgVo"); if(sgVo) sgVo.onclick = (e)=>{ e.stopPropagation(); playLanding(); };
+  // Page-1 bird tap (SME): tapping the bird plays the Page 1 welcome again — but NOT while the bird is pulsing with its
+  // replay line (that tap is ignored; the cue is left to finish). Only once the first welcome has finished (state done),
+  // so the once-only reveal chain above is never disturbed. A tap during the replay restarts it (engine replay-chip
+  // convention). The tap is activity: it drops any pending 1.5 s / 5 s cue, and when the replayed welcome ends the 5 s
+  // no-activity count starts afresh. The shared play() is fine here: ended / missing / blocked all just end the replay.
+  const replayWelcome = ()=>{
+    if(landingVO.state !== "done" || !onLanding()) return;                    // first welcome still owed, or Page 1 left
+    if(landingVO.cue === "playing") return;                                   // pulsing + replay line running → ignored
+    const m = birdEl(); if(m && m.classList.contains("sg-pulsing")) return;   // still settling from the pulse → ignored
+    clearTimeout(landingVO.followUpTimer); clearTimeout(landingVO.idleTimer);
+    landingVO.cue = "welcome";
+    const my = ++landingVO.welcomeToken;                                      // a re-tap restarts: only the latest replay's end counts
+    play(landSrc, ()=>{ if(my !== landingVO.welcomeToken) return; landingVO.cue = "idle"; armIdleReplay(); });
+  };
+  const sgBird = birdEl(); if(sgBird) sgBird.addEventListener("click", replayWelcome);
   // ---- BOOT LOADER (reference parity, 2s): hold the logo, fade it, THEN start the landing narration.
   // The same handler adds body.loaded (unblocks the landing icon pop-in) and fires the landing VO. ----
   (function(){
@@ -4734,10 +4770,14 @@ function boot(){
   // A tap on Page 1 plays the VO where the browser refused to start it by itself (desktop browsers before the first
   // click). A tap during the LOADING SCREEN must not start it early: playLanding waits for Page 1, and that tap only
   // unlocks sound, so the 2 s loader hand-over can speak. Once the VO has played this is a no-op (never a replay).
-  window.addEventListener("pointerdown", ()=>{ if(landingVO.state === "idle" && pageOneOpen()){ landingVO.tapTried = true; playLanding(); } });
+  // Every tap on Page 1 also counts as ACTIVITY: it restarts the 5 s no-activity count behind the bird cue replay.
+  window.addEventListener("pointerdown", ()=>{
+    if(landingVO.state === "idle" && pageOneOpen()){ landingVO.tapTried = true; playLanding(); }
+    armIdleReplay();
+  });
 
   $("sgBtn").onclick = ()=>{
-    landingVO.leaving = true; clearTimeout(landingVO.followUpTimer); stopBirdPulse(true);   // no bird cue / replay line once the child has moved on
+    landingVO.leaving = true; clearTimeout(landingVO.followUpTimer); clearTimeout(landingVO.idleTimer); stopBirdPulse(true);   // no bird cue / replay line / idle replay once the child has moved on
     stopAudio();          // silence the landing greeting BEFORE slide 0 speaks (no VO overlap)
     _ac();                // unlock/resume WebAudio on the start gesture so the first clip never clips
     // [engine JS] r4/P1: peek gate into the tutorial. The landing stays visible-and-BLURRED behind the
@@ -4826,8 +4866,8 @@ boot();
 .audio-chip.playing .wv2,.mascot-wrap .audio-chip.playing .wv2,.sg-vo.playing .wv2,.tut-audio.playing .wv2{animation:wv2 1.2s steps(1) infinite !important;}
 .audio-chip .wv,.mascot-wrap .audio-chip .wv,.sg-vo .wv{opacity:1;}
 /* landing bird + speaker: fully still (no float/pulse/hover) — except the deliberate pulse while the replay line
-   plays (.sg-pulsing, from 1.5 s after the welcome VO; see LANDING-START-AFTER-VO): an !important transform lock
-   would beat any animation */
+   plays (.sg-pulsing, from 1.5 s after the welcome VO and again after every 5 s of no activity on Page 1; see
+   LANDING-START-AFTER-VO): an !important transform lock would beat any animation */
 .sg-mascot:not(.sg-pulsing),.sg-mascot:hover:not(.sg-pulsing),.sg-mascot:active:not(.sg-pulsing){animation:none !important;transform:none !important;}
 </style>
 <script id="UIFIX-DEVGATE">(function(){
@@ -6985,7 +7025,8 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 /* ===== Page 1: शुरू करें appears only AFTER the landing VO has played once =====
    The button is kept out of the page (display:none) until the engine adds .ready at the end of the
    welcome line (playLanding in the engine script); it then pops in with the landing's own icon reveal.
-   Every keyframe keeps translateX(-50%): that is the pill's centring transform. One-shot, not a pulse. */
+   Every keyframe keeps translateX(-50%): that is the pill's centring transform. One-shot pop-in; the breathing
+   that follows it is ruled further down in this block. */
 .start-gate .sg-btn:not(.ready){display:none !important;}
 .start-gate .sg-btn.ready{animation:sgBtnReveal .52s cubic-bezier(.34,1.5,.6,1) !important;}
 @keyframes sgBtnReveal{
@@ -6993,11 +7034,21 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   60% {opacity:1;transform:translateX(-50%) scale(1.08) translateY(0);}
   100%{opacity:1;transform:translateX(-50%) scale(1)   translateY(0);}
 }
-/* Page-1 follow-up: the bird pulses for as long as the replay line plays (from 1.5 s after the welcome) and settles
-   when it ends. The "fully still" lock on .sg-mascot exempts .sg-pulsing, otherwise its !important transform:none
-   would beat this animation. */
+/* Page-1 follow-up: the bird pulses for as long as the replay line plays (from 1.5 s after the welcome, then again
+   after every 5 s without a tap on Page 1) and settles when it ends. The "fully still" lock on .sg-mascot exempts
+   .sg-pulsing, otherwise its !important transform:none would beat this animation. */
 .start-gate .sg-mascot.sg-pulsing{animation:sgMascotPulse .8s ease-in-out infinite !important;transform-origin:50% 100%;}
+/* the bird is tappable (replays the welcome; see replayWelcome in the engine script): a shared img rule had left it
+   pointer-events:none, so taps fell through to the card — re-enable hit-testing here; cursor only, nothing else moves */
+.start-gate .sg-mascot{pointer-events:auto !important;cursor:pointer;}
 @keyframes sgMascotPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+/* Page 1 button breathing (SME): once the welcome VO is over and the pop-in has landed, शुरू करें pulses (.sg-breathe,
+   added by revealStart; the engine's own sgBtnPulse keyframes keep translateX(-50%)). It is held STILL for as long as
+   the bird pulses with its line (.start-gate.sg-bird-cue, flipped together with .sg-pulsing by setBirdCue) and breathes
+   again from rest once the bird settles. Higher specificity than the reference-pill "no breathing" rule
+   (.sg-btn.ready{animation:none !important}) and the pop-in rule above, so these win. */
+.start-gate .sg-btn.ready.sg-breathe{animation:sgBtnPulse 1.4s ease-in-out infinite !important;}
+.start-gate.sg-bird-cue .sg-btn.ready.sg-breathe{animation:none !important;}
 </style>
 </body>
 </html>
