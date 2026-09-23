@@ -6895,18 +6895,28 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    that had no such frame get it here as an INSET stroke drawn over the picture's own baked white edge, so nothing grows or
    moves: the landing hero (page 1), the story picture (pages 2-3), the picture pair (page 4) and the wagon pictures
    (page 13). The *_ylw pictures are left alone - they already carry the frame in the asset. */
-/* page 1: pic_girl_play_ball.png has transparent padding (7/16/13/12 px of 1462x730), so the stroke is a pseudo-element
-   laid on the picture's visible bounds; 4px = its ~13px white edge at this size, 16px = its 54px corner */
+/* page 1: pic_girl_play_ball.png has transparent padding (8/17/14/13 px of 1462x730), so the stroke is a pseudo-element
+   laid on the picture's visible bounds and the img is clipped to the very same rounded box (clip-path), so the two corners
+   coincide. The asset's white edge is 12px thick with a 65px outer / 51px inner corner = 3.6 / 19.6 / 15.4 css px here,
+   plus a ~1px orange rim baked inside the white at the corners. Corner rule ([YLW-CORNER-FIX] 2026-09-23): the stroke's
+   inner corner must pass INSIDE the white edge's inner corner along the diagonal, i.e. R*(1-1/sqrt2) + w/sqrt2 must exceed
+   the white edge's inner-boundary offset from the corner (8.8 css px here, 10.3 with the rim), and a LARGER radius helps
+   (it trims more of the corner) - a smaller one exposes the white, which is what the first 16px cut did. 26px / 4px gives
+   10.4px. Widths are whole px on purpose - Chrome snaps 4.5px borders/outlines down to 4px. */
 .start-gate .sg-icon{position:relative;}
-.start-gate .sg-icon::after{content:"";position:absolute;left:0.479%;top:2.192%;width:98.632%;height:96.164%;box-sizing:border-box;
-  border:4px solid #FCD86B;border-radius:16px;pointer-events:none;}
+.start-gate .sg-icon img{clip-path:inset(2.329% 0.958% 1.781% 0.547% round 26px);}
+.start-gate .sg-icon::after{content:"";position:absolute;left:0.547%;top:2.329%;width:98.495%;height:95.890%;box-sizing:border-box;
+  border:4px solid #FCD86B;border-radius:26px;pointer-events:none;}
 /* pages 2-3: the img box was letterboxed to the 900/432 frame (wider than the drawn picture) - let it hug the drawn picture
-   (same size, still centred by the frame's flex centring) so the stroke hugs it too; 4px = the assets' 16-19px white edge
-   at 242px tall, 16px = their 68-76px corner */
+   (same size, still centred by the frame's flex centring) so the stroke hugs it too. The assets' white edge is 16-19px
+   thick with a 85-96px outer / 68-76px inner corner = 3.7-3.9 / 19.4-19.5 / 15.4-15.6 css px at 242px tall; the white's
+   inner boundary sits 8.5px in along the corner diagonal, and 22px / 4px puts the stroke's inner corner at 9.3px (see the
+   corner rule above), so no white shows anywhere ([YLW-CORNER-FIX] 2026-09-23; was 16px / 4px = 7.5px, exposing it) */
 .stage.tut .story-frame:not(.story-frame-pair) .story-img{width:auto;max-width:100%;}
-.stage.tut .story-frame .story-img{outline:4px solid #FCD86B;outline-offset:-4px;border-radius:16px;}
-/* page 4 pair (190px tall): 3px = the assets' 19px edge at this size, 13px = their 76px corner; .p4-mark (green, 6px) still outranks it */
-.stage.tut .story-frame-pair .story-img{outline:3px solid #FCD86B;outline-offset:-3px;border-radius:13px;}
+.stage.tut .story-frame .story-img{outline:4px solid #FCD86B;outline-offset:-4px;border-radius:22px;}
+/* page 4 pair (190px tall): edge 3.0 / outer corner 15.2 / inner 12.0 css px, inner boundary 6.7px in along the diagonal
+   -> 18px radius, 3px stroke = 7.4px; .p4-mark (green, 6px) still outranks it ([YLW-CORNER-FIX]; was 13px / 3px) */
+.stage.tut .story-frame-pair .story-img{outline:3px solid #FCD86B;outline-offset:-3px;border-radius:18px;}
 /* page 13 wagon pictures: their 19px/19px/0/0 corners are kept; the stroke follows them */
 .ref-panel .ref-cargo-img{outline:3px solid #FCD86B;outline-offset:-3px;}
 </style>
