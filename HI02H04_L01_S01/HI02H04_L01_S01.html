@@ -4685,28 +4685,34 @@ function boot(){
   // finished (#sgBtn is display:none until it carries .ready — see <style id="LANDING-START-AFTER-VO">).
   // Outcomes: ended → reveal; file missing/unsupported → reveal after a short beat (the landing can never get
   // stuck); autoplay refused before a gesture → wait, the first pointerdown retries; a second refusal still reveals.
-  const landingVO = { state:"idle", tapTried:false, followUpTimer:0, idleTimer:0, cue:"off", welcomeToken:0, leaving:false };   // state: idle | playing | done
-  // SME: once the Page 1 VO is over, शुरू करें pops in (.ready → one-shot sgBtnReveal) and then BREATHES (.sg-breathe →
-  // sgBtnPulse, see LANDING-START-AFTER-VO). The pulse takes over only when the pop-in has landed, so nothing jumps.
+  const landingVO = { state:"idle", tapTried:false, followUpTimer:0, idleTimer:0, cue:"off", welcomeToken:0, leaving:false, revealWatch:0 };   // state: idle | playing | done
+  // SME: शुरू करें pops in (.ready → one-shot sgBtnReveal) and then BREATHES (.sg-breathe → sgBtnPulse, see
+  // LANDING-START-AFTER-VO). The pulse takes over only when the pop-in has landed, so nothing jumps.
+  // [LANDING-BTN-AFTER-BIRD] (2026-09-23): the button no longer appears at the end of the welcome VO - it appears only once
+  // the FIRST bird cue (bird pulse + "Page 1 Replay" line, 1.5 s after the welcome) has finished and the bird has settled
+  // (runBirdCue → stopBirdPulse(false, revealStart)). Page 1 order is now: welcome VO → 1.5 s → bird pulses with its line →
+  // bird settles → शुरू करें pops in and breathes. A welcome that could not be heard (file error) still reveals it at once,
+  // and a 10 s watchdog from the end of the welcome reveals it if the cue never completes - the landing can never get stuck.
   const revealStart = ()=>{ const b = $("sgBtn"); if(!b || b.classList.contains("ready")) return; b.classList.add("ready");
     let on = false; const breathe = ()=>{ if(on) return; on = true; b.classList.add("sg-breathe"); };
     b.addEventListener("animationend", breathe, { once:true }); setTimeout(breathe, 700); };   // 700 ms fallback: the pop-in is .52 s
   // Page-1 follow-up (SME): 1.5 s after the welcome has finished, the bird pulses FOR AS LONG AS the replay line plays
-  // ("फिर से सुनने के लिए मुझ पर टैप करिए" = vo_tap_swiftee_replay) and settles when it ends. Then, for as long as the
-  // child stays on Page 1, the SAME cue (pulse + line) plays again after every 5 s WITHOUT ACTIVITY: a tap anywhere on
-  // Page 1 restarts the 5 s count; a tap while the cue is running is left alone (the cue finishes, then the count restarts).
-  // Dropped the moment the child taps शुरू करें or the landing is bypassed, so it can never talk over the phase-transition line.
+  // ("फिर से सुनने के लिए मुझ पर टैप करिए" = vo_tap_swiftee_replay) and settles when it ends. [P1-CUE-ONCE] (2026-09-23): that cue
+  // plays ONCE - the former "again after every 5 s without activity" repeat is off (armIdleReplay below is a no-op), so on
+  // Page 1 the welcome, the bird pulse and the replay line are each heard once; only a tap on the bird replays the welcome.
+  // A tap while the cue is running is left alone (the cue finishes). Dropped the moment the child taps शुरू करें or the
+  // landing is bypassed, so it can never talk over the phase-transition line.
   // landingVO.cue: off (welcome not heard yet) | pending (1.5 s beat) | playing (pulse + line) | welcome (bird-tap replay of
-  // the welcome) | idle (5 s no-activity count)
-  const IDLE_REPLAY_MS = 5000;
+  // the welcome) | idle (cue over; nothing more is scheduled)
   const replaySrc = (CARD.assets && CARD.assets.audio && CARD.assets.audio["vo_tap_swiftee_replay"]) || ("assets/Audio/vo_tap_swiftee_replay." + AUDIO_EXT);
   const birdEl = ()=> document.querySelector(".start-gate .sg-mascot");
   const onLanding = ()=> !landingVO.leaving && !$("startGate").classList.contains("hidden");
   // the bird's pulse and the button's breathing are mutually exclusive (SME): while the bird pulses with its line the
   // start gate carries .sg-bird-cue, which holds शुरू करें still; the two flags always flip together
   const setBirdCue = (on)=>{ const m = birdEl(); if(m) m.classList.toggle("sg-pulsing", on); $("startGate").classList.toggle("sg-bird-cue", on); };
-  const stopBirdPulse = (atOnce)=>{ const m = birdEl(); if(!m || !m.classList.contains("sg-pulsing")) return;
-    let off = false; const settle = ()=>{ if(off) return; off = true; setBirdCue(false); };
+  const stopBirdPulse = (atOnce, then)=>{ const m = birdEl();          // then: runs once the bird is at rest ([LANDING-BTN-AFTER-BIRD]: the button reveal)
+    if(!m || !m.classList.contains("sg-pulsing")){ if(then) then(); return; }
+    let off = false; const settle = ()=>{ if(off) return; off = true; setBirdCue(false); if(then) then(); };
     if(atOnce){ settle(); return; }
     m.addEventListener("animationiteration", settle, { once:true });   // let the current breath finish, then rest
     setTimeout(settle, 900); };
@@ -4714,17 +4720,16 @@ function boot(){
     if(!onLanding()) return;
     landingVO.cue = "playing";
     setBirdCue(true);
-    play(replaySrc, ()=>{ stopBirdPulse(false); landingVO.cue = "idle"; armIdleReplay(); });   // line ended / missing / blocked → the bird settles
+    play(replaySrc, ()=>{ stopBirdPulse(false, revealStart); landingVO.cue = "idle"; armIdleReplay(); });   // line ended / missing / blocked → the bird settles, then शुरू करें pops in (first cue only; later cues find it there)
   };
-  const armIdleReplay = ()=>{                            // (re)start the 5 s no-activity count → the cue plays again; no-op unless the count is live
+  const armIdleReplay = ()=>{                            // [P1-CUE-ONCE]: the 5 s no-activity repeat of the cue is OFF - the cue plays once; kept as a no-op so its callers stay as they were
     clearTimeout(landingVO.idleTimer);
-    if(landingVO.cue !== "idle" || !onLanding()) return;
-    landingVO.idleTimer = setTimeout(runBirdCue, IDLE_REPLAY_MS);
   };
   const scheduleFollowUp = ()=>{
     clearTimeout(landingVO.followUpTimer);
     landingVO.cue = "pending";
     landingVO.followUpTimer = setTimeout(runBirdCue, 1500);
+    if(!$("sgBtn").classList.contains("ready")){ clearTimeout(landingVO.revealWatch); landingVO.revealWatch = setTimeout(revealStart, 10000); }   // [LANDING-BTN-AFTER-BIRD] safety net
   };
   // Page 1 counts as OPEN only once the boot loader has begun to fade (.done) or is gone
   const pageOneOpen = ()=>{ const bl = $("bootLoader"); return !bl || !bl.isConnected || bl.classList.contains("done"); };
@@ -4737,8 +4742,9 @@ function boot(){
     const finish = (why)=>{
       if(done) return; done = true; setPlaying(false);
       if(why === "blocked" && !landingVO.tapTried){ landingVO.state = "idle"; return; }   // browser wants a tap first → the first tap ON PAGE 1 plays it
-      landingVO.state = "done"; revealStart();
-      if(why === "ended") scheduleFollowUp();           // the bird cue follows a welcome that was actually heard
+      landingVO.state = "done";
+      if(why === "ended") scheduleFollowUp();           // the bird cue follows a welcome that was actually heard; शुरू करें follows the cue ([LANDING-BTN-AFTER-BIRD])
+      else revealStart();                               // welcome not heard (file error): nothing to wait for, show the button now
     };
     const a = new Audio(landSrc); currentAudio = a;       // registered so stopAudio() (start tap / dev nav) can silence it
     a.onended = ()=> finish("ended");
@@ -4757,10 +4763,12 @@ function boot(){
     if(landingVO.state !== "done" || !onLanding()) return;                    // first welcome still owed, or Page 1 left
     if(landingVO.cue === "playing") return;                                   // pulsing + replay line running → ignored
     const m = birdEl(); if(m && m.classList.contains("sg-pulsing")) return;   // still settling from the pulse → ignored
-    clearTimeout(landingVO.followUpTimer); clearTimeout(landingVO.idleTimer);
+    clearTimeout(landingVO.followUpTimer); clearTimeout(landingVO.idleTimer); clearTimeout(landingVO.revealWatch);
     landingVO.cue = "welcome";
     const my = ++landingVO.welcomeToken;                                      // a re-tap restarts: only the latest replay's end counts
-    play(landSrc, ()=>{ if(my !== landingVO.welcomeToken) return; landingVO.cue = "idle"; armIdleReplay(); });
+    play(landSrc, ()=>{ if(my !== landingVO.welcomeToken) return;
+      if(!$("sgBtn").classList.contains("ready")){ scheduleFollowUp(); return; }   // [LANDING-BTN-AFTER-BIRD] button still owed: 1.5 s → bird cue → button, as after the first welcome
+      landingVO.cue = "idle"; armIdleReplay(); });
   };
   const sgBird = birdEl(); if(sgBird) sgBird.addEventListener("click", replayWelcome);
   // ---- BOOT LOADER (reference parity, 2s): hold the logo, fade it, THEN start the landing narration.
@@ -4779,7 +4787,7 @@ function boot(){
   // A tap on Page 1 plays the VO where the browser refused to start it by itself (desktop browsers before the first
   // click). A tap during the LOADING SCREEN must not start it early: playLanding waits for Page 1, and that tap only
   // unlocks sound, so the 2 s loader hand-over can speak. Once the VO has played this is a no-op (never a replay).
-  // Every tap on Page 1 also counts as ACTIVITY: it restarts the 5 s no-activity count behind the bird cue replay.
+  // (armIdleReplay is a no-op since [P1-CUE-ONCE]: the bird cue no longer repeats on inactivity.)
   window.addEventListener("pointerdown", ()=>{
     if(landingVO.state === "idle" && pageOneOpen()){ landingVO.tapTried = true; playLanding(); }
     armIdleReplay();
@@ -4875,7 +4883,7 @@ boot();
 .audio-chip.playing .wv2,.mascot-wrap .audio-chip.playing .wv2,.sg-vo.playing .wv2,.tut-audio.playing .wv2{animation:wv2 1.2s steps(1) infinite !important;}
 .audio-chip .wv,.mascot-wrap .audio-chip .wv,.sg-vo .wv{opacity:1;}
 /* landing bird + speaker: fully still (no float/pulse/hover) — except the deliberate pulse while the replay line
-   plays (.sg-pulsing, from 1.5 s after the welcome VO and again after every 5 s of no activity on Page 1; see
+   plays (.sg-pulsing, once, from 1.5 s after the welcome VO - no idle repeat since [P1-CUE-ONCE]; see
    LANDING-START-AFTER-VO): an !important transform lock would beat any animation */
 .sg-mascot:not(.sg-pulsing),.sg-mascot:hover:not(.sg-pulsing),.sg-mascot:active:not(.sg-pulsing){animation:none !important;transform:none !important;}
 </style>
@@ -6868,22 +6876,28 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 .stage.tut .story-caption.p2-sentence-btn:active{transform:scale(.97);}
 /* [VO-BATCH] page 4 (T3, the picture pair): while "इस वाक्य के लिए यह चित्र सही है।" (vo_t3_explain) speaks, the picture it means
    (data.image_ids[1], the girl watering the plants) is ringed in green and the other one fades - no motion (the pictures stay
-   still, as asked on 2026-09-21); the mark stays until the page is left */
+   still, as asked on 2026-09-21); the mark stays until the page is left. Since [P4-TAP-ONLY] (2026-09-24) that line follows
+   the speaker-chip tap (no automatic sentence any more), so the ring appears from the first tap on. */
 .stage.tut .story-frame-pair .story-img.p4-mark{outline:6px solid #22B14C;outline-offset:-6px;border-radius:14px;}
 .stage.tut .story-frame-pair .story-img.p4-dim{opacity:.45;transition:opacity .4s ease;}
-/* [P2-WORD-SYNC] page 2: while the yellow bar speaks its sentence (vo_sent_boy_sit) the word being said carries .on - a warm
-   highlight and a very slight pop - word by word from the audio clock (#P2-BIRD-POP-JS splits the pill text into .p2-word
-   spans at wire time and flips .on in a requestAnimationFrame loop over currentTime). inline-block gives each word a box for
-   the highlight and the transform; the negative side margins give the highlight a little air without moving the text. */
+/* [P2-WORD-SYNC] page 2: while the bar speaks its sentence (vo_sent_boy_sit) the word being said carries .on - since
+   [WORD-ORANGE] (2026-09-23) its TEXT turns dark orange (#E86A00) with a very slight pop; the earlier #FFC94D block behind the
+   word is gone (the user: colour the word, not a block) - word by word from the audio clock (#P2-BIRD-POP-JS splits the pill
+   text into .p2-word spans at wire time and flips .on in a requestAnimationFrame loop over currentTime). inline-block gives
+   each word a box for the transform; the padding/negative margins are kept as they were so no text moves. */
 .stage.tut .story-caption .p2-word{display:inline-block;border-radius:10px;padding:0 .12em;margin:0 -.12em;transform-origin:50% 60%;}
-.stage.tut .story-caption .p2-word.on{background:#FFC94D;animation:p2WordPop .28s ease-out 1;}
+.stage.tut .story-caption .p2-word.on{color:#E86A00;animation:p2WordPop .28s ease-out 1;}
 @keyframes p2WordPop{0%{transform:scale(1);}45%{transform:scale(1.10);}100%{transform:scale(1);}}
 /* [P6-OPT-WORDS] page 6 (and pages 8, 10 and 12, [P8-SAME-AS-P6] / [P10-SAME-AS-P6] / [P12-SAME-AS-P6]): the three sentence option pills (.sent-opt .so-pill, the same yellow bar) highlight word by word too,
    from whichever of their recordings play() is speaking (a tap on the pill, right or wrong, the guided tap). The pill is a
    flex box, so its words sit in one inline wrapper (.p2-words) - flex would drop the spaces between separate word boxes. */
 .sent-opt .so-pill .p2-words{display:inline;}
 .sent-opt .so-pill .p2-word{display:inline-block;border-radius:10px;padding:0 .12em;margin:0 -.12em;transform-origin:50% 60%;}
-.sent-opt .so-pill .p2-word.on{background:#FFC94D;animation:p2WordPop .28s ease-out 1;}
+.sent-opt .so-pill .p2-word.on{color:#E86A00;animation:p2WordPop .28s ease-out 1;}   /* [WORD-ORANGE]: dark-orange text, no block */
+/* [P5-BOX-WORDS] (2026-09-24) page 5: the sentence box's text (.sq-text, a blockified flex item, so its word spans sit directly in it
+   with their spaces) lights up word by word while its sentence speaks - the same look as the pages 2-4 bars above */
+.sq-sentence-box .sq-text .p2-word{display:inline-block;border-radius:10px;padding:0 .12em;margin:0 -.12em;transform-origin:50% 60%;}
+.sq-sentence-box .sq-text .p2-word.on{color:#E86A00;animation:p2WordPop .28s ease-out 1;}
 /* [P6-REVIEW] page 6 (and pages 8, 10 and 12, [P8-SAME-AS-P6] / [P10-SAME-AS-P6] / [P12-SAME-AS-P6]): after the second wrong tap the page reads out all three sentence pills, one by one; the pill whose line
    is speaking pops very slightly (a springy lift while it speaks, eased back at its end) and its words light up as usual */
 .sent-opt .so-pill{transition:transform .28s ease;}
@@ -7002,6 +7016,47 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    NOT applied: the pop/SFX and "no आगे before the first tap" - the page still shows आगे by itself after its explanation. A tap
    on the bar while the page is still speaking its sentence already brings the follow-up line, so the script then only marks
    the picture instead of saying the same line twice.
+   [P4-TAP-ONLY] (2026-09-24) SUPERSEDES the automatic part above: page 4 now runs exactly like pages 2-3 minus the pop -
+   narration (vo_t3_instr), CUE_GAP_MS later the "tap the speaker" cue with the chip pulse (run() arms the cue when a page has
+   no pop steps), the sentence vo_sent_girl_water ONLY on a speaker-chip tap (word sync as before), then the follow-up line
+   vo_t3_explain while the meant picture is ringed and the other fades (MARK_BY_SLIDE via markFor in the tap handler; the
+   mark stays until the page is left), आगे NAV_AFTER_MS after those lines and never before the first tap (NAV_AFTER_TAP), the
+   idle cue every 5 s until आगे appears ([P2-QUIET-AFTER-NAV]). AUTO_SENTENCE_BY_SLIDE is empty; autoSentence() is unused.
+   [P5-SPK-CUE] (2026-09-24) pages in SPK_CUE_BY_SLIDE (page 5 = G1 = ?slide=3, the sentence-box question): after the page's
+   background lines - the engine's autoPlayChain: the instruction vo_prompt_sent_to_pic and (until [P5-TAP-ONLY] below took it
+   out) the automatic read-out of the sentence vo_sent_cat_ok - CUE_GAP_MS later the "tap the speaker" line (vo_tap_speaker_sentence) speaks while ONLY the
+   speaker chip beside the sentence box pulses (.p2-cue on the box, chip pulse in #P5-SPK-CUE-CSS), repeating after
+   CUE_IDLE_BY_SLIDE ms of inactivity like pages 2-4. Until the chip has been tapped it is the ONLY tappable thing on the page:
+   the option pictures (.opt-grid.spk-locked) and the sentence bar itself (.sq-sentence-box.spk-only) take no tap; the chip's
+   tap is the box's own replay (the engine's stim.onclick -> state.replayAudio = the sentence alone, [SPK-TAP-ONLY] lets its
+   waves run) and once that line is over the pictures unlock. The tap also ends the cue for good on this page
+   (box.__spkTapped: startCue / idleArm / idleFire bow out) - there is no आगे on this page to stop the idle repeat. Everything
+   after the unlock (wrong tap, hint, reveal, the correct tap's SFX + शाबाश) runs exactly as shipped. wireSpkCue() below.
+   [P5-TAP-ONLY] (2026-09-24) pages in SENTENCE_TAP_ONLY_BY_SLIDE (page 5): the page's sentence (card audio.word_name =
+   vo_sent_cat_ok) is NOT read out by the page itself any more - the engine's autoPlayChain (prompt, then word_name) still asks
+   for it, and the play() wrapper below skips that one call (autoSentenceOff: the id matches and the call did not come through
+   state.replayAudio) and hands the chain its callback, so the chain ends as if the clip had played. The sentence speaks ONLY
+   on the speaker-chip tap (the box's replay handler -> state.replayAudio, flagged replayVia while it runs), exactly as pages 2-4.
+   The card is unchanged (word_name stays: wireReplay needs it). So page 5 now goes: instruction -> 1.5 s -> cue -> chip tap ->
+   sentence -> pictures open.
+   [P5-BOX-WORDS] (2026-09-24) pages in BOX_WORDS_BY_SLIDE (page 5): the sentence box's Hindi text (.sq-text) is split into
+   .p2-word spans at mount (wireBoxWords, the same splitWords) and lights up word by word - dark orange text + the tiny pop,
+   the pages 2-4 bar look ([WORD-ORANGE], CSS in #P2-BIRD-POP-CSS) - whenever its sentence speaks, through the same play()
+   wrapper as the option pills (optWords, WORD_TIMES_BY_AUDIO[vo_sent_cat_ok]). The box geometry does not change (inline-block
+   words, padding and negative margin cancel out, as on the bars).
+   [P5-WRONG-PULSE] (2026-09-24) pages in WRONG_PULSE_BY_SLIDE (page 5): on wrong attempt #cfg.attempt (the FIRST) the speaker chip
+   pulses again as it did for the cue, but SILENTLY - no "tap the speaker" line. The engine's wrong branch speaks the page's
+   try_again slot (vo_try_again: no recording, so a 1.2 s silent beat) while the card shakes red; the play() wrapper below
+   recognises that call (wrongCueFor: the page's audio.try_again with state.attempts === cfg.attempt) and, when its beat is over
+   (the engine's un-crossing has run), puts .p2-cue on the box for cfg.ms (silentPulse: the [P5-SPK-CUE] chip pulse, no audio),
+   settling at the end of a breath; any tap (pointerdown) settles it early, so a chip tap (replay) or the next picture tap never
+   overlaps it. The second wrong attempt (the hint line) and the third (the reveal) are untouched.
+   [P5-NO-OK-AFTER-REVEAL] (2026-09-24) pages in NO_OK_AFTER_REVEAL_BY_SLIDE (page 5): after the reveal (3 wrong taps: decoys
+   dimmed, the answer ringed with the pointing hand, state.scaffoldLevel 3) the tap on the guided answer keeps its whole beat -
+   #P5-CORRECT-SFX-JS's SFX hold + green mark, then the engine's onGuidedTap (kit correct-select, happy mascot, ding + confetti) -
+   but the शाबाश line (card audio.correct = vo_ok_pic) is NOT spoken: the play() wrapper skips it (okAfterRevealOff) and hands
+   the engine its callback, so completeSlide(false) follows 700 ms later exactly as before. A first-try or second-try correct
+   tap (no reveal) still speaks it.
    [P6-OPT-WORDS] (2026-09-23) pages in OPT_WORDS_BY_SLIDE (page 6 = G2 = ?slide=4; pages 8, 10 and 12 too, see [P8-SAME-AS-P6] / [P10-SAME-AS-P6] / [P12-SAME-AS-P6]): each sentence option pill (.sent-opt
    .so-pill) is split into .p2-word spans at mount and mapped to its option's audio id (card data.options[].audio, matched by
    label_hi); play() is re-pointed so that whenever one of those ids is spoken - the engine's word-on-tap (right or wrong),
@@ -7053,7 +7108,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   var CUE_BY_SLIDE = {
     0: { src: "assets/Audio/vo_tap_speaker_sentence.ogg", pulse: "#slideHost .story-caption" },  // page 2: "Tap speaker icon" line, the caption pill + its speaker chip
     1: { src: "assets/Audio/vo_tap_speaker_sentence.ogg", pulse: "#slideHost .story-caption" },  // page 3: the same cue ([VO-BATCH])
-    2: { src: "assets/Audio/vo_tap_speaker_sentence.ogg", pulse: "#slideHost .story-caption" }   // page 4: idle repeat only, from the release of its script ([P4-BAR])
+    2: { src: "assets/Audio/vo_tap_speaker_sentence.ogg", pulse: "#slideHost .story-caption" }   // page 4: CUE_GAP_MS after the narration (no pop), then the idle repeat ([P4-TAP-ONLY])
   };
   // slide index -> true: a tap on the bird (.tut-mascot) repeats the page's narration ([P2-BIRD-REPLAY])
   var BIRD_REPLAY_BY_SLIDE = {
@@ -7082,7 +7137,8 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   // slide index -> true: आगे may not appear before the first tap on the pill / chip ([P2-NAV-AFTER-TAP])
   var NAV_AFTER_TAP_BY_SLIDE = {
     0: true,                                                                             // page 2
-    1: true                                                                              // page 3 ([P3-SAME-AS-P2])
+    1: true,                                                                             // page 3 ([P3-SAME-AS-P2])
+    2: true                                                                              // page 4 ([P4-TAP-ONLY], 2026-09-24)
   };
   // slide index -> the explanation that follows the FIRST hearing of the sentence, once per page open ([VO-BATCH])
   var EXPLAIN_BY_SLIDE = {
@@ -7093,7 +7149,8 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   var CUE_IDLE_BY_SLIDE = {
     0: 5000,                                                                             // page 2
     1: 5000,                                                                             // page 3 ([P3-SAME-AS-P2])
-    2: 5000                                                                              // page 4 ([P4-BAR])
+    2: 5000,                                                                             // page 4 ([P4-BAR])
+    3: 5000                                                                              // page 5: until its speaker chip is tapped ([P5-SPK-CUE])
   };
   // slide index -> word starts (s) in the pill's sentence recording, then the end of the last word ([P2-WORD-SYNC]); must have
   // one more entry than the pill has words (else no highlight). Page 2.wav = vo_sent_boy_sit, 2.64 s, speech 0.29-2.27 s:
@@ -7136,7 +7193,12 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     vo_sent_bird_wrong:      [0.29, 1.05, 1.25, 1.62, 1.93],
     // vo_sent_bird_peck_ok, 2.40 s, speech 0.27-2.05: चिड़िया 0.26 | दाना 0.93 | चुग 1.38 | रही 1.57 | है। 1.87 | end 2.05
     // (the ch noise 0.26-0.34, the ṛ flap 0.47-0.48; the prevoiced d closure 0.82-0.96 with its burst at 0.97; the ch closure 1.32-1.38 + noise 1.39-1.43; the g closure 1.49-1.54, release 1.55; the h of रही 1.71-1.76; the h of है 1.87-1.91)
-    vo_sent_bird_peck_ok:    [0.26, 0.93, 1.38, 1.57, 1.87, 2.05]
+    vo_sent_bird_peck_ok:    [0.26, 0.93, 1.38, 1.57, 1.87, 2.05],
+    // page 5 ([P5-BOX-WORDS]): vo_sent_cat_ok, 2.24 s, speech 0.26-1.79: बिल्ली 0.26 | दूध 0.83 | पी 1.21 | रही 1.35 | है। 1.62 | end 1.79
+    // (the voiced b onset 0.26-0.27 then ि, ल्ली 0.38-0.73; the d closure 0.74-0.86 (murmur) with its burst at 0.87, ू 0.89-1.03; the dh
+    // closure 1.04-1.08 + aspiration 1.09-1.11; the p closure 1.14-1.20 (silence) with its burst at 1.21, ी 1.23-1.34; the r tap 1.35-1.37,
+    // the h of रही 1.46-1.52 (noise, tilt ~1), ी 1.53-1.61; the h of है 1.62-1.66, ऐ 1.67-1.78)
+    vo_sent_cat_ok:          [0.26, 0.83, 1.21, 1.35, 1.62, 1.79]
   };
   // slide index -> true: that page's sentence option pills highlight word by word while their line speaks ([P6-OPT-WORDS])
   var OPT_WORDS_BY_SLIDE = {
@@ -7154,8 +7216,41 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   };
   // slide index -> the page speaks its sentence by itself after the narration, then the explanation while picture #mark is ringed ([VO-BATCH])
   var AUTO_SENTENCE_BY_SLIDE = {
-    2: { explain: "vo_t3_explain", mark: 1 }                                             // page 4: इस वाक्य के लिए यह चित्र सही है। -> the girl watering the plants (image_ids[1])
+    // [P4-TAP-ONLY] (2026-09-24) page 4's automatic script (sentence with the chip pulse, then the explanation, then आगे) is
+    // OFF: the sentence vo_sent_girl_water speaks only on a speaker-chip tap, exactly like pages 2-3 (entry 2 removed; the
+    // picture ring now rides on the tapped sentence's follow-up line, see MARK_BY_SLIDE). autoSentence() below is kept, unused.
   };
+  // [P4-TAP-ONLY] slide index -> while the follow-up line (FOLLOW_BY_SLIDE) speaks after a tapped sentence, ring picture #mark
+  // of the pair (.p4-mark) and fade the others (.p4-dim); the mark stays until the page is left, as before
+  var MARK_BY_SLIDE = {
+    2: { line: "vo_t3_explain", mark: 1 }                                                // page 4: इस वाक्य के लिए यह चित्र सही है। -> the girl watering the plants (image_ids[1])
+  };
+  // [P5-SPK-CUE] slide index -> the speaker cue of a sentence-box page: src = the "tap the speaker" line, pulse = the box whose
+  // chip pulses with it (.p2-cue) and is the only tappable thing until tapped (see wireSpkCue)
+  var SPK_CUE_BY_SLIDE = {
+    3: { src: "assets/Audio/vo_tap_speaker_sentence.ogg", pulse: "#slideHost .sq-sentence-box" }   // page 5 (G1): बिल्ली दूध पी रही है।
+  };
+  // [P5-TAP-ONLY] slide index -> true: the page's sentence (card audio.word_name) speaks ONLY on the speaker-chip tap; the engine's
+  // automatic chain (autoPlayChain: prompt, then word_name) skips it (autoSentenceOff in the play() wrapper)
+  var SENTENCE_TAP_ONLY_BY_SLIDE = {
+    3: true                                                                              // page 5 (G1)
+  };
+  // [P5-BOX-WORDS] slide index -> true: the sentence box's text lights up word by word while its sentence speaks (wireBoxWords;
+  // timings in WORD_TIMES_BY_AUDIO under the card's audio.word_name)
+  var BOX_WORDS_BY_SLIDE = {
+    3: true                                                                              // page 5 (G1)
+  };
+  var replayVia = false;                                    // [P5-TAP-ONLY] true while state.replayAudio (the box / chip tap) is calling play()
+  // [P5-WRONG-PULSE] slide index -> { attempt, ms }: after the feedback of wrong attempt #attempt the speaker chip pulses silently
+  // for ms (the cue's pulse without its line; 3500 ms = the length of the "tap the speaker" line)
+  var WRONG_PULSE_BY_SLIDE = {
+    3: { attempt: 1, ms: 3500 }                                                          // page 5 (G1): the first wrong picture
+  };
+  // [P5-NO-OK-AFTER-REVEAL] slide index -> true: after the reveal (state.scaffoldLevel 3) the guided tap's शाबाश line (audio.correct) is skipped
+  var NO_OK_AFTER_REVEAL_BY_SLIDE = {
+    3: true                                                                              // page 5 (G1): vo_ok_pic
+  };
+  var silentEl = null;                                      // [P5-WRONG-PULSE] the box pulsing silently right now (null when none)
   var timers = [], sfx = null;
   var narrEl = null;                                        // the first narration element of the AFTER_VO page being watched
   var gateFrame = null, navRevealAt = 0, navTimer = null;   // आगे gate for the page currently popping
@@ -7172,7 +7267,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     if(navTimer){ clearTimeout(navTimer); navTimer = null; }
     gateFrame = null; navRevealAt = 0;
     voFrame = null; voPlan = null; voCue = null; voIdx = -1; narrEl = null;
-    settleCue(true); idleCancel(); wordStop(); navHideToken++; optWords = null; reviewing = false;
+    settleCue(true); idleCancel(); wordStop(); navHideToken++; optWords = null; reviewing = false; silentEl = null;
   }
   // pop-and-hold el while src plays on its own player. onDone(popLeftMs), when given, fires once the SOUND is over (ended,
   // error, blocked, or a POP_MS + 3s safety) with the ms still left of the pop, so a caller can wait for both to finish.
@@ -7200,7 +7295,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     var targets = frame.classList.contains("story-frame-pair")
       ? Array.prototype.slice.call(frame.querySelectorAll(".story-img")) : [frame];
     var steps = Math.min(targets.length, plan.length);
-    if(!steps) return;
+    if(!steps){ if(cue) armCue(frame, cue, 0); return; }                 // [P4-TAP-ONLY] no pop (page 4): the cue still comes CUE_GAP_MS after the narration
     gateFrame = frame; navRevealAt = Date.now() + startMs + steps * POP_MS + NAV_AFTER_MS;
     for(var i = 0; i < steps; i++){
       (function(el, src, at, last){
@@ -7245,6 +7340,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   }
   function startCue(frame, cue, repeat){
     if(!frame.isConnected) return;                                            // the page was left
+    if(frame.__spkTapped){ idleCancel(); return; }                            // [P5-SPK-CUE] the chip has been tapped: no cue any more on this page
     if(!repeat){                                                              // the scheduled cue point: from here on the page's idle repeat is live ([P2-CUE-IDLE])
       var ix = (typeof state === "object" && state) ? state.idx : -1;
       if(CUE_IDLE_BY_SLIDE[ix]){ idleFrame = frame; idleCue = cue; idleMs = CUE_IDLE_BY_SLIDE[ix]; }
@@ -7265,16 +7361,22 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   }
   // [P2-CUE-IDLE] the inactivity count: idleMs of silence with no tap, then the cue again
   function idleCancel(){ if(idleTimer){ clearTimeout(idleTimer); idleTimer = null; } idleFrame = null; idleCue = null; idleMs = 0; }
+  // [P2-QUIET-AFTER-NAV] (2026-09-23) once आगे has appeared on the page, nothing repeats any more: the idle cue (line + chip
+  // pulse) is dropped and never re-armed. आगे appears NAV_AFTER_MS after the lines of the first chip tap (pages 2-3) or after
+  // the explanation (page 4), i.e. before the 5 s idle count can fire, so the count is cancelled at its arm or fire time.
+  function navShowing(){ var b = document.getElementById("navBtn"); return !!(b && b.classList.contains("active")); }
   function idleArm(){
     if(!idleFrame) return;
     if(idleTimer){ clearTimeout(idleTimer); idleTimer = null; }
     if(!idleFrame.isConnected){ idleCancel(); return; }
+    if(navShowing() || idleFrame.__spkTapped){ idleCancel(); return; }                             // [P2-QUIET-AFTER-NAV] / [P5-SPK-CUE]
     if(document.body.classList.contains("vo-playing")){ whenQuiet(idleFrame, idleArm); return; }   // a line speaks: count from its end
     idleTimer = setTimeout(idleFire, idleMs);
   }
   function idleFire(){
     idleTimer = null;
     if(!idleFrame || !idleFrame.isConnected){ idleCancel(); return; }
+    if(navShowing() || idleFrame.__spkTapped){ idleCancel(); return; }                             // [P2-QUIET-AFTER-NAV] / [P5-SPK-CUE]
     if(document.body.classList.contains("vo-playing")){ idleArm(); return; }
     startCue(idleFrame, idleCue, true);
   }
@@ -7348,7 +7450,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
           }
         };
         play(src, function(){
-          if(follow && pill.isConnected) play(follow, onceExplain);   // [P2-FOLLOW] every time: the follow-up line right after the sentence
+          if(follow && pill.isConnected){ markFor(idx); play(follow, onceExplain); }   // [P2-FOLLOW] every time: the follow-up line right after the sentence ([P4-TAP-ONLY]: page 4 rings its picture as it starts)
           else onceExplain();
         });
         if(words) wordSync((typeof currentAudio !== "undefined") ? currentAudio : null, words, times);   // [P2-WORD-SYNC] highlight word by word
@@ -7411,12 +7513,90 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
       if(ws) wordSync((typeof currentAudio !== "undefined") ? currentAudio : null, ws, wt);
     }, AFTER_VO_MS));
   }
+  // [P4-TAP-ONLY] page 4: ring picture #mark and fade the other while the follow-up line speaks (MARK_BY_SLIDE); idempotent
+  function markFor(idx){
+    var m = MARK_BY_SLIDE[idx]; if(!m || FOLLOW_BY_SLIDE[idx] !== m.line) return;
+    var pics = Array.prototype.slice.call(document.querySelectorAll("#slideHost .story-frame-pair .story-img"));
+    pics.forEach(function(im, k){ im.classList.toggle("p4-mark", k === m.mark); im.classList.toggle("p4-dim", k !== m.mark); });
+  }
   // [VO-BATCH] pages 5-12 with a sentence box: its tap (and the header chip) replays the sentence alone, not the whole chain
   function wireReplay(idx){
     var sl = (typeof CARD === "object" && CARD && CARD.slides) ? CARD.slides[idx] : null;
     if(!sl || sl.sentence_box !== true || !sl.audio || !sl.audio.word_name || typeof state !== "object" || !state || typeof play !== "function") return;
     var src = srcOf(sl.audio.word_name);
-    state.replayAudio = function(){ play(src, function(){}); };
+    state.replayAudio = function(){ replayVia = true; try{ play(src, function(){}); } finally { replayVia = false; } };   // [P5-TAP-ONLY] a replay is never the automatic chain
+  }
+  // [P5-TAP-ONLY] true when the engine's automatic chain (not a replay) is asking for the page's sentence on a listed page
+  function autoSentenceOff(src){
+    var ix = (typeof state === "object" && state) ? state.idx : -1;
+    if(SENTENCE_TAP_ONLY_BY_SLIDE[ix] !== true || replayVia) return false;
+    var sl = (typeof CARD === "object" && CARD && CARD.slides) ? CARD.slides[ix] : null;
+    var id = sl && sl.audio && sl.audio.word_name;
+    return !!id && String(src).split("/").pop() === srcOf(id).split("/").pop();
+  }
+  // [P5-BOX-WORDS] page 5: split the sentence box's text into words and map them to the page's sentence id for the play() wrapper
+  function wireBoxWords(idx){
+    if(BOX_WORDS_BY_SLIDE[idx] !== true) return;
+    var sl = (typeof CARD === "object" && CARD && CARD.slides) ? CARD.slides[idx] : null;
+    var id = sl && sl.audio && sl.audio.word_name;
+    var text = document.querySelector("#slideHost .sq-sentence-box .sq-text");
+    if(!id || !text || !WORD_TIMES_BY_AUDIO[id]) return;
+    var els = splitWords(text);
+    if(!els || els.length !== WORD_TIMES_BY_AUDIO[id].length - 1) return;
+    optWords = optWords || {};
+    optWords[id] = { els: els, times: WORD_TIMES_BY_AUDIO[id] };
+  }
+  // [P5-WRONG-PULSE] this play() call is the page's try_again feedback for the listed wrong attempt: {box, cfg}, else null
+  function wrongCueFor(src){
+    var ix = (typeof state === "object" && state) ? state.idx : -1;
+    var cfg = WRONG_PULSE_BY_SLIDE[ix]; if(!cfg || !src) return null;
+    var sl = (typeof CARD === "object" && CARD && CARD.slides) ? CARD.slides[ix] : null;
+    var id = sl && sl.audio && sl.audio.try_again; if(!id) return null;
+    if(String(src).split("/").pop() !== srcOf(id).split("/").pop()) return null;
+    if(state.attempts !== cfg.attempt) return null;
+    var box = document.querySelector("#slideHost .sq-sentence-box");
+    return box ? { box: box, cfg: cfg } : null;
+  }
+  // [P5-WRONG-PULSE] the chip pulse of the cue without its line: .p2-cue on the box for ms, then settled at the end of a breath;
+  // waits while a line speaks; any tap settles it early (the document pointerdown listener below)
+  function silentPulse(box, ms){
+    if(!box.isConnected || stillMode()) return;
+    if(document.body.classList.contains("vo-playing")){ whenQuiet(box, function(){ silentPulse(box, ms); }); return; }
+    settleCue(true); cueEl = box; silentEl = box; box.classList.add("p2-cue");
+    timers.push(setTimeout(function(){ if(silentEl === box){ silentEl = null; if(cueEl === box) settleCue(false); } }, ms));
+  }
+  document.addEventListener("pointerdown", function(){ if(silentEl){ var el = silentEl; silentEl = null; if(cueEl === el) settleCue(false); } }, true);
+  // [P5-NO-OK-AFTER-REVEAL] this play() call is the page's शाबाश line (audio.correct) after the reveal
+  function okAfterRevealOff(src){
+    var ix = (typeof state === "object" && state) ? state.idx : -1;
+    if(NO_OK_AFTER_REVEAL_BY_SLIDE[ix] !== true || !src || state.scaffoldLevel !== 3) return false;
+    var sl = (typeof CARD === "object" && CARD && CARD.slides) ? CARD.slides[ix] : null;
+    var id = sl && sl.audio && sl.audio.correct;
+    return !!id && String(src).split("/").pop() === srcOf(id).split("/").pop();
+  }
+  // [P5-SPK-CUE] page 5: the chip beside the sentence box is the only tappable thing until tapped - the bar (.spk-only) and the
+  // option pictures (.spk-locked) take no tap; once the page's own lines are over, the "tap the speaker" cue CUE_GAP_MS later
+  // (chip pulse, idle repeat); the chip tap = the engine's replay of the sentence, and when that line is over the pictures unlock
+  function wireSpkCue(idx){
+    var cue = SPK_CUE_BY_SLIDE[idx]; if(!cue) return;
+    var box = document.querySelector(cue.pulse);
+    if(!box || box.__spkWired) return;
+    box.__spkWired = true;
+    var chip = box.querySelector(".tut-audio");
+    var grid = document.querySelector("#slideHost .opt-grid");
+    box.classList.add("spk-only");                                             // the bar takes no tap, its chip does (CSS #P5-SPK-CUE-CSS)
+    if(grid) grid.classList.add("spk-locked");                                  // the pictures wait for the chip tap
+    var unlock = function(){ if(grid) grid.classList.remove("spk-locked"); };
+    var tapped = function(){
+      if(box.__spkTapped) return;
+      box.__spkTapped = true; box.__p2Heard = true;                            // the cue is over for good (startCue / idleArm / idleFire bow out)
+      settleCue(true); idleCancel();
+      timers.push(setTimeout(function(){ whenQuiet(box, unlock); }, 0));      // the box's replay (the sentence) has started by then: unlock once it is over
+    };
+    if(chip) chip.addEventListener("click", tapped);
+    // the page's own lines are speaking now (autoPlayChain: the instruction; its automatic sentence is skipped since [P5-TAP-ONLY]):
+    // cue CUE_GAP_MS after they end
+    whenQuiet(box, function(){ if(!box.__spkTapped) armCue(box, cue, 0); });
   }
   // ---- [P2-WORD-SYNC] ----
   // split the pill's sentence (its first non-empty text node) into .p2-word spans, once; spaces stay as text between them
@@ -7460,6 +7640,16 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   var origPlay = window.play;
   if(typeof origPlay === "function"){
     window.play = function(src, onEnd){
+      if(src && autoSentenceOff(src)){                                          // [P5-TAP-ONLY] the page's own read-out of its sentence: skipped, the chain moves on
+        if(onEnd) timers.push(setTimeout(onEnd, 0));
+        return;
+      }
+      if(src && okAfterRevealOff(src)){                                         // [P5-NO-OK-AFTER-REVEAL] the शाबाश line after the guided tap: skipped, the advance follows as before
+        if(onEnd) timers.push(setTimeout(onEnd, 0));
+        return;
+      }
+      var wc = wrongCueFor(src);                                                // [P5-WRONG-PULSE] the first wrong attempt's feedback: the chip pulses silently once it is over
+      if(wc){ var cb = onEnd; onEnd = function(){ if(typeof cb === "function") cb.apply(this, arguments); silentPulse(wc.box, wc.cfg.ms); }; }
       if(src && isReviewLine(src)){                                             // [P6-REVIEW] the second wrong tap's feedback line: the read-out instead
         var ix = state.idx;
         reviewing = true; state.hintActive = true;                              // taps wait, as with the engine's own hint hook
@@ -7470,7 +7660,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
         });
         return;
       }
-      var r = origPlay.apply(this, arguments);
+      var r = origPlay.call(this, src, onEnd);
       if(optWords && src){
         var id = String(src).split("/").pop().replace(/\.[A-Za-z0-9]+$/, "");
         var w = optWords[id];
@@ -7581,14 +7771,14 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     var r = orig.apply(this, arguments);
     var f = frameOf(idx);
     if(f) schedule(f, PLAN_BY_SLIDE[idx], AFTER_VO_BY_SLIDE[idx] === true, CUE_BY_SLIDE[idx] || null, idx);
-    wireBird(idx); wirePill(idx); wireReplay(idx); wireOptWords(idx);
+    wireBird(idx); wirePill(idx); wireReplay(idx); wireOptWords(idx); wireBoxWords(idx); wireSpkCue(idx);
     return r;
   };
   // a ?slide=N dev load mounts inside the engine script, before this block runs
   var cur = (typeof state === "object" && state) ? state.idx : -1;
   var now = frameOf(cur);
   if(now) schedule(now, PLAN_BY_SLIDE[cur], AFTER_VO_BY_SLIDE[cur] === true, CUE_BY_SLIDE[cur] || null, cur);
-  wireBird(cur); wirePill(cur); wireReplay(cur); wireOptWords(cur);
+  wireBird(cur); wirePill(cur); wireReplay(cur); wireOptWords(cur); wireBoxWords(cur); wireSpkCue(cur);
 })();
 </script>
 <script id="P5-CORRECT-SFX-JS">
@@ -7622,7 +7812,9 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    ding and no confetti. Now a tap on the guided option gets the same beat as a first-try correct tap: the hand goes and
    the guide-pulse becomes the green mark at once, the page SFX (and pop) play for hold_ms, then the tap is handed over
    with state.locked still true (so cell.onclick's correct branch stays out and onGuidedTap runs exactly as shipped) and
-   the ding + confetti are fired alongside it. The slide is still recorded as a revealed answer (completeSlide(false)). */
+   the ding + confetti are fired alongside it. The slide is still recorded as a revealed answer (completeSlide(false)).
+   On page 5 the शाबाश line of that guided tap (vo_ok_pic) is skipped since [P5-NO-OK-AFTER-REVEAL] (2026-09-24, #P2-BIRD-POP-JS
+   play() wrapper); the advance still follows 700 ms after the hand-over. */
 (function(){ "use strict";
   var VOL = 0.7, POP_MS = 2000;
   // slide index -> {src, hold_ms, pop?, vol?} (the user counts pages from the landing page: ?slide=N is page N+2); vol defaults to VOL
@@ -7700,9 +7892,11 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 })();
 </script>
 <style id="LANDING-START-AFTER-VO">
-/* ===== Page 1: शुरू करें appears only AFTER the landing VO has played once =====
-   The button is kept out of the page (display:none) until the engine adds .ready at the end of the
-   welcome line (playLanding in the engine script); it then pops in with the landing's own icon reveal.
+/* ===== Page 1: शुरू करें appears only AFTER the landing VO has played once AND the first bird cue has finished =====
+   The button is kept out of the page (display:none) until the engine adds .ready - since [LANDING-BTN-AFTER-BIRD]
+   (2026-09-23) that is when the bird has settled after its first pulse + replay line (runBirdCue → stopBirdPulse →
+   revealStart in the engine script; at the end of the welcome only if that file failed); it then pops in with the
+   landing's own icon reveal.
    Every keyframe keeps translateX(-50%): that is the pill's centring transform. One-shot pop-in; the breathing
    that follows it is ruled further down in this block. */
 .start-gate .sg-btn:not(.ready){display:none !important;}
@@ -7712,8 +7906,8 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   60% {opacity:1;transform:translateX(-50%) scale(1.08) translateY(0);}
   100%{opacity:1;transform:translateX(-50%) scale(1)   translateY(0);}
 }
-/* Page-1 follow-up: the bird pulses for as long as the replay line plays (from 1.5 s after the welcome, then again
-   after every 5 s without a tap on Page 1) and settles when it ends. The "fully still" lock on .sg-mascot exempts
+/* Page-1 follow-up: the bird pulses for as long as the replay line plays (once, from 1.5 s after the welcome; the
+   5 s idle repeat is off since [P1-CUE-ONCE] 2026-09-23) and settles when it ends. The "fully still" lock on .sg-mascot exempts
    .sg-pulsing, otherwise its !important transform:none would beat this animation. */
 .start-gate .sg-mascot.sg-pulsing{animation:sgMascotPulse .8s ease-in-out infinite !important;transform-origin:50% 100%;}
 /* the bird is tappable (replays the welcome; see replayWelcome in the engine script): a shared img rule had left it
@@ -7728,5 +7922,101 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 .start-gate .sg-btn.ready.sg-breathe{animation:sgBtnPulse 1.4s ease-in-out infinite !important;}
 .start-gate.sg-bird-cue .sg-btn.ready.sg-breathe{animation:none !important;}
 </style>
+<style id="SPK-STILL-BG-CSS">
+/* [SPK-STILL-BG] (2026-09-23) pages 2-5 (slides 0-3): the speaker chip beside the sentence (.tut-audio: in the tut frame on
+   pages 2-4, next to the sentence box on page 5) shows its sound waves ONLY while the sentence itself is spoken BECAUSE THE
+   CHILD TAPPED for it ([SPK-TAP-ONLY] 2026-09-24: page 5 used to read its sentence out by itself right after the instruction -
+   that automatic read-out was background VO too and left the chip still; since [P5-TAP-ONLY], later that day, the page no
+   longer reads it out at all, the rule simply stays). During every other line on those pages - narration,
+   the "tap the speaker" cue, the explanations, page 5's instruction and its automatic sentence, hints, feedback, silent
+   beats - <script id="SPK-STILL-BG-JS"> flags the body with .vo-bg and these rules keep the waves static, i.e. the chip's
+   idle look (setPlaying() still adds .playing to the chip for every clip; only the wave animation is held).
+   Higher specificity than the .tut-audio.playing .wv1/.wv2 wave rules, so it wins. Other pages: .vo-bg is always off. */
+body.vo-bg .stage.tut .tut-audio.playing .wv1,body.vo-bg .stage.tut .tut-audio.playing .wv2,
+body.vo-bg .sq-sentence-box .tut-audio.playing .wv1,body.vo-bg .sq-sentence-box .tut-audio.playing .wv2{animation:none !important;opacity:1 !important;}
+</style>
+<script id="SPK-STILL-BG-JS">
+/* [SPK-STILL-BG] (2026-09-23) pages 2-5 (slides 0-3): the sentence speaker chip animates only for the sentence line - a
+   vo_sent_* recording (vo_sent_boy_sit / vo_sent_girl_cycle / vo_sent_girl_water / page 5's vo_sent_cat_ok) - and, since
+   [SPK-TAP-ONLY] (2026-09-24), only when that line was started by the child's tap (the chip / bar on pages 2-4, the sentence
+   box or its chip on page 5): page 5 used to read its sentence out by itself right after the instruction, and that automatic
+   read-out kept the chip still like any other background line (it is skipped altogether since [P5-TAP-ONLY], #P2-BIRD-POP-JS;
+   the rule stays as a safety). "Started by a tap" = play() was called inside a trusted
+   click / pointer event (window.event) or within TAP_MS of the last trusted pointerdown / click. This outermost wrapper of
+   the shared play() (the word-sync wrapper in #P2-BIRD-POP-JS sits under it) marks every other clip on those slides as
+   background VO on the body (.vo-bg); <style id="SPK-STILL-BG-CSS"> holds the chip's waves still under that flag. On every
+   other slide the flag is cleared, so nothing else changes. Only the wave animation is affected: the mascot pose, the clip
+   chain, taps, word sync and आगे timing are untouched. */
+(function(){
+  var orig = window.play; if(typeof orig !== "function") return;
+  var STILL_SLIDES = { 0:true, 1:true, 2:true, 3:true };          // pages 2, 3, 4, 5
+  var TAP_MS = 400, lastTap = -1e9;                                 // [SPK-TAP-ONLY]
+  var now = function(){ return (window.performance && performance.now) ? performance.now() : Date.now(); };
+  var noteTap = function(e){ if(e && e.isTrusted) lastTap = now(); };
+  window.addEventListener("pointerdown", noteTap, true); window.addEventListener("click", noteTap, true);
+  var fromTap = function(){
+    var ev = window.event;
+    if(ev && ev.isTrusted && /^(click|pointerdown|pointerup|mousedown|mouseup|touchstart|touchend)$/.test(ev.type)) return true;
+    return (now() - lastTap) < TAP_MS;
+  };
+  var mark = function(src){
+    var idx = (typeof state === "object" && state) ? state.idx : -1;
+    var isSentence = (typeof src === "string") && /vo_sent_/.test(src);
+    document.body.classList.toggle("vo-bg", !!STILL_SLIDES[idx] && !(isSentence && fromTap()));   // [SPK-TAP-ONLY]: a sentence the child did not ask for is background too
+  };
+  window.play = function(src, onEnd){ mark(src); return orig.apply(this, arguments); };
+  // a direct ?slide=N load mounts the slide (and starts its first clip) before this end-of-file script runs: classify
+  // the clip that is already playing too, so the chip is still from the first line there as well
+  try{ if(typeof currentAudio !== "undefined" && currentAudio && currentAudio.src) mark(currentAudio.src); }catch(e){}
+})();
+</script>
+<style id="SPK-ONLY-CUE-CSS">
+/* [SPK-ONLY-CUE] (2026-09-23) pages 2-4: after the background VO, ONLY the speaker chip pulsates with the "Tap speaker icon"
+   line (vo_tap_speaker_sentence = voiceovers_batch "Tap speaker icon.wav", already wired), and ONLY the speaker chip is
+   tappable - the sentence bar no longer breathes and no longer takes the tap. #P2-BIRD-POP-JS is unchanged: it still puts
+   .p2-cue on the bar (the chip's animationiteration bubbles up to the bar, so the cue still settles at the end of a breath)
+   and still listens for the tap on the bar - the chip is the bar's child, so a chip tap reaches that listener, while the bar
+   itself (pointer-events:none) is not hit-testable. The chip pulses through the `scale` property, so the chip's
+   transform:none !important stillness lock (UIFIX-CONSIST) is left exactly as it is; 1.10 on the 58px chip so it reads at
+   that size. Page 4's automatic sentence (the bar carried .p2-cue while it spoke) now pulses the chip the same way. */
+@keyframes spkCuePulse{0%,100%{scale:1;}50%{scale:1.10;}}
+.stage.tut .story-caption.p2-cue{animation:none !important;}
+.stage.tut .story-caption.p2-cue .tut-audio{animation:spkCuePulse .8s ease-in-out infinite !important;transform-origin:50% 50%;}
+.stage.tut .story-caption.p2-sentence-btn{pointer-events:none;cursor:default;}
+.stage.tut .story-caption.p2-sentence-btn:active{transform:none;}
+.stage.tut .story-caption.p2-sentence-btn .tut-audio{pointer-events:auto;cursor:pointer;}
+</style>
+<style id="P5-SPK-CUE-CSS">
+/* [P5-SPK-CUE] (2026-09-24) page 5 (G1 = ?slide=3): after the page's background line (its instruction; the automatic sentence
+   read-out is off since [P5-TAP-ONLY]), ONLY the speaker chip beside the sentence box pulsates with the "Tap speaker icon" line
+   (vo_tap_speaker_sentence = voiceovers_batch "Tap speaker icon.wav", already wired) and ONLY that chip is tappable until it
+   has been tapped. #P2-BIRD-POP-JS (wireSpkCue / SPK_CUE_BY_SLIDE) puts .p2-cue on the box while the line speaks - the chip
+   pulses through `scale` exactly like pages 2-4 ([SPK-ONLY-CUE] keyframes spkCuePulse, 1.10 on the 58px chip), so the chip's
+   transform:none !important stillness lock (UIFIX-CONSIST) stays as it is - and marks the box .spk-only (the bar is not
+   hit-testable and no longer sinks when its chip is pressed; the chip is) and the option grid .spk-locked (the pictures are not
+   hit-testable) until the tapped sentence is over. Looks are unchanged: nothing is dimmed, moved or resized. */
+.sq-sentence-box.p2-cue{animation:none !important;}
+.sq-sentence-box.p2-cue .tut-audio{animation:spkCuePulse .8s ease-in-out infinite !important;transform-origin:50% 50%;}
+.sq-sentence-box.spk-only{pointer-events:none;cursor:default;}
+.sq-sentence-box.spk-only:active{transform:none;}
+.sq-sentence-box.spk-only .tut-audio{pointer-events:auto;cursor:pointer;}
+#slideHost .opt-grid.spk-locked{pointer-events:none;}
+</style>
+<script id="P2-QUIET-AFTER-NAV-JS">
+/* [P2-QUIET-AFTER-NAV] (2026-09-23) pages 2-4 (slides 0-2): once आगे has appeared, no repeating animation is left on the
+   page. The idle cue (line + chip pulse) is dropped inside #P2-BIRD-POP-JS (navShowing guard); the engine's आगे hand nudge -
+   nudgeNavBtn, armed by setNavActive 4.5 s after आगे appears, a hand tapping on आगे with ripple rings, repeating - is
+   suppressed here on those slides only. Every other page keeps its nudge. Only the 4.5 s nudge call is intercepted; आगे
+   itself (its appearance, hiding, enabling) is untouched. */
+(function(){
+  var orig = window.nudgeNavBtn; if(typeof orig !== "function") return;
+  var QUIET = { 0:true, 1:true, 2:true };                          // pages 2, 3, 4
+  window.nudgeNavBtn = function(){
+    var idx = (typeof state === "object" && state) ? state.idx : -1;
+    if(QUIET[idx]) return;
+    return orig.apply(this, arguments);
+  };
+})();
+</script>
 </body>
 </html>
