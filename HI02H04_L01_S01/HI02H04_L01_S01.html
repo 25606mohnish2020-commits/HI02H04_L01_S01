@@ -4676,8 +4676,26 @@ function boot(){
   // finished (#sgBtn is display:none until it carries .ready — see <style id="LANDING-START-AFTER-VO">).
   // Outcomes: ended → reveal; file missing/unsupported → reveal after a short beat (the landing can never get
   // stuck); autoplay refused before a gesture → wait, the first pointerdown retries; a second refusal still reveals.
-  const landingVO = { state:"idle", tapTried:false };   // state: idle | playing | done
+  const landingVO = { state:"idle", tapTried:false, followUpTimer:0, leaving:false };   // state: idle | playing | done
   const revealStart = ()=>{ const b = $("sgBtn"); if(b) b.classList.add("ready"); };
+  // Page-1 follow-up (SME): 1.5 s after the welcome has finished, the bird pulses FOR AS LONG AS the replay line plays
+  // ("फिर से सुनने के लिए मुझ पर टैप करिए" = vo_tap_swiftee_replay) and settles when it ends. Once per open; dropped if
+  // the child has already tapped शुरू करें or the landing was bypassed, so it can never talk over the phase-transition line.
+  const replaySrc = (CARD.assets && CARD.assets.audio && CARD.assets.audio["vo_tap_swiftee_replay"]) || ("assets/Audio/vo_tap_swiftee_replay." + AUDIO_EXT);
+  const birdEl = ()=> document.querySelector(".start-gate .sg-mascot");
+  const stopBirdPulse = (atOnce)=>{ const m = birdEl(); if(!m || !m.classList.contains("sg-pulsing")) return;
+    let off = false; const settle = ()=>{ if(off) return; off = true; m.classList.remove("sg-pulsing"); };
+    if(atOnce){ settle(); return; }
+    m.addEventListener("animationiteration", settle, { once:true });   // let the current breath finish, then rest
+    setTimeout(settle, 900); };
+  const scheduleFollowUp = ()=>{
+    clearTimeout(landingVO.followUpTimer);
+    landingVO.followUpTimer = setTimeout(()=>{
+      if(landingVO.leaving || $("startGate").classList.contains("hidden")) return;
+      const m = birdEl(); if(m) m.classList.add("sg-pulsing");
+      play(replaySrc, ()=> stopBirdPulse(false));           // line ended / missing / blocked → the bird settles
+    }, 1500);
+  };
   // Page 1 counts as OPEN only once the boot loader has begun to fade (.done) or is gone
   const pageOneOpen = ()=>{ const bl = $("bootLoader"); return !bl || !bl.isConnected || bl.classList.contains("done"); };
   const playLanding = ()=>{
@@ -4690,6 +4708,7 @@ function boot(){
       if(done) return; done = true; setPlaying(false);
       if(why === "blocked" && !landingVO.tapTried){ landingVO.state = "idle"; return; }   // browser wants a tap first → the first tap ON PAGE 1 plays it
       landingVO.state = "done"; revealStart();
+      if(why === "ended") scheduleFollowUp();           // the bird cue follows a welcome that was actually heard
     };
     const a = new Audio(landSrc); currentAudio = a;       // registered so stopAudio() (start tap / dev nav) can silence it
     a.onended = ()=> finish("ended");
@@ -4718,6 +4737,7 @@ function boot(){
   window.addEventListener("pointerdown", ()=>{ if(landingVO.state === "idle" && pageOneOpen()){ landingVO.tapTried = true; playLanding(); } });
 
   $("sgBtn").onclick = ()=>{
+    landingVO.leaving = true; clearTimeout(landingVO.followUpTimer); stopBirdPulse(true);   // no bird cue / replay line once the child has moved on
     stopAudio();          // silence the landing greeting BEFORE slide 0 speaks (no VO overlap)
     _ac();                // unlock/resume WebAudio on the start gesture so the first clip never clips
     // [engine JS] r4/P1: peek gate into the tutorial. The landing stays visible-and-BLURRED behind the
@@ -4805,8 +4825,10 @@ boot();
 .audio-chip.playing .wv1,.mascot-wrap .audio-chip.playing .wv1,.sg-vo.playing .wv1,.tut-audio.playing .wv1{animation:wv1 1.2s steps(1) infinite !important;}
 .audio-chip.playing .wv2,.mascot-wrap .audio-chip.playing .wv2,.sg-vo.playing .wv2,.tut-audio.playing .wv2{animation:wv2 1.2s steps(1) infinite !important;}
 .audio-chip .wv,.mascot-wrap .audio-chip .wv,.sg-vo .wv{opacity:1;}
-/* landing bird + speaker: fully still (no float/pulse/hover) */
-.sg-mascot,.sg-mascot:hover,.sg-mascot:active{animation:none !important;transform:none !important;}
+/* landing bird + speaker: fully still (no float/pulse/hover) — except the deliberate pulse while the replay line
+   plays (.sg-pulsing, from 1.5 s after the welcome VO; see LANDING-START-AFTER-VO): an !important transform lock
+   would beat any animation */
+.sg-mascot:not(.sg-pulsing),.sg-mascot:hover:not(.sg-pulsing),.sg-mascot:active:not(.sg-pulsing){animation:none !important;transform:none !important;}
 </style>
 <script id="UIFIX-DEVGATE">(function(){
   /* Skip / Jump to page are DEV tools: visible only with ?dev=1. They stay parented to <body>
@@ -6971,6 +6993,11 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   60% {opacity:1;transform:translateX(-50%) scale(1.08) translateY(0);}
   100%{opacity:1;transform:translateX(-50%) scale(1)   translateY(0);}
 }
+/* Page-1 follow-up: the bird pulses for as long as the replay line plays (from 1.5 s after the welcome) and settles
+   when it ends. The "fully still" lock on .sg-mascot exempts .sg-pulsing, otherwise its !important transform:none
+   would beat this animation. */
+.start-gate .sg-mascot.sg-pulsing{animation:sgMascotPulse .8s ease-in-out infinite !important;transform-origin:50% 100%;}
+@keyframes sgMascotPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
 </style>
 </body>
 </html>
