@@ -6889,6 +6889,27 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 .sent-opt .so-pill{transition:transform .28s ease;}
 .sent-opt .so-pill.p6-say{transform:scale(1.05);transition:transform .32s cubic-bezier(.34,1.6,.6,1);}
 </style>
+<style id="YLW-IMG-STROKE">
+/* [YLW-IMG-STROKE] 2026-09-23: the user asked for the yellow picture frame (the 3-4px #FCD86B edge baked into the *_ylw
+   picture assets on pages 5-12 and 14) around EVERY picture on pages 1-14, with size and position untouched. The pictures
+   that had no such frame get it here as an INSET stroke drawn over the picture's own baked white edge, so nothing grows or
+   moves: the landing hero (page 1), the story picture (pages 2-3), the picture pair (page 4) and the wagon pictures
+   (page 13). The *_ylw pictures are left alone - they already carry the frame in the asset. */
+/* page 1: pic_girl_play_ball.png has transparent padding (7/16/13/12 px of 1462x730), so the stroke is a pseudo-element
+   laid on the picture's visible bounds; 4px = its ~13px white edge at this size, 16px = its 54px corner */
+.start-gate .sg-icon{position:relative;}
+.start-gate .sg-icon::after{content:"";position:absolute;left:0.479%;top:2.192%;width:98.632%;height:96.164%;box-sizing:border-box;
+  border:4px solid #FCD86B;border-radius:16px;pointer-events:none;}
+/* pages 2-3: the img box was letterboxed to the 900/432 frame (wider than the drawn picture) - let it hug the drawn picture
+   (same size, still centred by the frame's flex centring) so the stroke hugs it too; 4px = the assets' 16-19px white edge
+   at 242px tall, 16px = their 68-76px corner */
+.stage.tut .story-frame:not(.story-frame-pair) .story-img{width:auto;max-width:100%;}
+.stage.tut .story-frame .story-img{outline:4px solid #FCD86B;outline-offset:-4px;border-radius:16px;}
+/* page 4 pair (190px tall): 3px = the assets' 19px edge at this size, 13px = their 76px corner; .p4-mark (green, 6px) still outranks it */
+.stage.tut .story-frame-pair .story-img{outline:3px solid #FCD86B;outline-offset:-3px;border-radius:13px;}
+/* page 13 wagon pictures: their 19px/19px/0/0 corners are kept; the stroke follows them */
+.ref-panel .ref-cargo-img{outline:3px solid #FCD86B;outline-offset:-3px;}
+</style>
 <script id="P2-BIRD-POP-JS">
 /* [P2-BIRD-POP] pages listed in PLAN_BY_SLIDE only (page 2 = T1 = ?slide=0, page 3 = T2 = ?slide=1; page 4 was removed 2026-09-21).
    Re-points mountSlide (the same pattern the kit uses for confettiCannon): once such a slide has mounted, wait DELAY_MS, then
