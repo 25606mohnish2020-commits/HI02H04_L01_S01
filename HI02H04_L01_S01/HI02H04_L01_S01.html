@@ -8139,7 +8139,8 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    centred, never stretched. The user's originals (btn-next.svg / btn-next-disabled.svg) are kept beside them unused. The pill's own
    fill, border colour, box-shadows and text are switched off (the art has its own shadow; the text is the accessible name only).
    The end screen keeps the button away exactly as before (body.is-end #navBtn{display:none}), and so does the title screen
-   (body.is-start, see the last rule: its start gate is transparent, so the stage would show through). */
+   (body.is-start: its start gate is transparent, so the stage would show through); the train pages 13-14 show no disabled art
+   either - see the last two rules. */
 #navBtn{display:flex !important;background:transparent !important;border-color:transparent !important;box-shadow:none !important;
   color:transparent !important;font-size:0 !important;opacity:1 !important;visibility:visible !important;overflow:visible !important;}
 #navBtn:not(.active){box-shadow:none !important;pointer-events:none !important;cursor:default !important;}
@@ -8155,6 +8156,12 @@ body.is-end #navBtn{display:none !important;}
    under the landing card. The landing has no आगे at all, so the button stays out of the page while body.is-start (dropped once the
    tutorial has mounted, so page 2 gets it back); pages 2-14 are unchanged. */
 body.is-start #navBtn{display:none !important;}
+/* Pages 13-14 (2026-09-24, bak109, [TRAIN-NAV-AFTER-DEPART]): the train pages (slide.ref_frame -> .stage.ref-frame) show NO disabled
+   art. The BLANK_PANEL module hides the button inline (style.display none) from mount until the train has left the panel and only
+   then shows + activates it (showNav at the end of the refTrainOut run, fallback 6.3 s) - the display:flex above had overridden
+   that inline none. So here the button stays out of the page while it is not .active, and the enabled art appears in the same
+   190x62 box at bottom 80 the moment the module activates it, exactly where the disabled art stood. Pages 2-12 are unchanged. */
+.stage.ref-frame #navBtn:not(.active){display:none !important;}
 </style>
 <style id="END-FINISH-BTN">
 /* [END-FINISH-BTN] (2026-09-24) Page 15 (the celebration screen): the आगे बढ़ें pill (#endBtn) is drawn by the user's finish-button
