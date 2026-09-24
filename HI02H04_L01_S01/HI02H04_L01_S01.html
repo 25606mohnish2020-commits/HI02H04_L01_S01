@@ -7022,7 +7022,8 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    vo_t3_explain while the meant picture is ringed and the other fades (MARK_BY_SLIDE via markFor in the tap handler; the
    mark stays until the page is left), आगे NAV_AFTER_MS after those lines and never before the first tap (NAV_AFTER_TAP), the
    idle cue every 5 s until आगे appears ([P2-QUIET-AFTER-NAV]). AUTO_SENTENCE_BY_SLIDE is empty; autoSentence() is unused.
-   [P5-SPK-CUE] (2026-09-24) pages in SPK_CUE_BY_SLIDE (page 5 = G1 = ?slide=3, the sentence-box question): after the page's
+   [P5-SPK-CUE] (2026-09-24) pages in SPK_CUE_BY_SLIDE (page 5 = G1 = ?slide=3, the sentence-box question; pages 7, 9 and 11 too
+   since [P5-ALL-SENT-PAGES] below): after the page's
    background lines - the engine's autoPlayChain: the instruction vo_prompt_sent_to_pic and (until [P5-TAP-ONLY] below took it
    out) the automatic read-out of the sentence vo_sent_cat_ok - CUE_GAP_MS later the "tap the speaker" line (vo_tap_speaker_sentence) speaks while ONLY the
    speaker chip beside the sentence box pulses (.p2-cue on the box, chip pulse in #P5-SPK-CUE-CSS), repeating after
@@ -7032,31 +7033,40 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    waves run) and once that line is over the pictures unlock. The tap also ends the cue for good on this page
    (box.__spkTapped: startCue / idleArm / idleFire bow out) - there is no आगे on this page to stop the idle repeat. Everything
    after the unlock (wrong tap, hint, reveal, the correct tap's SFX + शाबाश) runs exactly as shipped. wireSpkCue() below.
-   [P5-TAP-ONLY] (2026-09-24) pages in SENTENCE_TAP_ONLY_BY_SLIDE (page 5): the page's sentence (card audio.word_name =
+   [P5-TAP-ONLY] (2026-09-24) pages in SENTENCE_TAP_ONLY_BY_SLIDE (page 5; pages 7, 9 and 11 too since [P5-ALL-SENT-PAGES]): the page's sentence (card audio.word_name =
    vo_sent_cat_ok) is NOT read out by the page itself any more - the engine's autoPlayChain (prompt, then word_name) still asks
    for it, and the play() wrapper below skips that one call (autoSentenceOff: the id matches and the call did not come through
    state.replayAudio) and hands the chain its callback, so the chain ends as if the clip had played. The sentence speaks ONLY
    on the speaker-chip tap (the box's replay handler -> state.replayAudio, flagged replayVia while it runs), exactly as pages 2-4.
    The card is unchanged (word_name stays: wireReplay needs it). So page 5 now goes: instruction -> 1.5 s -> cue -> chip tap ->
    sentence -> pictures open.
-   [P5-BOX-WORDS] (2026-09-24) pages in BOX_WORDS_BY_SLIDE (page 5): the sentence box's Hindi text (.sq-text) is split into
+   [P5-BOX-WORDS] (2026-09-24) pages in BOX_WORDS_BY_SLIDE (page 5; pages 7, 9 and 11 too since [P5-ALL-SENT-PAGES]): the sentence box's Hindi text (.sq-text) is split into
    .p2-word spans at mount (wireBoxWords, the same splitWords) and lights up word by word - dark orange text + the tiny pop,
    the pages 2-4 bar look ([WORD-ORANGE], CSS in #P2-BIRD-POP-CSS) - whenever its sentence speaks, through the same play()
    wrapper as the option pills (optWords, WORD_TIMES_BY_AUDIO[vo_sent_cat_ok]). The box geometry does not change (inline-block
    words, padding and negative margin cancel out, as on the bars).
-   [P5-WRONG-PULSE] (2026-09-24) pages in WRONG_PULSE_BY_SLIDE (page 5): on wrong attempt #cfg.attempt (the FIRST) the speaker chip
+   [P5-WRONG-PULSE] (2026-09-24) pages in WRONG_PULSE_BY_SLIDE (page 5; pages 7, 9 and 11 too since [P5-ALL-SENT-PAGES]): on wrong attempt #cfg.attempt (the FIRST) the speaker chip
    pulses again as it did for the cue, but SILENTLY - no "tap the speaker" line. The engine's wrong branch speaks the page's
    try_again slot (vo_try_again: no recording, so a 1.2 s silent beat) while the card shakes red; the play() wrapper below
    recognises that call (wrongCueFor: the page's audio.try_again with state.attempts === cfg.attempt) and, when its beat is over
    (the engine's un-crossing has run), puts .p2-cue on the box for cfg.ms (silentPulse: the [P5-SPK-CUE] chip pulse, no audio),
    settling at the end of a breath; any tap (pointerdown) settles it early, so a chip tap (replay) or the next picture tap never
    overlaps it. The second wrong attempt (the hint line) and the third (the reveal) are untouched.
-   [P5-NO-OK-AFTER-REVEAL] (2026-09-24) pages in NO_OK_AFTER_REVEAL_BY_SLIDE (page 5): after the reveal (3 wrong taps: decoys
+   [P5-NO-OK-AFTER-REVEAL] (2026-09-24) pages in NO_OK_AFTER_REVEAL_BY_SLIDE (page 5; pages 7, 9 and 11 too since [P5-ALL-SENT-PAGES]): after the reveal (3 wrong taps: decoys
    dimmed, the answer ringed with the pointing hand, state.scaffoldLevel 3) the tap on the guided answer keeps its whole beat -
    #P5-CORRECT-SFX-JS's SFX hold + green mark, then the engine's onGuidedTap (kit correct-select, happy mascot, ding + confetti) -
    but the शाबाश line (card audio.correct = vo_ok_pic) is NOT spoken: the play() wrapper skips it (okAfterRevealOff) and hands
    the engine its callback, so completeSlide(false) follows 700 ms later exactly as before. A first-try or second-try correct
    tap (no reveal) still speaks it.
+   [P5-ALL-SENT-PAGES] (2026-09-24) pages 7, 9 and 11 (G3 = ?slide=5, P1 = ?slide=7, P3 = ?slide=9: the other three sentence-box
+   questions, same card shape as page 5 - sentence_box + pic_options, word_name / hint / vo_ok_pic) now have every page-5 behaviour
+   above, by table only: SPK_CUE_BY_SLIDE + CUE_IDLE_BY_SLIDE ([P5-SPK-CUE]: chip-only cue after the instruction, idle repeat, chip
+   the only tappable thing until tapped), SENTENCE_TAP_ONLY_BY_SLIDE ([P5-TAP-ONLY]: no automatic sentence read-out),
+   BOX_WORDS_BY_SLIDE with WORD_TIMES_BY_AUDIO entries for vo_sent_mom_ok / vo_sent_boy_fill_ok / vo_sent_cat_sleep_ok
+   ([P5-BOX-WORDS]: the box text lights up word by word), WRONG_PULSE_BY_SLIDE ([P5-WRONG-PULSE]: 3.5 s silent chip pulse after the
+   first wrong picture), NO_OK_AFTER_REVEAL_BY_SLIDE ([P5-NO-OK-AFTER-REVEAL]: no vo_ok_pic after the guided tap) and STILL_SLIDES in
+   #SPK-STILL-BG-JS ([SPK-STILL-BG] / [SPK-TAP-ONLY]: the chip's waves move only for the tapped sentence). Their correct-tap SFX hold
+   ([P5-CORRECT-SFX]) was already in place. No code path changed; the CSS (#P5-SPK-CUE-CSS, #SPK-STILL-BG-CSS) is class-based.
    [P6-OPT-WORDS] (2026-09-23) pages in OPT_WORDS_BY_SLIDE (page 6 = G2 = ?slide=4; pages 8, 10 and 12 too, see [P8-SAME-AS-P6] / [P10-SAME-AS-P6] / [P12-SAME-AS-P6]): each sentence option pill (.sent-opt
    .so-pill) is split into .p2-word spans at mount and mapped to its option's audio id (card data.options[].audio, matched by
    label_hi); play() is re-pointed so that whenever one of those ids is spoken - the engine's word-on-tap (right or wrong),
@@ -7082,7 +7092,8 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    WORD_TIMES_BY_AUDIO entries for vo_sent_bird_ok, vo_sent_bird_wrong and vo_sent_bird_peck_ok; no audio.correct on its card
    either (no शाबाश line recorded), so its correct tap goes SFX -> its line -> advance as before. All four picture-to-sentence
    pages (6, 8, 10, 12) now behave alike.
-   [P6-WRONG-QUIET] (2026-09-24) pages in WRONG_WORD_OFF_BY_SLIDE (page 6 = G2 = ?slide=4 only): a WRONG sentence pill is no longer read
+   [P6-WRONG-QUIET] (2026-09-24) pages in WRONG_WORD_OFF_BY_SLIDE (page 6 = G2 = ?slide=4; pages 8, 10 and 12 = G4 / P2 / P4 =
+   ?slide=6 / 8 / 10 too since later that day, see the end of this note): a WRONG sentence pill is no longer read
    out when tapped. The engine's wrong branch speaks the tapped option's own line first (its word-on-tap rule) and only then the
    attempt's feedback; the play() wrapper below recognises that call (wrongWordOff: one of the page's option ids whose option is
    not the correct one, outside the read-out) and skips it - no line, so its words stay still - cutting whatever was speaking
@@ -7095,7 +7106,10 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    confetti at the hand-over) and speaks the correct pill's line with its words lit ([P6-OPT-WORDS]); its शाबाश line
    (vo_ok_sent_boy_drink) is skipped since page 6 is now listed in NO_OK_AFTER_REVEAL_BY_SLIDE ([P5-NO-OK-AFTER-REVEAL]), so
    completeSlide(false) follows 700 ms after the line, as on page 5. A correct tap on the first or second try still speaks its
-   line and the शाबाश line. Pages 8, 10 and 12 are untouched (not listed).
+   line and the शाबाश line. Pages 8, 10 and 12 (2026-09-24, later): the user asked for page 6's flow on them too - they were
+   already in OPT_WORDS_BY_SLIDE / REVIEW_BY_SLIDE / CORRECT_SFX_BY_SLIDE, so they are now listed in WRONG_WORD_OFF_BY_SLIDE and
+   NO_OK_AFTER_REVEAL_BY_SLIDE as well (page 8's शाबाश line is vo_ok_sent_children_sit; pages 10 and 12 have no audio.correct on
+   their card, so that entry is parity only). All four picture-to-sentence pages behave alike again.
    [P2-NAV-AFTER-TAP] (2026-09-23) pages in NAV_AFTER_TAP_BY_SLIDE (pages 2-3): आगे does not appear at all before the child has
    tapped the yellow bar (or its speaker) once. Every activation - the pop gate's held reveal, the engine's end-of-narration
    and 30 s watchdog calls - is swallowed while the pill has not been tapped (pill.__p2Heard); the idle cue keeps asking for
@@ -7165,7 +7179,10 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     0: 5000,                                                                             // page 2
     1: 5000,                                                                             // page 3 ([P3-SAME-AS-P2])
     2: 5000,                                                                             // page 4 ([P4-BAR])
-    3: 5000                                                                              // page 5: until its speaker chip is tapped ([P5-SPK-CUE])
+    3: 5000,                                                                             // page 5: until its speaker chip is tapped ([P5-SPK-CUE])
+    5: 5000,                                                                             // page 7 (G3) ([P5-ALL-SENT-PAGES])
+    7: 5000,                                                                             // page 9 (P1) ([P5-ALL-SENT-PAGES])
+    9: 5000                                                                              // page 11 (P3) ([P5-ALL-SENT-PAGES])
   };
   // slide index -> word starts (s) in the pill's sentence recording, then the end of the last word ([P2-WORD-SYNC]); must have
   // one more entry than the pill has words (else no highlight). Page 2.wav = vo_sent_boy_sit, 2.64 s, speech 0.29-2.27 s:
@@ -7213,7 +7230,18 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     // (the voiced b onset 0.26-0.27 then ि, ल्ली 0.38-0.73; the d closure 0.74-0.86 (murmur) with its burst at 0.87, ू 0.89-1.03; the dh
     // closure 1.04-1.08 + aspiration 1.09-1.11; the p closure 1.14-1.20 (silence) with its burst at 1.21, ी 1.23-1.34; the r tap 1.35-1.37,
     // the h of रही 1.46-1.52 (noise, tilt ~1), ी 1.53-1.61; the h of है 1.62-1.66, ऐ 1.67-1.78)
-    vo_sent_cat_ok:          [0.26, 0.83, 1.21, 1.35, 1.62, 1.79]
+    vo_sent_cat_ok:          [0.26, 0.83, 1.21, 1.35, 1.62, 1.79],
+    // page 7 ([P5-ALL-SENT-PAGES]): vo_sent_mom_ok, 2.56 s, speech 0.29-2.25: माँ 0.29 | अखबार 1.00 | पढ़ 1.56 | रही 1.73 | है। 2.05 | end 2.25
+    // (the nasal माँ 0.29-0.68 then a 0.3 s pause; the glottal onset of अ at 1.00, the kh aspiration 1.07-1.16, बा 1.17-1.43, its r tap 1.44-1.45;
+    // the p closure 1.48-1.55 with its burst at 1.56; the ḍh flap 1.68-1.69 + aspiration 1.70; the r of रही 1.73-1.74, the h of ही 1.87-1.91; the h of है 2.05-2.10)
+    vo_sent_mom_ok:          [0.29, 1.00, 1.56, 1.73, 2.05, 2.25],
+    // page 9 ([P5-ALL-SENT-PAGES]): vo_sent_boy_fill_ok, 2.32 s, speech 0.29-1.96: लड़का 0.29 | पानी 0.95 | भर 1.29 | रहा 1.50 | है। 1.81 | end 1.96
+    // (the ṛ flap 0.54-0.55, the k closure 0.60-0.68 with its burst at 0.69; the p closure 0.82-0.94 with its burst at 0.95, the n 1.10; the voiced bh
+    // closure 1.26-1.32 (murmur) with its release at 1.33; the r taps 1.47 and 1.50-1.51 (भर's final r runs into रहा's), the h of हा 1.62-1.67; the h of है 1.81-1.87)
+    vo_sent_boy_fill_ok:     [0.29, 0.95, 1.29, 1.50, 1.81, 1.96],
+    // page 11 ([P5-ALL-SENT-PAGES]): vo_sent_cat_sleep_ok, 1.92 s, speech 0.27-1.54: बिल्ली 0.27 | सो 0.76 | रही 1.08 | है। 1.36 | end 1.54
+    // (the voiced b onset 0.27-0.28 then ि, ल्ली 0.41-0.74; the s noise 0.76-0.92 then ओ 0.93-1.07; the r tap 1.08-1.09, the weak h of ही 1.20-1.23; the h of है 1.36-1.40)
+    vo_sent_cat_sleep_ok:    [0.27, 0.76, 1.08, 1.36, 1.54]
   };
   // slide index -> true: that page's sentence option pills highlight word by word while their line speaks ([P6-OPT-WORDS])
   var OPT_WORDS_BY_SLIDE = {
@@ -7243,33 +7271,54 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   // [P5-SPK-CUE] slide index -> the speaker cue of a sentence-box page: src = the "tap the speaker" line, pulse = the box whose
   // chip pulses with it (.p2-cue) and is the only tappable thing until tapped (see wireSpkCue)
   var SPK_CUE_BY_SLIDE = {
-    3: { src: "assets/Audio/vo_tap_speaker_sentence.ogg", pulse: "#slideHost .sq-sentence-box" }   // page 5 (G1): बिल्ली दूध पी रही है।
+    3: { src: "assets/Audio/vo_tap_speaker_sentence.ogg", pulse: "#slideHost .sq-sentence-box" },  // page 5 (G1): बिल्ली दूध पी रही है।
+    5: { src: "assets/Audio/vo_tap_speaker_sentence.ogg", pulse: "#slideHost .sq-sentence-box" },  // page 7 (G3): माँ अखबार पढ़ रही है। ([P5-ALL-SENT-PAGES])
+    7: { src: "assets/Audio/vo_tap_speaker_sentence.ogg", pulse: "#slideHost .sq-sentence-box" },  // page 9 (P1): लड़का पानी भर रहा है। ([P5-ALL-SENT-PAGES])
+    9: { src: "assets/Audio/vo_tap_speaker_sentence.ogg", pulse: "#slideHost .sq-sentence-box" }   // page 11 (P3): बिल्ली सो रही है। ([P5-ALL-SENT-PAGES])
   };
   // [P5-TAP-ONLY] slide index -> true: the page's sentence (card audio.word_name) speaks ONLY on the speaker-chip tap; the engine's
   // automatic chain (autoPlayChain: prompt, then word_name) skips it (autoSentenceOff in the play() wrapper)
   var SENTENCE_TAP_ONLY_BY_SLIDE = {
-    3: true                                                                              // page 5 (G1)
+    3: true,                                                                             // page 5 (G1)
+    5: true,                                                                             // page 7 (G3) ([P5-ALL-SENT-PAGES])
+    7: true,                                                                             // page 9 (P1) ([P5-ALL-SENT-PAGES])
+    9: true                                                                              // page 11 (P3) ([P5-ALL-SENT-PAGES])
   };
   // [P5-BOX-WORDS] slide index -> true: the sentence box's text lights up word by word while its sentence speaks (wireBoxWords;
   // timings in WORD_TIMES_BY_AUDIO under the card's audio.word_name)
   var BOX_WORDS_BY_SLIDE = {
-    3: true                                                                              // page 5 (G1)
+    3: true,                                                                             // page 5 (G1)
+    5: true,                                                                             // page 7 (G3) ([P5-ALL-SENT-PAGES])
+    7: true,                                                                             // page 9 (P1) ([P5-ALL-SENT-PAGES])
+    9: true                                                                              // page 11 (P3) ([P5-ALL-SENT-PAGES])
   };
   var replayVia = false;                                    // [P5-TAP-ONLY] true while state.replayAudio (the box / chip tap) is calling play()
   // [P5-WRONG-PULSE] slide index -> { attempt, ms }: after the feedback of wrong attempt #attempt the speaker chip pulses silently
   // for ms (the cue's pulse without its line; 3500 ms = the length of the "tap the speaker" line)
   var WRONG_PULSE_BY_SLIDE = {
-    3: { attempt: 1, ms: 3500 }                                                          // page 5 (G1): the first wrong picture
+    3: { attempt: 1, ms: 3500 },                                                         // page 5 (G1): the first wrong picture
+    5: { attempt: 1, ms: 3500 },                                                         // page 7 (G3) ([P5-ALL-SENT-PAGES])
+    7: { attempt: 1, ms: 3500 },                                                         // page 9 (P1) ([P5-ALL-SENT-PAGES])
+    9: { attempt: 1, ms: 3500 }                                                          // page 11 (P3) ([P5-ALL-SENT-PAGES])
   };
   // [P5-NO-OK-AFTER-REVEAL] slide index -> true: after the reveal (state.scaffoldLevel 3) the guided tap's शाबाश line (audio.correct) is skipped
   var NO_OK_AFTER_REVEAL_BY_SLIDE = {
     3: true,                                                                             // page 5 (G1): vo_ok_pic
-    4: true                                                                              // page 6 (G2): vo_ok_sent_boy_drink ([P6-WRONG-QUIET])
+    4: true,                                                                             // page 6 (G2): vo_ok_sent_boy_drink ([P6-WRONG-QUIET])
+    5: true,                                                                             // page 7 (G3): vo_ok_pic ([P5-ALL-SENT-PAGES])
+    6: true,                                                                             // page 8 (G4): vo_ok_sent_children_sit ([P8-SAME-AS-P6])
+    7: true,                                                                             // page 9 (P1): vo_ok_pic ([P5-ALL-SENT-PAGES])
+    8: true,                                                                             // page 10 (P2): no audio.correct on its card - parity only ([P10-SAME-AS-P6])
+    9: true,                                                                             // page 11 (P3): vo_ok_pic ([P5-ALL-SENT-PAGES])
+   10: true                                                                              // page 12 (P4): no audio.correct on its card - parity only ([P12-SAME-AS-P6])
   };
   // [P6-WRONG-QUIET] slide index -> true: a tapped WRONG sentence pill is not read out (its words stay still); the attempt's
   // feedback (the silent try_again beat, the read-out, the reveal) follows WRONG_BEAT_MS after the tap, once the wiggle is over
   var WRONG_WORD_OFF_BY_SLIDE = {
-    4: true                                                                              // page 6 (G2)
+    4: true,                                                                             // page 6 (G2)
+    6: true,                                                                             // page 8 (G4) ([P8-SAME-AS-P6])
+    8: true,                                                                             // page 10 (P2) ([P10-SAME-AS-P6])
+   10: true                                                                              // page 12 (P4) ([P12-SAME-AS-P6])
   };
   var silentEl = null;                                      // [P5-WRONG-PULSE] the box pulsing silently right now (null when none)
   var timers = [], sfx = null;
@@ -7979,7 +8028,8 @@ body.vo-bg .stage.tut .tut-audio.playing .wv1,body.vo-bg .stage.tut .tut-audio.p
 body.vo-bg .sq-sentence-box .tut-audio.playing .wv1,body.vo-bg .sq-sentence-box .tut-audio.playing .wv2{animation:none !important;opacity:1 !important;}
 </style>
 <script id="SPK-STILL-BG-JS">
-/* [SPK-STILL-BG] (2026-09-23) pages 2-5 (slides 0-3): the sentence speaker chip animates only for the sentence line - a
+/* [SPK-STILL-BG] (2026-09-23) pages 2-5 (slides 0-3; pages 7, 9 and 11 = slides 5, 7, 9 too since [P5-ALL-SENT-PAGES], 2026-09-24,
+   their sentences vo_sent_mom_ok / vo_sent_boy_fill_ok / vo_sent_cat_sleep_ok): the sentence speaker chip animates only for the sentence line - a
    vo_sent_* recording (vo_sent_boy_sit / vo_sent_girl_cycle / vo_sent_girl_water / page 5's vo_sent_cat_ok) - and, since
    [SPK-TAP-ONLY] (2026-09-24), only when that line was started by the child's tap (the chip / bar on pages 2-4, the sentence
    box or its chip on page 5): page 5 used to read its sentence out by itself right after the instruction, and that automatic
@@ -7992,7 +8042,7 @@ body.vo-bg .sq-sentence-box .tut-audio.playing .wv1,body.vo-bg .sq-sentence-box 
    chain, taps, word sync and आगे timing are untouched. */
 (function(){
   var orig = window.play; if(typeof orig !== "function") return;
-  var STILL_SLIDES = { 0:true, 1:true, 2:true, 3:true };          // pages 2, 3, 4, 5
+  var STILL_SLIDES = { 0:true, 1:true, 2:true, 3:true, 5:true, 7:true, 9:true };   // pages 2, 3, 4, 5 + pages 7, 9, 11 ([P5-ALL-SENT-PAGES], #P2-BIRD-POP-JS)
   var TAP_MS = 400, lastTap = -1e9;                                 // [SPK-TAP-ONLY]
   var now = function(){ return (window.performance && performance.now) ? performance.now() : Date.now(); };
   var noteTap = function(e){ if(e && e.isTrusted) lastTap = now(); };
@@ -8030,7 +8080,7 @@ body.vo-bg .sq-sentence-box .tut-audio.playing .wv1,body.vo-bg .sq-sentence-box 
 .stage.tut .story-caption.p2-sentence-btn .tut-audio{pointer-events:auto;cursor:pointer;}
 </style>
 <style id="P5-SPK-CUE-CSS">
-/* [P5-SPK-CUE] (2026-09-24) page 5 (G1 = ?slide=3): after the page's background line (its instruction; the automatic sentence
+/* [P5-SPK-CUE] (2026-09-24) page 5 (G1 = ?slide=3; pages 7, 9 and 11 too since [P5-ALL-SENT-PAGES]): after the page's background line (its instruction; the automatic sentence
    read-out is off since [P5-TAP-ONLY]), ONLY the speaker chip beside the sentence box pulsates with the "Tap speaker icon" line
    (vo_tap_speaker_sentence = voiceovers_batch "Tap speaker icon.wav", already wired) and ONLY that chip is tappable until it
    has been tapped. #P2-BIRD-POP-JS (wireSpkCue / SPK_CUE_BY_SLIDE) puts .p2-cue on the box while the line speaks - the chip
