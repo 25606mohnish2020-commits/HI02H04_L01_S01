@@ -8137,7 +8137,8 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    pill fills the box exactly whether it is 170 or 190 wide, and the ARROW (btn-next(-disabled)-arrow.svg) at its own 40x28 size
    centred, never stretched. The user's originals (btn-next.svg / btn-next-disabled.svg) are kept beside them unused. The pill's own
    fill, border colour, box-shadows and text are switched off (the art has its own shadow; the text is the accessible name only).
-   The end screen keeps the button away exactly as before (body.is-end #navBtn{display:none}). */
+   The end screen keeps the button away exactly as before (body.is-end #navBtn{display:none}), and so does the title screen
+   (body.is-start, see the last rule: its start gate is transparent, so the stage would show through). */
 #navBtn{display:flex !important;background:transparent !important;border-color:transparent !important;box-shadow:none !important;
   color:transparent !important;font-size:0 !important;opacity:1 !important;visibility:visible !important;overflow:visible !important;}
 #navBtn:not(.active){box-shadow:none !important;pointer-events:none !important;cursor:default !important;}
@@ -8148,6 +8149,11 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 #navBtn.active::after{opacity:1;}
 #navBtn.active::before{opacity:0;}
 body.is-end #navBtn{display:none !important;}
+/* Page 1 (2026-09-24, bak107): the title screen's start gate is TRANSPARENT there (body.is-start .start-gate{background:transparent};
+   the body carries the sky), so the stage behind it shows through - the disabled art, visible since display:flex above, appeared
+   under the landing card. The landing has no आगे at all, so the button stays out of the page while body.is-start (dropped once the
+   tutorial has mounted, so page 2 gets it back); pages 2-14 are unchanged. */
+body.is-start #navBtn{display:none !important;}
 </style>
 <style id="SPK-STILL-BG-CSS">
 /* [SPK-STILL-BG] (2026-09-23) pages 2-5 (slides 0-3): the speaker chip beside the sentence (.tut-audio: in the tut frame on
