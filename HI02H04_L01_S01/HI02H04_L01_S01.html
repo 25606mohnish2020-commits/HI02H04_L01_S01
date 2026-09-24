@@ -7082,6 +7082,20 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    WORD_TIMES_BY_AUDIO entries for vo_sent_bird_ok, vo_sent_bird_wrong and vo_sent_bird_peck_ok; no audio.correct on its card
    either (no शाबाश line recorded), so its correct tap goes SFX -> its line -> advance as before. All four picture-to-sentence
    pages (6, 8, 10, 12) now behave alike.
+   [P6-WRONG-QUIET] (2026-09-24) pages in WRONG_WORD_OFF_BY_SLIDE (page 6 = G2 = ?slide=4 only): a WRONG sentence pill is no longer read
+   out when tapped. The engine's wrong branch speaks the tapped option's own line first (its word-on-tap rule) and only then the
+   attempt's feedback; the play() wrapper below recognises that call (wrongWordOff: one of the page's option ids whose option is
+   not the correct one, outside the read-out) and skips it - no line, so its words stay still - cutting whatever was speaking
+   (the tap still cuts the prompt, as before) and handing the engine its callback WRONG_BEAT_MS later, once the kit's wrong beat
+   (the wiggle + the red release, ~0.9 s) is over; taps are held off meanwhile (state.hintActive, as during the read-out). So
+   page 6 now goes: wrong tap 1 = wiggle + soft buzz, the silent try_again beat, un-cross; wrong tap 2 = wiggle, then the
+   [P6-REVIEW] read-out of all three pills (each lifted, words lit, one by one) - the tapped pill is not spoken on its own before
+   it; wrong tap 3 = wiggle, then the engine's reveal at once (decoys dimmed, the answer ringed with the pointing hand, the
+   silent vo_reveal beat). The guided tap keeps the [P5-GUIDED-TAP] beat (SFX hold, green mark, the recall picture's pop, ding +
+   confetti at the hand-over) and speaks the correct pill's line with its words lit ([P6-OPT-WORDS]); its शाबाश line
+   (vo_ok_sent_boy_drink) is skipped since page 6 is now listed in NO_OK_AFTER_REVEAL_BY_SLIDE ([P5-NO-OK-AFTER-REVEAL]), so
+   completeSlide(false) follows 700 ms after the line, as on page 5. A correct tap on the first or second try still speaks its
+   line and the शाबाश line. Pages 8, 10 and 12 are untouched (not listed).
    [P2-NAV-AFTER-TAP] (2026-09-23) pages in NAV_AFTER_TAP_BY_SLIDE (pages 2-3): आगे does not appear at all before the child has
    tapped the yellow bar (or its speaker) once. Every activation - the pop gate's held reveal, the engine's end-of-narration
    and 30 s watchdog calls - is swallowed while the pill has not been tapped (pill.__p2Heard); the idle cue keeps asking for
@@ -7092,6 +7106,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    setNavActive(false) or leaving the page drops a held reveal. Inactive .nav-btn is visibility:hidden, so "appear" == activate. */
 (function(){ "use strict";
   var DELAY_MS = 3000, POP_MS = 2000, VOL = 0.7, NAV_AFTER_MS = 1000, AFTER_VO_MS = 500, CUE_GAP_MS = 1500, REVIEW_GAP_MS = 500;
+  var WRONG_BEAT_MS = 1000;                                 // [P6-WRONG-QUIET] the kit's wrong beat (wiggle + red release, ~0.9 s) a wrong tap's feedback waits for
   // slide index -> one SFX per pop step, in picture order (the user counts pages from the landing page: ?slide=N is page N+2)
   var PLAN_BY_SLIDE = {
     0: ["assets/Audio/sfx_morning_birds.mp3"],                                           // page 2: boy under the tree
@@ -7248,7 +7263,13 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   };
   // [P5-NO-OK-AFTER-REVEAL] slide index -> true: after the reveal (state.scaffoldLevel 3) the guided tap's शाबाश line (audio.correct) is skipped
   var NO_OK_AFTER_REVEAL_BY_SLIDE = {
-    3: true                                                                              // page 5 (G1): vo_ok_pic
+    3: true,                                                                             // page 5 (G1): vo_ok_pic
+    4: true                                                                              // page 6 (G2): vo_ok_sent_boy_drink ([P6-WRONG-QUIET])
+  };
+  // [P6-WRONG-QUIET] slide index -> true: a tapped WRONG sentence pill is not read out (its words stay still); the attempt's
+  // feedback (the silent try_again beat, the read-out, the reveal) follows WRONG_BEAT_MS after the tap, once the wiggle is over
+  var WRONG_WORD_OFF_BY_SLIDE = {
+    4: true                                                                              // page 6 (G2)
   };
   var silentEl = null;                                      // [P5-WRONG-PULSE] the box pulsing silently right now (null when none)
   var timers = [], sfx = null;
@@ -7546,6 +7567,17 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     optWords = optWords || {};
     optWords[id] = { els: els, times: WORD_TIMES_BY_AUDIO[id] };
   }
+  // [P6-WRONG-QUIET] this play() call is the engine speaking a tapped WRONG sentence pill's own line on a listed page: one of
+  // the page's option ids whose option is not the correct one, outside the read-out (sayPill speaks those same ids while reviewing)
+  function wrongWordOff(src){
+    var ix = (typeof state === "object" && state) ? state.idx : -1;
+    if(WRONG_WORD_OFF_BY_SLIDE[ix] !== true || !src || reviewing || state.locked || !(state.attempts >= 1)) return false;
+    var sl = (typeof CARD === "object" && CARD && CARD.slides) ? CARD.slides[ix] : null;
+    var opts = (sl && sl.data && Array.isArray(sl.data.options)) ? sl.data.options : [];
+    var id = idOf(src);
+    for(var i = 0; i < opts.length; i++){ if(opts[i] && opts[i].audio && idOf(srcOf(opts[i].audio)) === id) return opts[i].correct !== true; }
+    return false;
+  }
   // [P5-WRONG-PULSE] this play() call is the page's try_again feedback for the listed wrong attempt: {box, cfg}, else null
   function wrongCueFor(src){
     var ix = (typeof state === "object" && state) ? state.idx : -1;
@@ -7646,6 +7678,17 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
       }
       if(src && okAfterRevealOff(src)){                                         // [P5-NO-OK-AFTER-REVEAL] the शाबाश line after the guided tap: skipped, the advance follows as before
         if(onEnd) timers.push(setTimeout(onEnd, 0));
+        return;
+      }
+      if(src && wrongWordOff(src)){                                             // [P6-WRONG-QUIET] a tapped wrong pill's own line: not spoken, its words stay still; the feedback follows the wiggle
+        var ixw = state.idx, cbw = onEnd;
+        if(typeof stopAudio === "function") stopAudio();                         // the tap still cuts whatever was speaking (the prompt), as the line did
+        state.hintActive = true;                                                // taps wait for the beat, as during the read-out
+        timers.push(setTimeout(function(){
+          if(typeof state !== "object" || !state || state.idx !== ixw) return;   // the page was left (mountSlide resets the hint state)
+          state.hintActive = false;
+          if(typeof cbw === "function") cbw();                                  // the engine's feedback for this attempt
+        }, WRONG_BEAT_MS));
         return;
       }
       var wc = wrongCueFor(src);                                                // [P5-WRONG-PULSE] the first wrong attempt's feedback: the chip pulses silently once it is over
