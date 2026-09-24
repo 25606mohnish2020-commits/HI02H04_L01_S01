@@ -6907,6 +6907,12 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    is speaking pops very slightly (a springy lift while it speaks, eased back at its end) and its words light up as usual */
 .sent-opt .so-pill{transition:transform .28s ease;}
 .sent-opt .so-pill.p6-say{transform:scale(1.05);transition:transform .32s cubic-bezier(.34,1.6,.6,1);}
+/* [TRAIN-WORDS] pages 13-14: the sentence written in a coach (.ref-slot-text) lights up word by word while its line speaks - the same
+   dark-orange text + tiny pop as the bars ([WORD-ORANGE]); the words sit in ONE inline box, so the label's flex centring and its
+   single line are unchanged (the padding and the negative margin cancel out, as on the bars) */
+.ref-panel .ref-slot-text .p2-words{display:inline;}
+.ref-panel .ref-slot-text .p2-word,.ref-panel .ref-slot-text .p2-punct{display:inline-block;border-radius:6px;padding:0 .1em;margin:0 -.1em;transform-origin:50% 60%;}
+.ref-panel .ref-slot-text .p2-word.on{color:#E86A00;animation:p2WordPop .28s ease-out 1;}
 </style>
 <style id="YLW-IMG-STROKE">
 /* [YLW-IMG-STROKE] 2026-09-23: the user asked for the yellow picture frame (the 3-4px #FCD86B edge baked into the *_ylw
@@ -7115,6 +7121,17 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    already in OPT_WORDS_BY_SLIDE / REVIEW_BY_SLIDE / CORRECT_SFX_BY_SLIDE, so they are now listed in WRONG_WORD_OFF_BY_SLIDE and
    NO_OK_AFTER_REVEAL_BY_SLIDE as well (page 8's शाबाश line is vo_ok_sent_children_sit; pages 10 and 12 have no audio.correct on
    their card, so that entry is parity only). All four picture-to-sentence pages behave alike again.
+   [TRAIN-WORDS] (2026-09-24) pages in TRAIN_WORDS_BY_SLIDE (pages 13 and 14 = P5 / P6 = ?slide=11 / 12, the train): when the
+   correct item lands in a coach the BLANK_PANEL module speaks its line (page 13: data.sentence_audio[i] as sentences[i] is
+   written into the dashed box; page 14: data.box_audio[c] for the coach's pre-written box_texts[c]) - now the sentence written in
+   that coach (.ref-slot-text) lights up word by word with it, the pages 2-12 look (dark-orange text + the tiny pop, [WORD-ORANGE];
+   CSS in #P2-BIRD-POP-CSS). Hooked at the play() seam below: trainWordsFor(src) maps the id back to its sentence through the
+   card, finds the label with that text (page 13's label is created by writeInBox just before the line plays), splits it once
+   into .p2-word spans (splitLabelWords: a lone danda, "है ।", is a plain .p2-punct span, not a word, so the word count
+   matches the recording and the label wraps exactly as the plain text did) and wordSync runs on WORD_TIMES_BY_AUDIO[id]. Page 13's three ids already had timings (vo_sent_cat_ok /
+   vo_sent_bird_ok / vo_sent_goat_ok); page 14's vo_sent_grandpa_newspaper / vo_sent_children_kite / vo_sent_dog_ball were
+   measured (energy envelope + band spectra + voicing). Nothing else on the train pages changes: the glide, the drag, the chime,
+   the label's own pop-in, the bounce and the departure are as before.
    [P2-NAV-AFTER-TAP] (2026-09-23) pages in NAV_AFTER_TAP_BY_SLIDE (pages 2-3): आगे does not appear at all before the child has
    tapped the yellow bar (or its speaker) once. Every activation - the pop gate's held reveal, the engine's end-of-narration
    and 30 s watchdog calls - is swallowed while the pill has not been tapped (pill.__p2Heard); the idle cue keeps asking for
@@ -7246,7 +7263,21 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     vo_sent_boy_fill_ok:     [0.29, 0.95, 1.29, 1.50, 1.81, 1.96],
     // page 11 ([P5-ALL-SENT-PAGES]): vo_sent_cat_sleep_ok, 1.92 s, speech 0.27-1.54: बिल्ली 0.27 | सो 0.76 | रही 1.08 | है। 1.36 | end 1.54
     // (the voiced b onset 0.27-0.28 then ि, ल्ली 0.41-0.74; the s noise 0.76-0.92 then ओ 0.93-1.07; the r tap 1.08-1.09, the weak h of ही 1.20-1.23; the h of है 1.36-1.40)
-    vo_sent_cat_sleep_ok:    [0.27, 0.76, 1.08, 1.36, 1.54]
+    vo_sent_cat_sleep_ok:    [0.27, 0.76, 1.08, 1.36, 1.54],
+    // page 14 ([TRAIN-WORDS]): vo_sent_grandpa_newspaper, 2.84 s, speech 0.28-2.45: दादाजी 0.28 | अखबार 0.80 | पढ़ 1.18 | रहे 1.37 | हैं 1.82 | end 2.45
+    // (the two d bursts 0.28 / 0.42, the j murmur 0.60-0.67, जी 0.68-0.79; the weak अ 0.80-0.85 (low band only) then the kh noise 0.86-0.93, बा 0.94-1.02, its r 1.03;
+    // the p closure 1.09-1.17 with its burst at 1.18, the ḍh aspiration 1.23-1.36; the r trill of रहे 1.37-1.47 (voiced, low band), ह 1.48-1.50, ए 1.51-1.73; a
+    // pause 1.74-1.81; the h of हैं at 1.82 then a long, stretched nasal vowel to 2.45 with breathy dips every ~150 ms)
+    vo_sent_grandpa_newspaper: [0.28, 0.80, 1.18, 1.37, 1.82, 2.45],
+    // vo_sent_children_kite, 2.28 s, speech 0.31-1.95: बच्चे 0.31 | पतंग 0.93 | उड़ा 1.29 | रहे 1.55 | हैं 1.82 | end 1.95
+    // (the cc closure 0.51-0.62 + release noise 0.63-0.69; the p closure 0.80-0.92 with its burst at 0.93, the t closure 1.00-1.08, burst 1.09, ंग to 1.28;
+    // उ from 1.29, the ṛ flap 1.40, आ 1.41-1.54; the r tap 1.55-1.57, अ 1.58-1.62, the voiced h 1.63-1.68, ए 1.69-1.81; the voiced h of हैं 1.82-1.83, ऐं 1.84-1.88, breathy tail to 1.95)
+    vo_sent_children_kite:   [0.31, 0.93, 1.29, 1.55, 1.82, 1.95],
+    // vo_sent_dog_ball, 2.60 s, speech 0.54-2.20: कुत्ता 0.54 | गेंद 1.01 | से 1.31 | खेल 1.51 | रहा 1.76 | है 1.95 | end 2.20
+    // (the k burst 0.54, उ 0.56-0.61, the tt closure 0.64-0.78 with its burst at 0.79, आ 0.80-0.93; the voiced g closure 0.94-1.04 (murmur) with its release at 1.05,
+    // ेंद 1.08-1.30; the s noise 1.31-1.40, ए 1.41-1.45; the kh closure 1.46-1.50 + aspiration 1.51-1.59, े 1.61-1.70, ल 1.71-1.75; the r tap + breathy h 1.76-1.79,
+    // आ 1.80-1.94; the vowel turns to ऐ at 1.95 (its h is fully voiced, no dip), fading from 2.15, gone by 2.20)
+    vo_sent_dog_ball:        [0.54, 1.01, 1.31, 1.51, 1.76, 1.95, 2.20]
   };
   // slide index -> true: that page's sentence option pills highlight word by word while their line speaks ([P6-OPT-WORDS])
   var OPT_WORDS_BY_SLIDE = {
@@ -7324,6 +7355,11 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     6: true,                                                                             // page 8 (G4) ([P8-SAME-AS-P6])
     8: true,                                                                             // page 10 (P2) ([P10-SAME-AS-P6])
    10: true                                                                              // page 12 (P4) ([P12-SAME-AS-P6])
+  };
+  // [TRAIN-WORDS] slide index -> true: the sentence written in a coach lights up word by word while its line speaks (trainWordsFor)
+  var TRAIN_WORDS_BY_SLIDE = {
+   11: true,                                                                             // page 13 (P5): sentence pills -> coaches
+   12: true                                                                              // page 14 (P6): picture cards -> coaches
   };
   var silentEl = null;                                      // [P5-WRONG-PULSE] the box pulsing silently right now (null when none)
   var timers = [], sfx = null;
@@ -7632,6 +7668,42 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     for(var i = 0; i < opts.length; i++){ if(opts[i] && opts[i].audio && idOf(srcOf(opts[i].audio)) === id) return opts[i].correct !== true; }
     return false;
   }
+  // [TRAIN-WORDS] split a coach label (.ref-slot-text) into .p2-word spans once, in ONE inline box (the label is a flex box, so its
+  // centring stays); a lone danda token ("है ।") becomes its own plain .p2-punct span - not a word, never lit - so the label
+  // keeps every break opportunity the plain text had and wraps exactly as before (page 14's long grandpa line breaks before its ।)
+  function splitLabelWords(label){
+    if(label.__p2Words) return label.__p2Words;
+    var text = label.textContent || ""; if(!text.trim()) return null;
+    var wrap = document.createElement("span"), els = []; wrap.className = "p2-words";
+    text.trim().split(/\s+/).forEach(function(t, i){
+      if(i) wrap.appendChild(document.createTextNode(" "));
+      var sp = document.createElement("span"); sp.textContent = t; wrap.appendChild(sp);
+      if(/^[\u0964\u0965,.!?]+$/.test(t)) sp.className = "p2-punct"; else { sp.className = "p2-word"; els.push(sp); }
+    });
+    label.textContent = ""; label.appendChild(wrap);
+    label.__p2Words = els;
+    return els;
+  }
+  // [TRAIN-WORDS] this play() call is a coach sentence on a listed page (page 13: data.sentence_audio[i] for sentences[i]; page 14:
+  // data.box_audio[c] for box_texts[c]) whose written label is on the page: {els, times} of that label, else null
+  function trainWordsFor(src){
+    var ix = (typeof state === "object" && state) ? state.idx : -1;
+    if(TRAIN_WORDS_BY_SLIDE[ix] !== true || !src) return null;
+    var sl = (typeof CARD === "object" && CARD && CARD.slides) ? CARD.slides[ix] : null, d = sl && sl.data; if(!d) return null;
+    var id = idOf(src), times = WORD_TIMES_BY_AUDIO[id]; if(!times) return null;
+    var text = null, ids, texts, i;
+    ids = Array.isArray(d.sentence_audio) ? d.sentence_audio : []; texts = Array.isArray(d.sentences) ? d.sentences : [];
+    for(i = 0; i < ids.length && text == null; i++){ if(ids[i] === id) text = texts[i]; }
+    ids = Array.isArray(d.box_audio) ? d.box_audio : []; texts = Array.isArray(d.box_texts) ? d.box_texts : [];
+    for(i = 0; i < ids.length && text == null; i++){ if(ids[i] === id) text = texts[i]; }
+    if(!text) return null;
+    var norm = function(t){ return String(t).replace(/\s+/g, " ").replace(/\s+([\u0964\u0965,.!?])/g, "$1").trim(); };
+    var labels = document.querySelectorAll("#slideHost .ref-slot-text"), label = null;
+    for(i = 0; i < labels.length; i++){ if(norm(labels[i].textContent) === norm(text)){ label = labels[i]; break; } }
+    if(!label) return null;
+    var els = splitLabelWords(label);
+    return (els && els.length === times.length - 1) ? { els: els, times: times } : null;
+  }
   // [P5-WRONG-PULSE] this play() call is the page's try_again feedback for the listed wrong attempt: {box, cfg}, else null
   function wrongCueFor(src){
     var ix = (typeof state === "object" && state) ? state.idx : -1;
@@ -7762,6 +7834,10 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
         var id = String(src).split("/").pop().replace(/\.[A-Za-z0-9]+$/, "");
         var w = optWords[id];
         if(w && w.els[0] && w.els[0].isConnected) wordSync((typeof currentAudio !== "undefined") ? currentAudio : null, w.els, w.times);
+      }
+      if(src){                                                                  // [TRAIN-WORDS] a coach sentence on pages 13-14: its written label lights up word by word
+        var tw = trainWordsFor(src);
+        if(tw) wordSync((typeof currentAudio !== "undefined") ? currentAudio : null, tw.els, tw.times);
       }
       return r;
     };
