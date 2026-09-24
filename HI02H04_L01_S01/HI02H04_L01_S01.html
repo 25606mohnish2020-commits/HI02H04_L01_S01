@@ -1034,6 +1034,7 @@ body.loaded .sg-icon{animation-play-state:running;}
   <div class="end-subtitle" id="endSubtitle"></div>
   <img class="end-mascot" src="assets/UI/sw_lg_celebrating_anim.webp" alt="Swiftee"
        onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'end-mascot',textContent:'🎉'}))">
+  <!-- [END-FINISH-BTN] drawn by assets/UI/btn-finish-pill/-arrow.svg (see <style id="END-FINISH-BTN">); the text is the accessible name only -->
   <button class="end-btn" id="endBtn">आगे बढ़ें →</button>
 </div>
 
@@ -8154,6 +8155,28 @@ body.is-end #navBtn{display:none !important;}
    under the landing card. The landing has no आगे at all, so the button stays out of the page while body.is-start (dropped once the
    tutorial has mounted, so page 2 gets it back); pages 2-14 are unchanged. */
 body.is-start #navBtn{display:none !important;}
+</style>
+<style id="END-FINISH-BTN">
+/* [END-FINISH-BTN] (2026-09-24) Page 15 (the celebration screen): the आगे बढ़ें pill (#endBtn) is drawn by the user's finish-button
+   art (btn-finish.svg: yellow #FCB717 pill, white ring, navy arrow) instead of its text, in the SAME box at the SAME spot: the
+   button's own box is untouched (its now-transparent text and the --scale-d padding still size it: ~209x81 design px, e.g. 201x78
+   at --scale .96, centred 22 px under the mascot), it still pops in with .show exactly when it did (hintPop) and its tap still does
+   exactly what it did (eb.onclick in the celebration mount). The art is two layers on ::before/::after, as on the आगे button
+   ([NAV-NEXT-BTN]): the PILL (btn-finish-pill.svg, preserveAspectRatio none, redrawn at that 209x81 box so its ring and shadow come
+   out ~1:1) fills a canvas = the border box + the art's 14 px shadow margin all round (x --scale, like the button's own font and
+   padding on this unscaled full-bleed screen; insets count from the padding box, hence the extra 4.54 px border), and the ARROW
+   (btn-finish-arrow.svg) at its own 40x28 (x --scale) centred, never stretched. The pill's own fill, ring colour, shadows and text
+   colour are switched off (the art has its own shadow; the text is the accessible name only). The user's original btn-finish.svg is
+   kept beside the two layers unused. position:relative (was static) only anchors the two layers - in a flex row it lays out the same. */
+#endBtn{position:relative !important;background:transparent !important;border-color:transparent !important;box-shadow:none !important;
+  color:transparent !important;text-shadow:none !important;overflow:visible !important;}
+#endBtn:active{box-shadow:none !important;}
+#endBtn::before,#endBtn::after{content:"";position:absolute;pointer-events:none;
+  left:calc(-14px * var(--scale,1) - 4.54px);right:calc(-14px * var(--scale,1) - 4.54px);
+  top:calc(-14px * var(--scale,1) - 4.54px);bottom:calc(-14px * var(--scale,1) - 4.54px);
+  background-repeat:no-repeat;background-position:center;}
+#endBtn::before{background-image:url("assets/UI/btn-finish-pill.svg");background-size:100% 100%;}
+#endBtn::after{background-image:url("assets/UI/btn-finish-arrow.svg");background-size:calc(40px * var(--scale,1)) calc(28px * var(--scale,1));}
 </style>
 <style id="SPK-STILL-BG-CSS">
 /* [SPK-STILL-BG] (2026-09-23) pages 2-5 (slides 0-3): the speaker chip beside the sentence (.tut-audio: in the tut frame on
