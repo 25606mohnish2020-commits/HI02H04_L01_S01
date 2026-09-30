@@ -969,7 +969,7 @@ body.loaded .sg-icon{animation-play-state:running;}
         </div>
         <!-- audio chip: CSS blue circle + inline-SVG speaker -->
         <div class="audio-chip" id="audioChip" title="आवाज़ सुनो">
-          <svg viewBox="0 0 62 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Audio"><g filter="url(#hdrChipShadow)"><rect x="8" y="4" width="46" height="44" rx="22" fill="url(#hdrChipGrad)"/><rect x="6" y="2" width="50" height="48" rx="24" stroke="white" stroke-width="4"/><rect x="26.75" y="15.05" width="8.5" height="15.85" rx="4.25" fill="white"/><path d="M24.5 26V26.7A6.5 6.5 0 0 0 37.5 26.7V26M31 33.2V36.1M27.7 36.8H34.3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g><defs><filter id="hdrChipShadow" x="0" y="0" width="62" height="60" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="4"/><feGaussianBlur stdDeviation="2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/></filter><linearGradient id="hdrChipGrad" x1="8" y1="26" x2="54" y2="26" gradientUnits="userSpaceOnUse"><stop stop-color="#1987FC"/><stop offset="1" stop-color="#1565F4"/></linearGradient></defs></svg>
+          <svg viewBox="0 0 62 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Audio"><g filter="url(#hdrChipShadow)"><rect x="8" y="4" width="46" height="44" rx="22" fill="url(#hdrChipGrad)"/><rect x="6" y="2" width="50" height="48" rx="24" stroke="white" stroke-width="4"/><rect class="mic" x="26.75" y="15.05" width="8.5" height="15.85" rx="4.25" fill="white"/><path class="mic" d="M24.5 26V26.7A6.5 6.5 0 0 0 37.5 26.7V26M31 33.2V36.1M27.7 36.8H34.3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><g class="mic-wave" fill="white"><rect x="22.9" y="22" width="2.2" height="8" rx="1.1"/><rect x="26.4" y="19" width="2.2" height="14" rx="1.1"/><rect x="29.9" y="17" width="2.2" height="18" rx="1.1"/><rect x="33.4" y="19" width="2.2" height="14" rx="1.1"/><rect x="36.9" y="22" width="2.2" height="8" rx="1.1"/></g></g><defs><filter id="hdrChipShadow" x="0" y="0" width="62" height="60" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="4"/><feGaussianBlur stdDeviation="2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/></filter><linearGradient id="hdrChipGrad" x1="8" y1="26" x2="54" y2="26" gradientUnits="userSpaceOnUse"><stop stop-color="#1987FC"/><stop offset="1" stop-color="#1565F4"/></linearGradient></defs></svg>
         </div>
       </div>
       <div class="prompt-band"><div class="prompt-text" id="promptText">…</div></div>
@@ -1016,7 +1016,7 @@ body.loaded .sg-icon{animation-play-state:running;}
         <!-- sentence under the hero picture: the story-slide caption pill (.story-caption) verbatim -->
         <div class="story-caption sg-caption" id="sgCaption">लड़की गेंद से खेल रही है।</div>
       </div>
-      <button class="sg-vo" id="sgVo" type="button" aria-label="सुनो"><svg viewBox="0 0 62 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Audio"><g filter="url(#sgChipShadow)"><rect x="8" y="4" width="46" height="44" rx="22" fill="url(#sgChipGrad)"/><rect x="6" y="2" width="50" height="48" rx="24" stroke="white" stroke-width="4"/><rect x="26.75" y="15.05" width="8.5" height="15.85" rx="4.25" fill="white"/><path d="M24.5 26V26.7A6.5 6.5 0 0 0 37.5 26.7V26M31 33.2V36.1M27.7 36.8H34.3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g><defs><filter id="sgChipShadow" x="0" y="0" width="62" height="60" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="4"/><feGaussianBlur stdDeviation="2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/></filter><linearGradient id="sgChipGrad" x1="8" y1="26" x2="54" y2="26" gradientUnits="userSpaceOnUse"><stop stop-color="#1987FC"/><stop offset="1" stop-color="#1565F4"/></linearGradient></defs></svg></button>
+      <button class="sg-vo" id="sgVo" type="button" aria-label="सुनो"><svg viewBox="0 0 62 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Audio"><g filter="url(#sgChipShadow)"><rect x="8" y="4" width="46" height="44" rx="22" fill="url(#sgChipGrad)"/><rect x="6" y="2" width="50" height="48" rx="24" stroke="white" stroke-width="4"/><rect class="mic" x="26.75" y="15.05" width="8.5" height="15.85" rx="4.25" fill="white"/><path class="mic" d="M24.5 26V26.7A6.5 6.5 0 0 0 37.5 26.7V26M31 33.2V36.1M27.7 36.8H34.3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><g class="mic-wave" fill="white"><rect x="22.9" y="22" width="2.2" height="8" rx="1.1"/><rect x="26.4" y="19" width="2.2" height="14" rx="1.1"/><rect x="29.9" y="17" width="2.2" height="18" rx="1.1"/><rect x="33.4" y="19" width="2.2" height="14" rx="1.1"/><rect x="36.9" y="22" width="2.2" height="8" rx="1.1"/></g></g><defs><filter id="sgChipShadow" x="0" y="0" width="62" height="60" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="4"/><feGaussianBlur stdDeviation="2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/></filter><linearGradient id="sgChipGrad" x1="8" y1="26" x2="54" y2="26" gradientUnits="userSpaceOnUse"><stop stop-color="#1987FC"/><stop offset="1" stop-color="#1565F4"/></linearGradient></defs></svg></button>
       <!-- [LANDING-PLAY-BTN] drawn by assets/UI/btn-play(-waiting).svg (see <style id="LANDING-PLAY-BTN">); the text is the aria-label only -->
       <button class="sg-btn" id="sgBtn" type="button" aria-label="शुरू करें">शुरू करें</button>
     </div>
@@ -4378,7 +4378,7 @@ SlideModules.MATCH_VACHAN_PAIRS    = SlideModules.MATCH_GENDER_PAIRS;
 /* the reference speaker chip (white ring, blue gradient, two wave arcs) used on the teaching frame's shoulder */
 /* [MIC-CHIP] (2026-09-30) the glyph inside every chip (this constant, #audioChip, #sgVo) is now the microphone art (capsule + cradle + base,
    v2: the larger, bolder mic of the second reference icon); the chip frame (ring, gradient, shadow, 62x60 viewBox), every element, class, size and position are unchanged */
-const SPK_SVG = '<svg viewBox="0 0 62 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Audio"><g filter="url(#spChipShadow)"><rect x="8" y="4" width="46" height="44" rx="22" fill="url(#spChipGrad)"/><rect x="6" y="2" width="50" height="48" rx="24" stroke="white" stroke-width="4"/><rect x="26.75" y="15.05" width="8.5" height="15.85" rx="4.25" fill="white"/><path d="M24.5 26V26.7A6.5 6.5 0 0 0 37.5 26.7V26M31 33.2V36.1M27.7 36.8H34.3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g><defs><filter id="spChipShadow" x="0" y="0" width="62" height="60" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="4"/><feGaussianBlur stdDeviation="2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/></filter><linearGradient id="spChipGrad" x1="8" y1="26" x2="54" y2="26" gradientUnits="userSpaceOnUse"><stop stop-color="#1987FC"/><stop offset="1" stop-color="#1565F4"/></linearGradient></defs></svg>';
+const SPK_SVG = '<svg viewBox="0 0 62 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Audio"><g filter="url(#spChipShadow)"><rect x="8" y="4" width="46" height="44" rx="22" fill="url(#spChipGrad)"/><rect x="6" y="2" width="50" height="48" rx="24" stroke="white" stroke-width="4"/><rect class="mic" x="26.75" y="15.05" width="8.5" height="15.85" rx="4.25" fill="white"/><path class="mic" d="M24.5 26V26.7A6.5 6.5 0 0 0 37.5 26.7V26M31 33.2V36.1M27.7 36.8H34.3" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><g class="mic-wave" fill="white"><rect x="22.9" y="22" width="2.2" height="8" rx="1.1"/><rect x="26.4" y="19" width="2.2" height="14" rx="1.1"/><rect x="29.9" y="17" width="2.2" height="18" rx="1.1"/><rect x="33.4" y="19" width="2.2" height="14" rx="1.1"/><rect x="36.9" y="22" width="2.2" height="8" rx="1.1"/></g></g><defs><filter id="spChipShadow" x="0" y="0" width="62" height="60" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="4"/><feGaussianBlur stdDeviation="2"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/></filter><linearGradient id="spChipGrad" x1="8" y1="26" x2="54" y2="26" gradientUnits="userSpaceOnUse"><stop stop-color="#1987FC"/><stop offset="1" stop-color="#1565F4"/></linearGradient></defs></svg>';
 /* r4: gold star burst for the celebration finale (adopted from Shruti's build) */
 function starBurst(){
   if(document.documentElement.classList.contains("no-anim")) return;
@@ -7147,8 +7147,20 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    आगे: on these pages setNavActive(true) is held until NAV_AFTER_MS after the LAST pop ends (page 3: mount + 3s + n*2s + 1s;
    page 2: narration end + 0.5s + n*2s + 1s); a later activation (e.g. a long narration VO) passes through untouched, and
    setNavActive(false) or leaving the page drops a held reveal. Inactive .nav-btn is visibility:hidden, so "appear" == activate. */
+/* [P2-READ-ALOUD] (2026-09-30; rev 2 the same day: 12 s, sound wave) pages 2-4 (slides 0-2, REC_BY_SLIDE): the cue now asks
+   the child to tap the mic and READ the sentence (vo_tap_speaker_sentence_story, [STORY-CUE-VO]). So the FIRST tap on the mic
+   chip no longer speaks the sentence: it starts a REC_MS (12 s) read-aloud beat - whatever is speaking stops, the white mic
+   glyph inside the chip dissolves away and a sound wave (five white level bars, .mic-wave in the chip art) plays in its place
+   (.p2-rec, #P2-READ-ALOUD-CSS: a voice-recording look), and the pill's words light one by one at an even pace over the 12 s
+   (wordPace: the same .p2-word.on orange as the word sync, one word at a time), while nothing speaks (the
+   cue and its idle repeat wait, startCue; the bird's replay is ignored, wireBird; आगे stays away, navBlocked - the pill is
+   not "heard" yet). When the beat is over the wave goes, the mic returns, the chip is disabled for good (.p2-rec-done: greyed,
+   not tappable) and speak() runs
+   exactly as a tap did before: the sentence with its word sync, the follow-up line, the once-only explanation, आगे
+   NAV_AFTER_MS after the last line. Taps during the beat, and on the disabled chip, do nothing; every other page is untouched. */
 (function(){ "use strict";
   var DELAY_MS = 3000, POP_MS = 2000, VOL = 0.7, NAV_AFTER_MS = 1000, AFTER_VO_MS = 500, CUE_GAP_MS = 1500, REVIEW_GAP_MS = 500;
+  var REC_MS = 12000;                                      // [P2-READ-ALOUD] the read-aloud beat: the sound wave plays and the words pace over these ms
   var WRONG_BEAT_MS = 1000;                                 // [P6-WRONG-QUIET] the kit's wrong beat (wiggle + red release, ~0.9 s) a wrong tap's feedback waits for
   // slide index -> one SFX per pop step, in picture order (the user counts pages from the landing page: ?slide=N is page N+2)
   var PLAN_BY_SLIDE = {
@@ -7200,6 +7212,12 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     0: true,                                                                             // page 2
     1: true,                                                                             // page 3 ([P3-SAME-AS-P2])
     2: true                                                                              // page 4 ([P4-TAP-ONLY], 2026-09-24)
+  };
+  // slide index -> true: the FIRST mic-chip tap starts the REC_MS read-aloud beat, then the chip is disabled ([P2-READ-ALOUD])
+  var REC_BY_SLIDE = {
+    0: true,                                                                             // page 2
+    1: true,                                                                             // page 3
+    2: true                                                                              // page 4
   };
   // slide index -> the explanation that follows the FIRST hearing of the sentence, once per page open ([VO-BATCH])
   var EXPLAIN_BY_SLIDE = {
@@ -7468,6 +7486,8 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
       var heard = document.querySelector(cue.pulse);
       if(heard && heard.__p2Heard){ idleArm(); return; }                      // [VO-BATCH] the sentence has already been heard: no cue now (the idle count still runs)
     }
+    var recEl = document.querySelector(cue.pulse);                            // [P2-READ-ALOUD] the read-aloud beat runs: no cue now, the idle count goes on
+    if(recEl && recEl.__p2Rec){ idleArm(); return; }
     if(document.body.classList.contains("vo-playing")){                       // the child is replaying the narration: wait for it
       timers.push(setTimeout(function(){ startCue(frame, cue, repeat); }, 250)); return;
     }
@@ -7525,6 +7545,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     bird.setAttribute("role", "button"); bird.setAttribute("aria-label", "फिर से सुनो");
     bird.addEventListener("click", function(){
       if(!bird.isConnected || typeof state !== "object" || !state || state.idx !== idx) return;
+      var pl = document.querySelector("#slideHost .story-caption"); if(pl && pl.__p2Rec) return;   // [P2-READ-ALOUD] the child is reading aloud: the bird waits
       var slide = (typeof CARD === "object" && CARD && CARD.slides) ? CARD.slides[idx] : null;
       var src = (slide && typeof audioFor === "function") ? audioFor(slide, "narration") : null;
       var a = (typeof currentAudio !== "undefined") ? currentAudio : null;
@@ -7582,10 +7603,34 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
         }
       }
     };
-    pill.addEventListener("click", speak);
+    // [P2-READ-ALOUD] pages in REC_BY_SLIDE: the FIRST tap starts the read-aloud beat (nothing speaks; the mic glyph dissolves into
+    // a sound wave, the words pace over REC_MS), then the chip is disabled for good and speak() runs as a tap did before; later taps do nothing
+    var startRec = function(){
+      pill.__p2Rec = true;
+      try{ stopNudge(); }catch(x){}
+      if(typeof stopAudio === "function"){ try{ stopAudio(); }catch(x){} }    // the cue / narration stops: the child reads now
+      if(chip && !stillMode()) chip.classList.add("p2-rec");
+      if(words) wordPace(words, REC_MS);
+      timers.push(setTimeout(function(){
+        pill.__p2Rec = false;
+        wordStop();
+        if(chip){ chip.classList.remove("p2-rec"); chip.classList.add("p2-rec-done"); chip.setAttribute("aria-disabled", "true"); }
+        if(!pill.isConnected || typeof state !== "object" || !state || state.idx !== idx) return;
+        pill.__p2RecDone = true;
+        speak(null);                                                          // the sentence with its word sync, then the rest of the flow as before
+      }, REC_MS));
+    };
+    var onTap = function(e){
+      if(REC_BY_SLIDE[idx] !== true){ speak(e); return; }
+      if(e) e.stopPropagation();
+      if(!pill.isConnected || typeof state !== "object" || !state || state.idx !== idx) return;
+      if(pill.__p2Rec || pill.__p2RecDone) return;                            // the beat runs, or the chip is disabled
+      startRec();
+    };
+    pill.addEventListener("click", onTap);
     if(chip){
       chip.onclick = null;                                  // the engine's narration replay on the chip goes: the chip is part of this button now
-      if(!pill.contains(chip)) chip.addEventListener("click", speak);   // (a chip left at Swiftee's shoulder still speaks the sentence)
+      if(!pill.contains(chip)) chip.addEventListener("click", onTap);   // (a chip left at Swiftee's shoulder still speaks the sentence)
     }
   }
   // ---- [VO-BATCH] helpers ----
@@ -7904,6 +7949,20 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   function wordStop(){
     if(wordRaf){ cancelAnimationFrame(wordRaf); wordRaf = 0; }
     if(wordEls){ wordEls.forEach(function(w){ w.classList.remove("on"); }); wordEls = null; }
+  }
+  // [P2-READ-ALOUD] pace the words over ms with no audio: word k is .on for its equal share of ms (the same .on look as wordSync)
+  function wordPace(els, ms){
+    wordStop();
+    if(!els || !els.length || !(ms > 0)) return;
+    wordEls = els; var cur = -1, t0 = Date.now(), slot = ms / els.length;
+    (function tick(){
+      wordRaf = 0;
+      var t = Date.now() - t0;
+      if(t >= ms || !els[0].isConnected){ wordStop(); return; }
+      var i = Math.min(els.length - 1, Math.floor(t / slot));
+      if(i !== cur){ if(cur >= 0) els[cur].classList.remove("on"); els[i].classList.add("on"); cur = i; }
+      wordRaf = requestAnimationFrame(tick);
+    })();
   }
   // follow the clock of a (play()'s element for the sentence): word k is .on while times[k] <= currentTime < times[k+1]
   function wordSync(a, els, times){
@@ -8256,6 +8315,29 @@ body.vo-bg .sq-sentence-box .tut-audio.playing .wv1,body.vo-bg .sq-sentence-box 
 .stage.tut .story-caption.p2-sentence-btn{pointer-events:none;cursor:default;}
 .stage.tut .story-caption.p2-sentence-btn:active{transform:none;}
 .stage.tut .story-caption.p2-sentence-btn .tut-audio{pointer-events:auto;cursor:pointer;}
+</style>
+<style id="P2-READ-ALOUD-CSS">
+/* [P2-READ-ALOUD] (2026-09-30, rev 2) pages 2-4: during the read-aloud beat the white mic glyph inside the chip (the .mic rect +
+   path of the chip art) dissolves away and the chip art's sound wave (.mic-wave: five white level bars, otherwise invisible
+   and still) fades in and bounces like a voice level meter - a recording look; the chip itself stays put (its stillness lock
+   is untouched). Afterwards the wave fades, the mic returns and the chip is disabled: greyed and not hit-testable, its size,
+   place and shadow unchanged; the cue pulse (.p2-cue) never moves a disabled chip. */
+.mic-wave{opacity:0;}
+.stage.tut .tut-audio svg .mic{transition:opacity .45s ease;}
+.stage.tut .tut-audio svg .mic-wave{transition:opacity .35s ease;}
+.stage.tut .tut-audio.p2-rec svg .mic{opacity:0;}
+.stage.tut .tut-audio.p2-rec svg .mic-wave{opacity:1;transition-delay:.2s;}
+@keyframes micWave{0%,100%{transform:scaleY(.3);}50%{transform:scaleY(1);}}
+.stage.tut .tut-audio.p2-rec svg .mic-wave rect{transform-box:fill-box;transform-origin:50% 50%;animation:micWave 1s ease-in-out infinite;}
+.stage.tut .tut-audio.p2-rec svg .mic-wave rect:nth-child(1){animation-duration:.9s;animation-delay:-.2s;}
+.stage.tut .tut-audio.p2-rec svg .mic-wave rect:nth-child(2){animation-duration:1.1s;animation-delay:-.5s;}
+.stage.tut .tut-audio.p2-rec svg .mic-wave rect:nth-child(3){animation-duration:.8s;animation-delay:-.1s;}
+.stage.tut .tut-audio.p2-rec svg .mic-wave rect:nth-child(4){animation-duration:1.2s;animation-delay:-.7s;}
+.stage.tut .tut-audio.p2-rec svg .mic-wave rect:nth-child(5){animation-duration:.95s;animation-delay:-.35s;}
+.stage.tut .tut-audio.p2-rec{cursor:default;}
+.stage.tut .tut-audio.p2-rec-done{pointer-events:none !important;cursor:default;opacity:.45;
+  filter:grayscale(1) drop-shadow(0 3px 6px rgba(0,0,0,.22));}
+.stage.tut .story-caption.p2-cue .tut-audio.p2-rec-done{animation:none !important;}
 </style>
 <style id="P5-SPK-CUE-CSS">
 /* [P5-SPK-CUE] (2026-09-24) page 5 (G1 = ?slide=3; pages 7, 9 and 11 too since [P5-ALL-SENT-PAGES]): after the page's background line (its instruction; the automatic sentence
