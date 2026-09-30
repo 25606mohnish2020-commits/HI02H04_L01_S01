@@ -7163,10 +7163,13 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     2: true                                                                              // page 4: vo_t3_instr first, then the sentence + explanation ([VO-BATCH])
   };
   // slide index -> the spoken cue CUE_GAP_MS after the pop beat ([P2-SPEAKER-CUE]): src, and the element that breathes with it
+  // [STORY-CUE-VO] (2026-09-30) the three story pages (slides 0-2) speak the re-recorded cue vo_tap_speaker_sentence_story.ogg
+  // (from vo_1.wav, 3.4 s, same length as before) at the cue point and on every idle repeat; the question pages (SPK_CUE_BY_SLIDE)
+  // keep the original vo_tap_speaker_sentence.ogg
   var CUE_BY_SLIDE = {
-    0: { src: "assets/Audio/vo_tap_speaker_sentence.ogg", pulse: "#slideHost .story-caption" },  // page 2: "Tap speaker icon" line, the caption pill + its speaker chip
-    1: { src: "assets/Audio/vo_tap_speaker_sentence.ogg", pulse: "#slideHost .story-caption" },  // page 3: the same cue ([VO-BATCH])
-    2: { src: "assets/Audio/vo_tap_speaker_sentence.ogg", pulse: "#slideHost .story-caption" }   // page 4: CUE_GAP_MS after the narration (no pop), then the idle repeat ([P4-TAP-ONLY])
+    0: { src: "assets/Audio/vo_tap_speaker_sentence_story.ogg", pulse: "#slideHost .story-caption" },  // page 2: "Tap speaker icon" line, the caption pill + its speaker chip
+    1: { src: "assets/Audio/vo_tap_speaker_sentence_story.ogg", pulse: "#slideHost .story-caption" },  // page 3: the same cue ([VO-BATCH])
+    2: { src: "assets/Audio/vo_tap_speaker_sentence_story.ogg", pulse: "#slideHost .story-caption" }   // page 4: CUE_GAP_MS after the narration (no pop), then the idle repeat ([P4-TAP-ONLY])
   };
   // slide index -> true: a tap on the bird (.tut-mascot) repeats the page's narration ([P2-BIRD-REPLAY])
   var BIRD_REPLAY_BY_SLIDE = {
