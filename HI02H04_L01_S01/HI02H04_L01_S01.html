@@ -7196,9 +7196,10 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     2: "vo_sent_girl_water"                                                              // page 4: लड़की पौधों को पानी दे रही है। ([VO-BATCH])
   };
   // slide index -> the line that follows the sentence EVERY time the pill speaks it ([P2-FOLLOW])
+  // [P2-NO-FOLLOW] (2026-09-30) pages 2-3 (slides 0-1) no longer speak the follow-up line "इस वाक्य के लिए यह चित्र सही है।"
+  // (vo_t3_explain) after the sentence: the once-only explanation (EXPLAIN_BY_SLIDE) follows the sentence directly and the rest of
+  // the flow (आगे NAV_AFTER_MS after the last line) is unchanged; page 4 (slide 2) keeps the line (it is its own explanation)
   var FOLLOW_BY_SLIDE = {
-    0: "vo_t3_explain",                                                                  // page 2: इस वाक्य के लिए यह चित्र सही है।
-    1: "vo_t3_explain",                                                                  // page 3: the same line ([P3-SAME-AS-P2])
     2: "vo_t3_explain"                                                                   // page 4: the same line (also its own explanation) ([P4-BAR])
   };
   // slide index -> true: a tap on the pill / chip hides आगे until NAV_AFTER_MS after its lines have ended ([P2-NAV-HIDE])
