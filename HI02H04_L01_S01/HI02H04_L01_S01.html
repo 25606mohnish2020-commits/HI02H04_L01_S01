@@ -7145,6 +7145,13 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    the play() wrapper's word sync runs on it) -> advance; the pill's own line, which the engine speaks first on every correct tap, is
    skipped on that tap (okSentOff in the play() wrapper) so the sentence is heard once, inside the praise. The guided tap after the
    reveal is untouched: the pill's own line with its words lit, no शाबाश ([P5-NO-OK-AFTER-REVEAL]).
+   [P6-PROMPT-IDLE] (2026-10-01) page 6 (G2 = ?slide=4; PROMPT_IDLE_BY_SLIDE): the title instruction इस चित्र के लिए सही वाक्य चुनिए।
+   (card audio.prompt = vo_prompt_pic_to_sent, the line the page speaks on entry) speaks AGAIN after every 5 s of inactivity - no tap
+   anywhere and nothing speaking - for as long as the page is open: the [P2-CUE-IDLE] machinery (idleFrame = the page's .q-row, idleCue =
+   the prompt with a pulse selector that matches nothing, so nothing breathes with it) armed by wireIdlePrompt once the page's own entry
+   line is over. Any pointerdown restarts the count; a count that runs out while a line speaks (a wrong tap's line, the read-out, the
+   reveal, the correct tap's शाबाश) starts over from that line's end; the correct tap's advance (mountSlide -> cancel) ends it. The
+   page's taps, feedback and advance are untouched. Other pages are not listed and do not change.
    [P5-SAME-ON-7-9-11] (2026-10-01) pages 7, 9 and 11 (G3 = ?slide=5, P1 = ?slide=7, P3 = ?slide=9: the other three sentence-box
    questions) now carry page 5's whole interaction, by table and card data only, each with its own sentence clip and correct-tap SFX:
    REC_BY_SLIDE ([P5-READ-ALOUD]: the first mic-chip tap starts the 12 s read-aloud beat - the mic dissolves into the wave, the box's
@@ -7466,6 +7473,13 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   // the correct pill to it too), and the pill's own line the engine speaks first is skipped (okSentOff in the play() wrapper)
   var OK_SENT_BY_SLIDE = {
     4: true                                                                              // page 6 (G2): vo_ok_sent_boy_drink
+  };
+  // [P6-PROMPT-IDLE] slide index -> ms of inactivity (no tap, nothing speaking) after which the page's instruction line (card
+  // audio.prompt) speaks again, from the end of the page's own lines on, for as long as the page is open - the shared idle machinery
+  // of [P2-CUE-IDLE] (wireIdlePrompt: any pointerdown restarts the count, a count that runs out while a line speaks starts over from
+  // that line's end, leaving the page cancels it); nothing pulses with the line
+  var PROMPT_IDLE_BY_SLIDE = {
+    4: 5000                                                                              // page 6 (G2): इस चित्र के लिए सही वाक्य चुनिए।
   };
   // [TRAIN-WORDS] slide index -> true: the sentence written in a coach lights up word by word while its line speaks (trainWordsFor)
   var TRAIN_WORDS_BY_SLIDE = {
@@ -7941,6 +7955,20 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     // cue CUE_GAP_MS after they end
     whenQuiet(box, function(){ if(!box.__spkTapped) armCue(box, cue, 0); });
   }
+  // [P6-PROMPT-IDLE] pages in PROMPT_IDLE_BY_SLIDE: once the page's own lines are over, the instruction repeats after every
+  // PROMPT_IDLE_BY_SLIDE ms of inactivity (idleFrame / idleCue / idleArm of [P2-CUE-IDLE]; the cue's pulse selector matches nothing)
+  function wireIdlePrompt(idx){
+    var ms = PROMPT_IDLE_BY_SLIDE[idx]; if(!ms) return;
+    var sl = (typeof CARD === "object" && CARD && CARD.slides) ? CARD.slides[idx] : null;
+    var src = (sl && typeof audioFor === "function") ? audioFor(sl, "prompt") : null; if(!src) return;
+    var frame = document.querySelector("#slideHost .q-row"); if(!frame || frame.__idleWired) return;
+    frame.__idleWired = true;
+    var cue = { src: src, pulse: "#slideHost .p6-no-pulse" };                  // no element breathes with the line
+    whenQuiet(frame, function(){                                               // the page's own lines first: the count runs from their end
+      if(!frame.isConnected || typeof state !== "object" || !state || state.idx !== idx) return;
+      idleFrame = frame; idleCue = cue; idleMs = ms; idleArm();
+    });
+  }
   // ---- [P2-WORD-SYNC] ----
   // split the pill's sentence (its first non-empty text node) into .p2-word spans, once; spaces stay as text between them
   function splitWords(pill){
@@ -8156,14 +8184,14 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     var r = orig.apply(this, arguments);
     var f = frameOf(idx);
     if(f) schedule(f, PLAN_BY_SLIDE[idx], AFTER_VO_BY_SLIDE[idx] === true, CUE_BY_SLIDE[idx] || null, idx);
-    wireBird(idx); wirePill(idx); wireReplay(idx); wireOptWords(idx); wireBoxWords(idx); wireSpkCue(idx);
+    wireBird(idx); wirePill(idx); wireReplay(idx); wireOptWords(idx); wireBoxWords(idx); wireSpkCue(idx); wireIdlePrompt(idx);
     return r;
   };
   // a ?slide=N dev load mounts inside the engine script, before this block runs
   var cur = (typeof state === "object" && state) ? state.idx : -1;
   var now = frameOf(cur);
   if(now) schedule(now, PLAN_BY_SLIDE[cur], AFTER_VO_BY_SLIDE[cur] === true, CUE_BY_SLIDE[cur] || null, cur);
-  wireBird(cur); wirePill(cur); wireReplay(cur); wireOptWords(cur); wireBoxWords(cur); wireSpkCue(cur);
+  wireBird(cur); wirePill(cur); wireReplay(cur); wireOptWords(cur); wireBoxWords(cur); wireSpkCue(cur); wireIdlePrompt(cur);
 })();
 </script>
 <script id="P5-CORRECT-SFX-JS">
