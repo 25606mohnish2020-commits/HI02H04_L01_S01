@@ -8458,11 +8458,17 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
      triangle) with the same pop-in (sgBtnReveal), the same breathing (.sg-breathe -> sgBtnPulse), the same hold while the bird
      pulses (.sg-bird-cue) and the same onclick (the tutorial gate). The label text stays in the DOM for its aria-label only
      (font-size 0). The reference pill's fill, border, radius and box-shadows are switched off: the art has its own shadow, and a
-     box-shadow would draw a rectangle around the transparent canvas. */
+     box-shadow would draw a rectangle around the transparent canvas.
+   [STD-PLAY-DISC] (2026-10-03, user request): the pill art is replaced by the user's STANDARD play button - a round disc - in the
+   SAME two files (overwritten: btn-play.svg = gold disc + navy triangle, btn-play-waiting.svg = grey disc + grey triangle) at the
+   SAME position. The pill's centre sat 72 px above the card's bottom (bottom:26 + half of the 92 canvas); the new 116x116 canvas
+   (an 86 px disc centred in it, 14 px shadow margin all round, drawn at its own size) sits at bottom:14 so its centre lands on
+   that same point (14 + 58 = 72), centred horizontally as before. Both states, their timing, the tap and the aria-label are
+   untouched; only the box (116x116, was 214x92), its bottom offset and the background-size changed. */
 .start-gate .sg-btn,.start-gate .sg-btn.ready{
-  width:214px !important;min-width:214px !important;max-width:214px !important;height:92px !important;bottom:26px !important;
+  width:116px !important;min-width:116px !important;max-width:116px !important;height:116px !important;bottom:14px !important;
   padding:0 !important;border:0 !important;border-radius:0 !important;box-shadow:none !important;
-  background:transparent url("assets/UI/btn-play.svg") center / 214px 92px no-repeat !important;
+  background:transparent url("assets/UI/btn-play.svg") center / 116px 116px no-repeat !important;
   font-size:0 !important;line-height:0 !important;color:transparent !important;overflow:visible !important;}
 .start-gate .sg-btn:not(.ready){display:inline-flex !important;background-image:url("assets/UI/btn-play-waiting.svg") !important;
   pointer-events:none !important;cursor:default !important;opacity:1 !important;filter:none !important;animation:none !important;}
