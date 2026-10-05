@@ -4758,23 +4758,20 @@ function boot(){
   const landingVO = { state:"idle", tapTried:false, followUpTimer:0, idleTimer:0, cue:"off", welcomeToken:0, leaving:false, revealWatch:0 };   // state: idle | playing | done
   // SME: शुरू करें pops in (.ready → one-shot sgBtnReveal) and then BREATHES (.sg-breathe → sgBtnPulse, see
   // LANDING-START-AFTER-VO). The pulse takes over only when the pop-in has landed, so nothing jumps.
-  // [LANDING-BTN-AFTER-BIRD] (2026-09-23): the button no longer appears at the end of the welcome VO - it appears only once
-  // the FIRST bird cue (bird pulse + "Page 1 Replay" line, 1.5 s after the welcome) has finished and the bird has settled
-  // (runBirdCue → stopBirdPulse(false, revealStart)). Page 1 order is now: welcome VO → 1.5 s → bird pulses with its line →
-  // bird settles → शुरू करें pops in and breathes. A welcome that could not be heard (file error) still reveals it at once,
-  // and a 10 s watchdog from the end of the welcome reveals it if the cue never completes - the landing can never get stuck.
+  // [LANDING-BTN-AFTER-BIRD] (2026-09-23) had the button appear only once the FIRST bird cue (bird pulse + "Page 1 Replay"
+  // line, 1.5 s after the welcome) had finished and the bird had settled.
+  // [P1-NO-BIRD-CUE] (2026-10-05, user request): that cue is GONE - no bird pulse, no "फिर से सुनने के लिए मुझ पर टैप करें" line.
+  // Page 1 order is now: welcome VO → शुरू करें pops in and breathes. A welcome that could not be heard (file error) still
+  // reveals it at once (after the engine's 1.2 s beat), so the landing can never get stuck. The bird stays tappable (replayWelcome).
   const revealStart = ()=>{ const b = $("sgBtn"); if(!b || b.classList.contains("ready")) return; b.classList.add("ready");
     let on = false; const breathe = ()=>{ if(on) return; on = true; b.classList.add("sg-breathe"); };
     b.addEventListener("animationend", breathe, { once:true }); setTimeout(breathe, 700); };   // 700 ms fallback: the pop-in is .52 s
-  // Page-1 follow-up (SME): 1.5 s after the welcome has finished, the bird pulses FOR AS LONG AS the replay line plays
-  // ("फिर से सुनने के लिए मुझ पर टैप करिए" = vo_tap_swiftee_replay) and settles when it ends. [P1-CUE-ONCE] (2026-09-23): that cue
-  // plays ONCE - the former "again after every 5 s without activity" repeat is off (armIdleReplay below is a no-op), so on
-  // Page 1 the welcome, the bird pulse and the replay line are each heard once; only a tap on the bird replays the welcome.
-  // A tap while the cue is running is left alone (the cue finishes). Dropped the moment the child taps शुरू करें or the
-  // landing is bypassed, so it can never talk over the phase-transition line.
-  // landingVO.cue: off (welcome not heard yet) | pending (1.5 s beat) | playing (pulse + line) | welcome (bird-tap replay of
-  // the welcome) | idle (cue over; nothing more is scheduled)
-  const replaySrc = (CARD.assets && CARD.assets.audio && CARD.assets.audio["vo_tap_swiftee_replay"]) || ("assets/Audio/vo_tap_swiftee_replay." + AUDIO_EXT);
+  // Page-1 follow-up (SME, 2026-09-23): 1.5 s after the welcome the bird pulsed for as long as the replay line played
+  // ("फिर से सुनने के लिए मुझ पर टैप करिए" = vo_tap_swiftee_replay), once ([P1-CUE-ONCE]). [P1-NO-BIRD-CUE] (2026-10-05): removed -
+  // the line is never played and the bird never pulses on Page 1 (runBirdCue / scheduleFollowUp / replaySrc are gone;
+  // the vo_tap_swiftee_replay file is simply unused). Only a tap on the bird replays the welcome (replayWelcome below).
+  // landingVO.cue: off (welcome not heard yet) | welcome (bird-tap replay of the welcome) | idle (welcome over; nothing
+  // more is scheduled). setBirdCue / stopBirdPulse are kept as no-op safeties (nothing adds .sg-pulsing any more).
   const birdEl = ()=> document.querySelector(".start-gate .sg-mascot");
   const onLanding = ()=> !landingVO.leaving && !$("startGate").classList.contains("hidden");
   // the bird's pulse and the button's breathing are mutually exclusive (SME): while the bird pulses with its line the
@@ -4786,20 +4783,10 @@ function boot(){
     if(atOnce){ settle(); return; }
     m.addEventListener("animationiteration", settle, { once:true });   // let the current breath finish, then rest
     setTimeout(settle, 900); };
-  const runBirdCue = ()=>{                               // pulse + replay line; when the line ends the bird settles and the idle count starts
-    if(!onLanding()) return;
-    landingVO.cue = "playing";
-    setBirdCue(true);
-    play(replaySrc, ()=>{ stopBirdPulse(false, revealStart); landingVO.cue = "idle"; armIdleReplay(); });   // line ended / missing / blocked → the bird settles, then शुरू करें pops in (first cue only; later cues find it there)
-  };
+  // [P1-NO-BIRD-CUE] (2026-10-05): runBirdCue and scheduleFollowUp (1.5 s beat → pulse + replay line → settle → reveal, with
+  // a 10 s watchdog) were removed here; the welcome's end calls revealStart directly (see finish() in playLanding).
   const armIdleReplay = ()=>{                            // [P1-CUE-ONCE]: the 5 s no-activity repeat of the cue is OFF - the cue plays once; kept as a no-op so its callers stay as they were
     clearTimeout(landingVO.idleTimer);
-  };
-  const scheduleFollowUp = ()=>{
-    clearTimeout(landingVO.followUpTimer);
-    landingVO.cue = "pending";
-    landingVO.followUpTimer = setTimeout(runBirdCue, 1500);
-    if(!$("sgBtn").classList.contains("ready")){ clearTimeout(landingVO.revealWatch); landingVO.revealWatch = setTimeout(revealStart, 10000); }   // [LANDING-BTN-AFTER-BIRD] safety net
   };
   // Page 1 counts as OPEN only once the boot loader has begun to fade (.done) or is gone
   const pageOneOpen = ()=>{ const bl = $("bootLoader"); return !bl || !bl.isConnected || bl.classList.contains("done"); };
@@ -4813,8 +4800,8 @@ function boot(){
       if(done) return; done = true; setPlaying(false);
       if(why === "blocked" && !landingVO.tapTried){ landingVO.state = "idle"; return; }   // browser wants a tap first → the first tap ON PAGE 1 plays it
       landingVO.state = "done";
-      if(why === "ended") scheduleFollowUp();           // the bird cue follows a welcome that was actually heard; शुरू करें follows the cue ([LANDING-BTN-AFTER-BIRD])
-      else revealStart();                               // welcome not heard (file error): nothing to wait for, show the button now
+      landingVO.cue = "idle";
+      revealStart();                                    // [P1-NO-BIRD-CUE] welcome over (heard, or not playable) → शुरू करें pops in now; no bird cue in between
     };
     const a = new Audio(landSrc); currentAudio = a;       // registered so stopAudio() (start tap / dev nav) can silence it
     a.onended = ()=> finish("ended");
@@ -4824,11 +4811,10 @@ function boot(){
       else setTimeout(()=> finish("error"), 1200); });
   };
   const sgVo = $("sgVo"); if(sgVo) sgVo.onclick = (e)=>{ e.stopPropagation(); playLanding(); };
-  // Page-1 bird tap (SME): tapping the bird plays the Page 1 welcome again — but NOT while the bird is pulsing with its
-  // replay line (that tap is ignored; the cue is left to finish). Only once the first welcome has finished (state done),
-  // so the once-only reveal chain above is never disturbed. A tap during the replay restarts it (engine replay-chip
-  // convention). The tap is activity: it drops any pending 1.5 s / 5 s cue, and when the replayed welcome ends the 5 s
-  // no-activity count starts afresh. The shared play() is fine here: ended / missing / blocked all just end the replay.
+  // Page-1 bird tap (SME): tapping the bird plays the Page 1 welcome again. Only once the first welcome has finished
+  // (state done), so the once-only reveal above is never disturbed. A tap during the replay restarts it (engine replay-chip
+  // convention). The shared play() is fine here: ended / missing / blocked all just end the replay. ([P1-NO-BIRD-CUE]: the
+  // "not while the bird pulses" guards below are never hit any more - nothing pulses the bird on Page 1 - and stay as safeties.)
   const replayWelcome = ()=>{
     if(landingVO.state !== "done" || !onLanding()) return;                    // first welcome still owed, or Page 1 left
     if(landingVO.cue === "playing") return;                                   // pulsing + replay line running → ignored
@@ -4837,7 +4823,7 @@ function boot(){
     landingVO.cue = "welcome";
     const my = ++landingVO.welcomeToken;                                      // a re-tap restarts: only the latest replay's end counts
     play(landSrc, ()=>{ if(my !== landingVO.welcomeToken) return;
-      if(!$("sgBtn").classList.contains("ready")){ scheduleFollowUp(); return; }   // [LANDING-BTN-AFTER-BIRD] button still owed: 1.5 s → bird cue → button, as after the first welcome
+      revealStart();                                                          // [P1-NO-BIRD-CUE] already .ready after the first welcome (no-op); kept so the button can never be owed
       landingVO.cue = "idle"; armIdleReplay(); });
   };
   const sgBird = birdEl(); if(sgBird) sgBird.addEventListener("click", replayWelcome);
@@ -8415,10 +8401,11 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 })();
 </script>
 <style id="LANDING-START-AFTER-VO">
-/* ===== Page 1: शुरू करें appears only AFTER the landing VO has played once AND the first bird cue has finished =====
-   The button is kept out of the page (display:none) until the engine adds .ready - since [LANDING-BTN-AFTER-BIRD]
-   (2026-09-23) that is when the bird has settled after its first pulse + replay line (runBirdCue → stopBirdPulse →
-   revealStart in the engine script; at the end of the welcome only if that file failed); it then pops in with the
+/* ===== Page 1: शुरू करें appears only AFTER the landing VO has played once =====
+   The button is kept out of the page (display:none) until the engine adds .ready - [P1-NO-BIRD-CUE] (2026-10-05): that is
+   the end of the welcome VO (revealStart from finish() in playLanding; after a 1.2 s beat if that file failed).
+   [LANDING-BTN-AFTER-BIRD] (2026-09-23) used to wait for the bird's first pulse + replay line as well; that cue is gone, so
+   the .sg-pulsing / .sg-bird-cue rules below are never triggered on Page 1 any more (kept, unused). It then pops in with the
    landing's own icon reveal.
    Every keyframe keeps translateX(-50%): that is the pill's centring transform. One-shot pop-in; the breathing
    that follows it is ruled further down in this block. */
