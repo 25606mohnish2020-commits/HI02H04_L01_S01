@@ -4598,7 +4598,9 @@ function mountSlide(idx){
 
 /* ---------- [engine JS] r4/P1 PHASE-TRANSITION PEEK GATE (Shruti's peek beat) ----------
    An automatic interstitial fired ON A PHASE BOUNDARY (not a slide type): blur the stage, Swiftie
-   peeks up from the bottom under a big headline, hold ≥2s, then mount the next slide. Kept ALONGSIDE
+   peeks up from the bottom under a big headline, hold ≥2s, then mount the next slide ([GATE-STD-ANIM]
+   2026-10-05: the standard Swiftee animation, the headline + line from the beak's first move, 4 s in all -
+   see phaseBlurTransition). Kept ALONGSIDE
    our journey-map PHASE_TRANSITION module (a distinct, author-placed slide type) — the gate below
    skips PHASE_TRANSITION + CELEBRATION so the two never double-fire. */
 function afterConfetti(fn){
@@ -4614,33 +4616,76 @@ const PHASE_GATE_TITLE = { tutorial:"चलिए, शुरू करें!", 
 const PHASE_GATE_VO    = { tutorial:"vo_pt_tutorial", guided:"vo_pt_guided", practice:"vo_pt_practice" };
 const _gatedPhases = new Set();   // each phase gate plays ONCE (Start→tutorial, →guided, →practice)
 let _gateToken = 0;
+/* [GATE-STD-ANIM] (2026-10-05, user request): the gate's bird is the content team's "Standard Swiftee Transition Animation"
+   (Downloads\Standard Swiftee Transition Animation.gif - an animated WebP despite the name: 1500x1500, 115 frames, 16.1 s
+   native, loops), rebuilt as assets/UI/swiftee_transition.webp (scratchpad build_gate_anim.py): cropped to the bird + its
+   ledge bar (the bar sits on the viewport's bottom edge), 504x440 (lossy q65, alpha q75, 98 frames, 1.5 MB), re-timed and played ONCE. Timeline of the file: rise
+   0-1.2 s (the two-step peek's middle pause, native frames 19-35, is dropped and the rise frames run at 24 ms), a blink,
+   then from GATE_BEAK_MS = 1200 ms the beak moves (native frame 58 on, holds at 0.6x) for ~6 s - longer than the longest
+   gate line - and the bird settles with a smile. The headline is held back until the beak moves (.pg-say on the gate; the
+   title is visibility:hidden without it, <style id="GATE-STD-ANIM">), so the pink text appears exactly when the bird
+   starts talking, and the line is spoken from that same moment. The whole screen lasts GATE_MS = 4000 ms from open to
+   the next slide's mount. A line longer than the time left (vo_pt_tutorial 5.12 s, vo_pt_guided 5.60 s; vo_pt_practice
+   2.32 s fits) keeps the gate open until it has ended (+200 ms), so no line is ever cut; a hard cap of GATE_MS + 7 s
+   closes the gate if a line never reports its end. Restart without a re-download: the file is fetched once at boot
+   (gateAnimBlob) and each gate shows it through a fresh blob: URL (a new URL = a fresh animation clock in every browser);
+   under file:// (local preview) fetch is not attempted and the former cache-busting ?r= URL is used. The beak clock starts at the image's load
+   event (its first paint), the 4 s clock at open; an image that never loads still speaks after GATE_BEAK_MS + 1.5 s.
+   Before: peeking_pal.webp looped from open, the title showed from open, the line played from open and the gate closed
+   when the line had ended, after at least 2 s. The two callers (the start tap, the guided/practice boundaries) are untouched. */
+const GATE_ANIM_SRC = "assets/UI/swiftee_transition.webp";
+const GATE_BEAK_MS = 1200, GATE_MS = 4000;
+let gateAnimBlob = null;
+if(location.protocol !== "file:") try{ fetch(GATE_ANIM_SRC).then(r=> r.ok ? r.blob() : null).then(b=>{ if(b) gateAnimBlob = b; }).catch(()=>{}); }catch(e){}
 function phaseBlurTransition(cb, toPhase){
   const tok = ++_gateToken;
   stopNudge(); stopAudio();
   const gate = $("phaseGate"), img = $("phaseGateImg");
-  if(img) img.src = "assets/UI/peeking_pal.webp?r=" + Date.now();   // restart the loop each time (cache-bust)
+  if(img){                                                   // a fresh URL each time = the animation starts from its first frame
+    if(img._gateUrl){ try{ URL.revokeObjectURL(img._gateUrl); }catch(e){} img._gateUrl = null; }
+    if(gateAnimBlob){ img._gateUrl = URL.createObjectURL(gateAnimBlob); img.src = img._gateUrl; }
+    else img.src = GATE_ANIM_SRC + "?r=" + Date.now();
+  }
   const title = $("phaseGateTitle"); if(title) title.textContent = PHASE_GATE_TITLE[toPhase] || "";
+  gate.classList.remove("pg-say");                           // headline hidden until the beak moves
   $("stage").classList.add("blurred", "gating");
   document.body.classList.add("gating");
   gate.classList.add("show");
   SwiftPAL.emit("phase_transition", { to: toPhase });
-  const closeGate = ()=>{ gate.classList.remove("show"); $("stage").classList.remove("blurred", "gating"); document.body.classList.remove("gating"); };
-  // VO only if the card actually ships it; else a silent beat — the 2s min-hold keeps the peek visible.
+  const closeGate = ()=>{ gate.classList.remove("show", "pg-say"); $("stage").classList.remove("blurred", "gating"); document.body.classList.remove("gating"); };
+  // VO only if the card actually ships it; else a silent beat (play() with no src ends after 0.8 s).
   const voId = PHASE_GATE_VO[toPhase];
   const voSrc = (voId && CARD.assets && CARD.assets.audio && CARD.assets.audio[voId]) || null;
   const openedAt = Date.now();
-  play(voSrc, ()=>{
-    if(tok !== _gateToken){ closeGate(); return; }               // a newer gate superseded us
-    const hold = Math.max(200, 2000 - (Date.now() - openedAt));  // Swiftie peeks ≥2s even with no/short VO
-    setTimeout(()=>{
+  let said = false, lineOver = false, timeUp = false, closed = false;
+  const finish = ()=>{                                       // runs once BOTH the 4 s and the line are over
+    if(closed || !(lineOver && timeUp)) return; closed = true;
+    if(tok !== _gateToken){ closeGate(); return; }           // a newer gate superseded us
+    gate.classList.remove("show", "pg-say");
+    $("stage").classList.remove("blurred");
+    if(cb) cb();                              // mounts the next slide
+    $("stage").classList.remove("gating");    // header returns once the slide is in
+    document.body.classList.remove("gating");
+  };
+  setTimeout(()=>{ timeUp = true; finish(); }, GATE_MS);
+  setTimeout(()=>{ lineOver = true; timeUp = true; finish(); }, GATE_MS + 7000);   // hard cap: never a stuck gate
+  const say = ()=>{                                          // the beak starts moving: show the headline, speak the line
+    if(said) return; said = true;
+    if(tok !== _gateToken){ closeGate(); return; }
+    gate.classList.add("pg-say");
+    play(voSrc, ()=>{
       if(tok !== _gateToken){ closeGate(); return; }
-      gate.classList.remove("show");
-      $("stage").classList.remove("blurred");
-      if(cb) cb();                              // mounts the next slide
-      $("stage").classList.remove("gating");    // header returns once the slide is in
-      document.body.classList.remove("gating");
-    }, hold);
-  });
+      const beat = (Date.now() - openedAt >= GATE_MS) ? 200 : 0;   // a line that outran the 4 s: a short beat after it, then close
+      setTimeout(()=>{ lineOver = true; finish(); }, beat);
+    });
+  };
+  const armSay = ()=> setTimeout(say, GATE_BEAK_MS);
+  if(img){
+    img.addEventListener("load", armSay, { once:true });
+    img.addEventListener("error", say, { once:true });
+    if(img.complete && img.naturalWidth > 0) armSay();       // already decoded (never for a fresh URL; kept as a guard)
+    setTimeout(say, GATE_BEAK_MS + 1500);                    // image stalled → speak anyway
+  } else armSay();
 }
 
 function completeSlide(success){
@@ -4932,7 +4977,7 @@ boot();
 </script>
 
 <!-- PHASE-TRANSITION GATE: body-level full-viewport (a fixed element inside the scaled stage would not cover the viewport) -->
-<div class="phase-gate" id="phaseGate"><div class="pg-title" id="phaseGateTitle"></div><img id="phaseGateImg" src="assets/UI/peeking_pal.webp" alt=""></div>
+<div class="phase-gate" id="phaseGate"><div class="pg-title" id="phaseGateTitle"></div><img id="phaseGateImg" src="assets/UI/swiftee_transition.webp" alt=""></div>
 <style id="UIFIX-CONSIST">
 /* speaker/audio chips: no zoom/hover/pulse — wave bars only */
 .audio-chip,.audio-chip.playing,.mascot-wrap .audio-chip,.mascot-wrap .audio-chip.playing,.sg-vo,.sg-vo.playing,.tut-audio,.tut-audio.playing{animation:none !important;transform:none !important;}
@@ -4956,6 +5001,12 @@ boot();
   setTimeout(hide,500); setTimeout(hide,1500);
 })();</script>
 
+<style id="GATE-STD-ANIM">
+/* [GATE-STD-ANIM] (2026-10-05) the gate's headline is held back until the bird's beak moves: phaseBlurTransition adds .pg-say
+   to #phaseGate at GATE_BEAK_MS (1200 ms after the animation starts) and removes it when the gate closes. */
+.phase-gate .pg-title,.phase-gate #phaseGateTitle{visibility:hidden;}
+.phase-gate.pg-say .pg-title,.phase-gate.pg-say #phaseGateTitle{visibility:visible;}
+</style>
 <style id="PHASEGATE-ADD">
 .phase-gate{position:fixed !important;inset:0 !important;width:100vw;height:100dvh;z-index:100000;display:none;align-items:center;justify-content:center;overflow:hidden;background:transparent;}
 .phase-gate.show{display:flex !important;background:rgba(57,55,55,.35) !important;backdrop-filter:blur(10px) !important;-webkit-backdrop-filter:blur(10px) !important;}
