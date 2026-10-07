@@ -7329,6 +7329,16 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    when the cue's own count starts (armCue); page 4, which has no pop, the moment run() is entered - the engine's end-of-narration
    signal, i.e. right after the instruction line vo_t3_instr (or its 30 s watchdog). Before that moment a tap on the chip does
    nothing: no read-aloud beat, no sentence. Everything from the unlock on (the silent pulse / cue line, the beat, आगे) is as before. */
+/* [T1-T3-CUE-ONCE] (2026-10-07) pages 2-4 (T1-T3): once the mic button has been tapped, the cue line vo_tap_speaker_sentence_story
+   never plays again on that page. Until now that rested on timing alone - आगे appears NAV_AFTER_MS after the tap's lines and the
+   idle count cancels on it - and it had a hole: any tap restarts the idle count (the document pointerdown listener), so a count
+   restarted by the mic tap itself fires at tap + idleMs; on page 4 that is exactly the beat's length (7 words, 7 s), and the idle
+   timer, armed first, fires just before the beat's own timer, finds the beat still running and re-arms - a second count that can
+   run out in the 1 s gap between the end of the explanation and आगे, where nothing stops it, and the line spoke once more.
+   Now the first mic tap (startRec) marks the page's frame __spkTapped - the very flag the sentence-box pages set on their chip
+   tap - so startCue (the scheduled cue point and every repeat), idleArm and idleFire bow out for good, and the count already
+   running is dropped at once (idleCancel). A line that is speaking when the chip is tapped is still cut by the beat's stopAudio,
+   and a silent pulse is still settled by the tap; the beat, the sentence, the explanation and आगे are untouched. */
 /* [P5-READ-ALOUD] (2026-10-01) page 5 (G1 = ?slide=3, the first sentence-box question; listed in REC_BY_SLIDE): its sentence is
    now बच्चे गेंद से खेल रहे हैं। (card data.stim_hi; audio.word_name = vo_sent_children_ball, from vo_2.wav, 2.64 s, timings in
    WORD_TIMES_BY_AUDIO) and the mic chip beside the sentence box runs the pages 2-4 read-aloud beat: the FIRST chip tap no longer
@@ -7900,6 +7910,8 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     // word spans (none today) would keep REC_MS. The sentence-box question pages (5, 7, 9, 11) keep their own 12 s beat below.
     var startRec = function(){
       pill.__p2Rec = true;
+      var fr = frameOf(idx); if(fr) fr.__spkTapped = true;                  // [T1-T3-CUE-ONCE] the mic has been tapped: the cue line never plays again on this page (startCue / idleArm / idleFire bow out on this flag, as on the sentence-box pages)
+      idleCancel();                                                           // [T1-T3-CUE-ONCE] ... and a repeat already counting down is dropped right now
       var recMs = (words && words.length) ? words.length * REC_WORD_MS : REC_MS;   // [T1-T3-REC-PER-WORD] 1 s per word
       try{ stopNudge(); }catch(x){}
       if(typeof stopAudio === "function"){ try{ stopAudio(); }catch(x){} }    // the cue / narration stops: the child reads now
