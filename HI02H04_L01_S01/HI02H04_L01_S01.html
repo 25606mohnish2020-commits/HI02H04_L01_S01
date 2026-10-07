@@ -7321,6 +7321,14 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    speaks again after every further 7 s of silence until the chip is tapped and आगे appears ([P2-QUIET-AFTER-NAV]). Page 2 (T1)
    is untouched: its cue line speaks at the cue point and repeats after 5 s of silence, as shipped. The guards before the cue point
    (sentence already heard, the read-aloud beat running, a narration replay playing) are unchanged and apply to the silent pulse too. */
+/* [T1-T3-MIC-LOCK] (2026-10-07) pages 2-4 (T1-T3, MIC_LOCK_BY_SLIDE): the mic button is not enabled when the page opens. wirePill
+   locks it at the mount (micLock: .p2-mic-locked on the chip - the .p2-rec-done look, greyed and not hit-testable - and
+   pill.__p2Locked, so onTap swallows a tap from any path) and run() lifts it (micUnlock) at the moment asked: pages 2-3, once the
+   picture's pop animation AND its sound effect are both over - the last pop's onDone fires when the SOUND is over (ended / error /
+   blocked / the POP_MS + 3 s safety) with popLeft ms of animation still to go, and the unlock is timed popLeft later, exactly
+   when the cue's own count starts (armCue); page 4, which has no pop, the moment run() is entered - the engine's end-of-narration
+   signal, i.e. right after the instruction line vo_t3_instr (or its 30 s watchdog). Before that moment a tap on the chip does
+   nothing: no read-aloud beat, no sentence. Everything from the unlock on (the silent pulse / cue line, the beat, आगे) is as before. */
 /* [P5-READ-ALOUD] (2026-10-01) page 5 (G1 = ?slide=3, the first sentence-box question; listed in REC_BY_SLIDE): its sentence is
    now बच्चे गेंद से खेल रहे हैं। (card data.stim_hi; audio.word_name = vo_sent_children_ball, from vo_2.wav, 2.64 s, timings in
    WORD_TIMES_BY_AUDIO) and the mic chip beside the sentence box runs the pages 2-4 read-aloud beat: the FIRST chip tap no longer
@@ -7386,6 +7394,14 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   var CUE_SILENT_FIRST_BY_SLIDE = {
     1: true,                                                                             // page 3 (T2)
     2: true                                                                              // page 4 (T3)
+  };
+  // slide index -> true: the mic button (the chip; the bar is not hit-testable on these pages) is DISABLED from the page's mount
+  // (.p2-mic-locked: the .p2-rec-done look, taps swallowed) until run() lifts it - with a pop: when the picture's pop animation
+  // and its SFX are both over (the last pop's onDone + popLeft); with no pop: as soon as the instruction line is over ([T1-T3-MIC-LOCK])
+  var MIC_LOCK_BY_SLIDE = {
+    0: true,                                                                             // page 2 (T1): after the pop + sfx_morning_birds
+    1: true,                                                                             // page 3 (T2): after the pop + sfx_bicycle_bell
+    2: true                                                                              // page 4 (T3): no pop - after vo_t3_instr
   };
   // slide index -> true: a tap on the bird (.tut-mascot) repeats the page's narration ([P2-BIRD-REPLAY])
   var BIRD_REPLAY_BY_SLIDE = {
@@ -7688,13 +7704,16 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     var targets = frame.classList.contains("story-frame-pair")
       ? Array.prototype.slice.call(frame.querySelectorAll(".story-img")) : [frame];
     var steps = Math.min(targets.length, plan.length);
-    if(!steps){ if(cue) armCue(frame, cue, 0); return; }                 // [P4-TAP-ONLY] no pop (page 4): the cue still comes CUE_GAP_MS after the narration
+    if(!steps){ micUnlock(); if(cue) armCue(frame, cue, 0); return; }    // [P4-TAP-ONLY] no pop (page 4): the cue still comes CUE_GAP_MS after the narration ([T1-T3-MIC-LOCK]: the narration is over, the mic button is enabled now)
     gateFrame = frame; navRevealAt = Date.now() + startMs + steps * POP_MS + NAV_AFTER_MS;
     for(var i = 0; i < steps; i++){
       (function(el, src, at, last){
         timers.push(setTimeout(function(){
           if(!frame.isConnected || !el.isConnected) return;            // the page was left before this step
-          pop(el, src, (last && cue) ? function(popLeft){ armCue(frame, cue, popLeft); } : null);
+          pop(el, src, last ? function(popLeft){                           // the last pop's SOUND is over; its animation has popLeft ms to go
+            timers.push(setTimeout(micUnlock, popLeft));                    // [T1-T3-MIC-LOCK] animation and SFX both over: the mic button is enabled
+            if(cue) armCue(frame, cue, popLeft);
+          } : null);
         }, at));
       })(targets[i], plan[i], startMs + i * POP_MS, i === steps - 1);
     }
@@ -7841,6 +7860,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     var src = (card && card.assets && card.assets.audio && card.assets.audio[id]) || ("assets/Audio/" + id + "." + (typeof AUDIO_EXT === "string" ? AUDIO_EXT : "ogg"));
     pill.classList.add("p2-sentence-btn");
     pill.setAttribute("role", "button"); pill.setAttribute("aria-label", text);
+    if(MIC_LOCK_BY_SLIDE[idx] === true && !pill.__p2MicFree) micLock(pill, chip);   // [T1-T3-MIC-LOCK] disabled until run() lifts it (pop beat over / narration over)
     var times = WORD_TIMES_BY_SLIDE[idx] || null, words = times ? splitWords(pill) : null;   // [P2-WORD-SYNC]
     var speak = function(e){
       if(e) e.stopPropagation();
@@ -7895,6 +7915,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
       }, recMs));
     };
     var onTap = function(e){
+      if(pill.__p2Locked){ if(e) e.stopPropagation(); return; }                // [T1-T3-MIC-LOCK] the mic button is not enabled yet: the tap does nothing
       if(REC_BY_SLIDE[idx] !== true){ speak(e); return; }
       if(e) e.stopPropagation();
       if(!pill.isConnected || typeof state !== "object" || !state || state.idx !== idx) return;
@@ -7906,6 +7927,17 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
       chip.onclick = null;                                  // the engine's narration replay on the chip goes: the chip is part of this button now
       if(!pill.contains(chip)) chip.addEventListener("click", onTap);   // (a chip left at Swiftee's shoulder still speaks the sentence)
     }
+  }
+  // [T1-T3-MIC-LOCK] the mic button's lock: .p2-mic-locked on the chip (the .p2-rec-done look, not hit-testable) + pill.__p2Locked
+  // (onTap swallows the tap); micUnlock lifts both on the page now open (run() calls it at the right moment, see MIC_LOCK_BY_SLIDE)
+  function micLock(pill, chip){
+    pill.__p2Locked = true;
+    if(chip){ chip.classList.add("p2-mic-locked"); chip.setAttribute("aria-disabled", "true"); }
+  }
+  function micUnlock(){
+    var pill = document.querySelector("#slideHost .story-caption"), chip = document.querySelector("#slideHost .tut-card .tut-audio");
+    if(pill){ pill.__p2MicFree = true; if(pill.__p2Locked) pill.__p2Locked = false; }
+    if(chip && chip.classList.contains("p2-mic-locked")){ chip.classList.remove("p2-mic-locked"); chip.removeAttribute("aria-disabled"); }
   }
   // ---- [VO-BATCH] helpers ----
   function srcOf(id){
@@ -8702,6 +8734,12 @@ body.vo-bg .sq-sentence-box .tut-audio.playing .wv1,body.vo-bg .sq-sentence-box 
 .stage.tut .tut-audio.p2-rec-done{pointer-events:none !important;cursor:default;opacity:.45;
   filter:grayscale(1) drop-shadow(0 3px 6px rgba(0,0,0,.22));}
 .stage.tut .story-caption.p2-cue .tut-audio.p2-rec-done{animation:none !important;}
+/* [T1-T3-MIC-LOCK] (2026-10-07) pages 2-4: from the page's mount until run() lifts it (pages 2-3: the pop animation and its SFX
+   both over; page 4: the instruction line over) the mic chip wears the .p2-rec-done look above as .p2-mic-locked, value for value
+   (greyed, not hit-testable, never moved by a cue). The engine's playing waves on the chip still show, greyed, while the narration speaks. */
+.stage.tut .tut-audio.p2-mic-locked{pointer-events:none !important;cursor:default;opacity:.45;
+  filter:grayscale(1) drop-shadow(0 3px 6px rgba(0,0,0,.22));}
+.stage.tut .story-caption.p2-cue .tut-audio.p2-mic-locked{animation:none !important;}
 </style>
 <style id="P5-SPK-CUE-CSS">
 /* [P5-SPK-CUE] (2026-09-24) page 5 (G1 = ?slide=3; pages 7, 9 and 11 too since [P5-ALL-SENT-PAGES]): after the page's background line (its instruction; the automatic sentence
