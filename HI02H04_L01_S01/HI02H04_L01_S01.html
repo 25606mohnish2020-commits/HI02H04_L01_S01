@@ -8663,6 +8663,72 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   }
 })();
 </script>
+<script id="GUIDED-EASY-TAP-JS">
+/* [GUIDED-EASY-TAP] (2026-10-07, user request) pages 5-12 (G1, G2, G3, G4, P1, P2, P3, P4 = ?slide=3..10, GUIDED_EASY_BY_SLIDE):
+   after the third wrong tap the reveal (revealAnswer: the decoys blurred and dead, the answer with its green guide-pulse and the
+   pointing hand, state.locked) waits for the child's tap on the answer - and that tap was hard to land, for three reasons:
+   (1) the hand came up at the very instant the reveal's play() began, and the card's reveal line vo_reveal has NO file in
+   assets/Audio, so the engine's missing-file beat keeps body.vo-playing on for 1.2 s - with [VO-SHIELD] every tap in that
+   window is swallowed, so the first tap after the hand appeared did nothing; (2) the hand sits just below the answer and took
+   no tap at all (pointer-events:none), so a child tapping the pointing finger hit the empty stage; (3) a tap a little outside
+   the card's edge hit the grid. Now, on these pages only:
+   - the hand appears once nothing speaks any more (showRevealHand is wrapped: the hand is placed when body.vo-playing is off,
+     polled every 100 ms from the next tick, so the line - or the silent 1.2 s beat - is over before the hand is seen; the blur
+     and the guide-pulse still come at once). From the moment the hand is visible, the tap goes through;
+   - the hand itself takes the tap (pointer-events:auto, pointer cursor) and hands it to the answer (cell.click(), i.e. the
+     same path as a tap on the card: the [P5-GUIDED-TAP] hold with the page SFX, then revealAnswer's onGuidedTap);
+   - the answer's hit area grows by GUIDED_HIT_PAD = 24 px (design px, scaled with the stage) on every side: a click that lands
+     anywhere in that band - the grid, the stage, the dead edge of a blurred decoy - is handed to the answer the same way.
+   Nothing else changes: the blurred decoys stay dead, the guided tap's own flow (SFX hold, ding, confetti, the word / शाबाश
+   line where recorded, completeSlide(false)) is as shipped, taps during a line are still blocked ([VO-SHIELD]), and the hand
+   logic of every other page (none in this lesson uses it) is untouched. Note for the content team: recording vo_reveal
+   ("यह सही जोड़ा है।") would replace the silent 1.2 s beat with the line; nothing here depends on it. */
+(function(){ "use strict";
+  var GUIDED_EASY_BY_SLIDE = { 3: true, 4: true, 5: true, 6: true, 7: true, 8: true, 9: true, 10: true };
+  var GUIDED_HIT_PAD = 24;                                   // design px around the guided card that still count as a tap on it
+  function listed(){ var ix = (typeof state === "object" && state) ? state.idx : -1; return GUIDED_EASY_BY_SLIDE[ix] === true ? ix : -1; }
+  function speaking(){ return document.body.classList.contains("vo-playing"); }
+  function guidedCell(){ return document.querySelector("#slideHost .opt-cell.opt-guided"); }
+  // the hand: placed once nothing speaks, and tappable
+  var origHand = window.showRevealHand;
+  if(typeof origHand === "function"){
+    window.showRevealHand = function(grid, cell){
+      var ix = listed();
+      if(ix < 0) return origHand.apply(this, arguments);
+      var self = this, args = arguments;
+      var place = function(){
+        if(!cell || !cell.isConnected || typeof state !== "object" || !state || state.idx !== ix) return;   // the page was left
+        if(!cell.classList.contains("opt-guided")) return;                                                  // the answer was tapped meanwhile
+        origHand.apply(self, args);
+        var hd = document.querySelector(".slide-stage .reveal-hand");
+        if(hd){
+          hd.style.setProperty("pointer-events", "auto", "important"); hd.style.cursor = "pointer";   // the sheet's global img{pointer-events:none !important} must be out-ranked
+          hd.addEventListener("click", function(e){ e.stopPropagation(); if(cell.isConnected && cell.classList.contains("opt-guided")) cell.click(); });
+        }
+      };
+      setTimeout(function wait(){                                              // the reveal's play() runs right after this call: from the next tick on, wait for quiet
+        if(typeof state !== "object" || !state || state.idx !== ix) return;
+        if(speaking()){ setTimeout(wait, 100); return; }
+        place();
+      }, 0);
+    };
+  }
+  // the padded hit area: a click just outside the guided card (not on it, not on the hand, not while a line speaks) is handed to it
+  document.addEventListener("click", function(e){
+    if(listed() < 0 || speaking()) return;
+    var cell = guidedCell(); if(!cell) return;
+    var t = e.target;
+    if(!t || t === cell || cell.contains(t)) return;
+    if(t.closest && t.closest(".reveal-hand")) return;                         // the hand forwards on its own
+    if(typeof e.clientX !== "number" || (e.clientX === 0 && e.clientY === 0)) return;   // a synthetic click() carries no point
+    var scale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--scale")) || 1;
+    var r = cell.getBoundingClientRect(), pad = GUIDED_HIT_PAD * scale;
+    if(e.clientX < r.left - pad || e.clientX > r.right + pad || e.clientY < r.top - pad || e.clientY > r.bottom + pad) return;
+    e.stopPropagation(); e.preventDefault();
+    cell.click();
+  }, true);
+})();
+</script>
 <style id="LANDING-START-AFTER-VO">
 /* ===== Page 1: शुरू करें appears only AFTER the landing VO has played once =====
    The button is kept out of the page (display:none) until the engine adds .ready - [P1-NO-BIRD-CUE] (2026-10-05): that is
