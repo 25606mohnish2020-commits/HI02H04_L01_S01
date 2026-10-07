@@ -4105,12 +4105,18 @@ const SlideModules = {
         // y 56) and cream strip (#FCF5DD, r8: 180x58 at y 174) as vectors over the plain white coaches of the art; here they are a
         // layer of six divs (.ref-coachart, CSS in #P13-14-FIGMA295-CSS) placed in picture px, under the cargo and the written
         // sentences, riding the train's runs like the cargo. The same art serves both pages (the user asked for one layout)
+        // [P5-STRIP-EMPTY] (2026-10-07, user request): on page 13 - the page whose sentences are dragged (data.sentences, no
+        // data.box_texts) - the strip starts as an EMPTY dashed box in the drop box's own look (.ref-fillable.ref-empty, CSS in
+        // #P13-14-FIGMA295-CSS) and turns cream the moment a sentence is dropped on the right coach (finish() below drops .ref-empty);
+        // page 14's strips are written at mount and stay cream. data-coach lets the drop find its strip
+        const STRIP_EMPTY = Array.isArray(d.sentences) && d.sentences.length > 0 && !(Array.isArray(d.box_texts) && d.box_texts.length);
         if(FIGMA){
           const art = document.createElement('div'); art.className = 'ref-coachart';
           const BOXES = [[286, 466], [506, 686], [726, 906]];
-          BOXES.forEach(([x0, x1]) => {
+          BOXES.forEach(([x0, x1], coach) => {
             [['ref-coach-drop', 56, 171], ['ref-coach-strip', 174, 232]].forEach(([cls, y0, y1]) => {
               const el = document.createElement('div'); el.className = cls;
+              if(cls === 'ref-coach-strip' && STRIP_EMPTY){ el.classList.add('ref-fillable', 'ref-empty'); el.dataset.coach = coach; }
               el.style.left = (x0 * PIC_S) + 'px'; el.style.width = ((x1 - x0) * PIC_S) + 'px';
               el.style.bottom = (-4 + (PIC_PH - y1) * PIC_S) + 'px'; el.style.height = ((y1 - y0) * PIC_S) + 'px';
               art.appendChild(el); }); });
@@ -4359,6 +4365,9 @@ const SlideModules = {
             SwiftPAL.emit("train_match_drop", { slide_id: slide.id, pill: i, kind, coach, correct: ok });
             if(!ok){ over = false; el.classList.remove('ref-over'); el.classList.add('ref-wrong'); el.style.transform = ''; sfxWrongSoft(); setTimeout(()=> el.classList.remove('ref-wrong'), 650); return; }   // [STD-SFX] the wrong drop sounds the standard incorrect feedback with its shake
             placed[i] = true; playCorrect();
+            // [P5-STRIP-EMPTY] the coach's empty dashed strip becomes the cream strip at the correct drop (a .25s fade, CSS), under the
+            // gliding pill; the sentence is written into it on landing as before. Page 14 has no .ref-empty strip, nothing happens
+            const emptyStrip = panel.querySelector('.ref-coach-strip.ref-empty[data-coach="' + coach + '"]'); if(emptyStrip) emptyStrip.classList.remove('ref-empty');
             // glide from the (untransformed) slot to where it lands, at the landing size (the item is already shrunk to it,
             // .ref-over stays on), then place it there
             const rr = railEl().getBoundingClientRect(), t = targetOf(coach);
@@ -9232,6 +9241,13 @@ html.rotated body.station-page::before{inset:auto;left:50%;top:50%;width:100vh;h
 .stage.ref-figma .ref-panel.ref-depart .ref-coachart{animation:refTrainOut 6.001s cubic-bezier(.75,0,.8,.25) both;}
 .stage.ref-figma .ref-panel .ref-coach-drop{position:absolute;box-sizing:border-box;background:#FFFFFF;border:2px dashed rgba(0,0,0,.6);border-radius:8.3px;}
 .stage.ref-figma .ref-panel .ref-coach-strip{position:absolute;box-sizing:border-box;background:#FCF5DD;border-radius:8.3px;}
+/* [P5-STRIP-EMPTY] (2026-10-07, user request): on page 13 the strip starts EMPTY - the drop box's own look (white, 2px dashed
+   rgba(0,0,0,.6), the same r8.3; the frame's empty state shows both coach boxes dashed) - and turns into the cream strip the moment a
+   sentence is dropped on the right coach (the module removes .ref-empty at the correct drop; a .25s fade of fill and dash while the
+   pill glides in, then the sentence writes into it as before). border-box: the dash sits inside the strip's own 187.5x60.4px box, so
+   the written sentence and the pill's .ref-over size are untouched. Page 14's strips (written at mount) never carry these classes */
+.stage.ref-figma .ref-panel .ref-coach-strip.ref-fillable{border:2px dashed transparent;transition:background-color .25s ease,border-color .25s ease;}
+.stage.ref-figma .ref-panel .ref-coach-strip.ref-fillable.ref-empty{background:#FFFFFF;border-color:rgba(0,0,0,.6);}
 /* page 13's coach pictures fill the dashed boxes (x 286 / 506 / 726, y 56-171 picture px -> 187.5 x 119.8px, bottom 148px) */
 .stage.ref-figma .ref-panel .ref-cargo-img{bottom:148px;height:119.8px;border-radius:8.3px;}
 .stage.ref-figma .ref-panel .ref-cargo-img:nth-child(1){left:297.8px;width:187.5px;}
