@@ -7307,7 +7307,11 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    not "heard" yet). When the beat is over the wave goes, the mic returns, the chip is disabled for good (.p2-rec-done: greyed,
    not tappable) and speak() runs
    exactly as a tap did before: the sentence with its word sync, the follow-up line, the once-only explanation, आगे
-   NAV_AFTER_MS after the last line. Taps during the beat, and on the disabled chip, do nothing; every other page is untouched. */
+   NAV_AFTER_MS after the last line. Taps during the beat, and on the disabled chip, do nothing; every other page is untouched.
+   rev 3 [T1-T3-REC-PER-WORD] (2026-10-07): on these three story pages the beat is no longer 12 s flat - each word of the pill's
+   sentence is lit for REC_WORD_MS = 1 s, one after the other, so the beat lasts words x 1 s (page 2 लड़का पेड़ के नीचे बैठा है। = 6 s,
+   page 3 = 5 s, page 4 = 7 s; wordPace over that span) and the flow after it (wave off, chip disabled, speak()) starts the moment
+   the last word's second is over. Only the beat's length changed; REC_MS (12 s) still rules the sentence-box pages 5, 7, 9, 11. */
 /* [P5-READ-ALOUD] (2026-10-01) page 5 (G1 = ?slide=3, the first sentence-box question; listed in REC_BY_SLIDE): its sentence is
    now बच्चे गेंद से खेल रहे हैं। (card data.stim_hi; audio.word_name = vo_sent_children_ball, from vo_2.wav, 2.64 s, timings in
    WORD_TIMES_BY_AUDIO) and the mic chip beside the sentence box runs the pages 2-4 read-aloud beat: the FIRST chip tap no longer
@@ -7342,6 +7346,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 (function(){ "use strict";
   var DELAY_MS = 3000, POP_MS = 2000, VOL = 0.7, NAV_AFTER_MS = 1000, AFTER_VO_MS = 500, CUE_GAP_MS = 1500, REVIEW_GAP_MS = 500;
   var REC_MS = 12000;                                      // [P2-READ-ALOUD] the read-aloud beat: the sound wave plays and the words pace over these ms
+  var REC_WORD_MS = 1000;                                  // [T1-T3-REC-PER-WORD] story pages 2-4 (T1-T3): the beat lasts this long PER WORD of the sentence instead (6 / 5 / 7 words -> 6 / 5 / 7 s)
   var WRONG_BEAT_MS = 1000;                                 // [P6-WRONG-QUIET] the kit's wrong beat (wiggle + red release, ~0.9 s) a wrong tap's feedback waits for
   // slide index -> one SFX per pop step, in picture order (the user counts pages from the landing page: ?slide=N is page N+2)
   var PLAN_BY_SLIDE = {
@@ -7845,13 +7850,18 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
       }
     };
     // [P2-READ-ALOUD] pages in REC_BY_SLIDE: the FIRST tap starts the read-aloud beat (nothing speaks; the mic glyph dissolves into
-    // a sound wave, the words pace over REC_MS), then the chip is disabled for good and speak() runs as a tap did before; later taps do nothing
+    // a sound wave, the words pace), then the chip is disabled for good and speak() runs as a tap did before; later taps do nothing
+    // [T1-T3-REC-PER-WORD] (2026-10-07) on these story pages the beat is no longer the fixed REC_MS (12 s): each word of the sentence
+    // is lit for REC_WORD_MS (1 s), so the beat lasts words x 1 s (page 2: 6 s, page 3: 5 s, page 4: 7 s) and the moment the last
+    // word's second is over the flow goes on exactly as before (the wave goes, the chip is disabled, speak() runs). A page without
+    // word spans (none today) would keep REC_MS. The sentence-box question pages (5, 7, 9, 11) keep their own 12 s beat below.
     var startRec = function(){
       pill.__p2Rec = true;
+      var recMs = (words && words.length) ? words.length * REC_WORD_MS : REC_MS;   // [T1-T3-REC-PER-WORD] 1 s per word
       try{ stopNudge(); }catch(x){}
       if(typeof stopAudio === "function"){ try{ stopAudio(); }catch(x){} }    // the cue / narration stops: the child reads now
       if(chip && !stillMode()) chip.classList.add("p2-rec");
-      if(words) wordPace(words, REC_MS);
+      if(words) wordPace(words, recMs);
       timers.push(setTimeout(function(){
         pill.__p2Rec = false;
         wordStop();
@@ -7859,7 +7869,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
         if(!pill.isConnected || typeof state !== "object" || !state || state.idx !== idx) return;
         pill.__p2RecDone = true;
         speak(null);                                                          // the sentence with its word sync, then the rest of the flow as before
-      }, REC_MS));
+      }, recMs));
     };
     var onTap = function(e){
       if(REC_BY_SLIDE[idx] !== true){ speak(e); return; }
