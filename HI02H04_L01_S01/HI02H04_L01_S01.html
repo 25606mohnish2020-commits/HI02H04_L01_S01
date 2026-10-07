@@ -6989,9 +6989,21 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
 /* [VO-BATCH] page 4 (T3, the picture pair): while "इस वाक्य के लिए यह चित्र सही है।" (vo_t3_explain) speaks, the picture it means
    (data.image_ids[1], the girl watering the plants) is ringed in green and the other one fades - no motion (the pictures stay
    still, as asked on 2026-09-21); the mark stays until the page is left. Since [P4-TAP-ONLY] (2026-09-24) that line follows
-   the speaker-chip tap (no automatic sentence any more), so the ring appears from the first tap on. */
+   the speaker-chip tap (no automatic sentence any more), so the ring appears from the first tap on.
+   [P4-MARK-POP] (2026-10-07) the "no motion" part is withdrawn for the MEANT picture only, as asked: with the ring it gives a
+   small silent pop-and-hold while the line speaks - the p6PromptPop shape (#P6-PROMPT-IDLE-CSS: out to 1.045 in 0.2 s, settled
+   at 1.03 by 0.32 s, HELD, eased back to 1 over the last 0.45 s) re-timed to vo_t3_explain (3.36 s -> 3.4 s = MARK_POP_MS).
+   markFor adds .p4-pop as the line starts and removes it at the animation's end. The other picture still only fades. */
 .stage.tut .story-frame-pair .story-img.p4-mark{outline:6px solid #22B14C;outline-offset:-6px;border-radius:14px;}
 .stage.tut .story-frame-pair .story-img.p4-dim{opacity:.45;transition:opacity .4s ease;}
+@keyframes p4MarkPop{
+  0%{transform:scale(1);animation-timing-function:cubic-bezier(.2,.8,.3,1);}      /* pop out: 0 -> 0.20s */
+  5.9%{transform:scale(1.045);animation-timing-function:ease-in-out;}             /* slight overshoot at 0.20s */
+  9.4%{transform:scale(1.03);animation-timing-function:linear;}                   /* settle by 0.32s ... */
+  86.8%{transform:scale(1.03);animation-timing-function:ease-in-out;}             /* ... HOLD until 2.95s */
+  100%{transform:scale(1);}                                                       /* ease back by 3.4s */
+}
+.stage.tut .story-frame-pair .story-img.p4-mark.p4-pop{animation:p4MarkPop 3.4s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
 /* [P2-WORD-SYNC] page 2: while the bar speaks its sentence (vo_sent_boy_sit) the word being said carries .on - since
    [WORD-ORANGE] (2026-09-23) its TEXT turns dark orange (#E86A00) with a very slight pop; the earlier #FFC94D block behind the
    word is gone (the user: colour the word, not a block) - word by word from the audio clock (#P2-BIRD-POP-JS splits the pill
@@ -7339,6 +7351,14 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    tap - so startCue (the scheduled cue point and every repeat), idleArm and idleFire bow out for good, and the count already
    running is dropped at once (idleCancel). A line that is speaking when the chip is tapped is still cut by the beat's stopAudio,
    and a silent pulse is still settled by the tap; the beat, the sentence, the explanation and आगे are untouched. */
+/* [P4-MARK-POP] (2026-10-07) page 4 (T3, the picture pair): when "इस वाक्य के लिए यह चित्र सही है।" (vo_t3_explain, the line that
+   follows the read-aloud beat's sentence) speaks, the picture it means (MARK_BY_SLIDE[2].mark = image_ids[1], the girl watering
+   the plants) now also POPS OUT slightly and holds while the line speaks, to tie the sentence to its picture: markFor, which
+   already rings it in green (.p4-mark) and fades the other (.p4-dim) as the line starts, adds .p4-pop too - the p6PromptPop
+   pop-and-hold shape re-timed to the line (p4MarkPop, 3.4 s, MARK_POP_MS; CSS in #P2-BIRD-POP-CSS next to the ring) - and removes
+   it at the animation's end (fallback timer MARK_POP_MS + 250 ms, as the other pops). Reduced motion (stillMode) skips the pop.
+   This withdraws, for this one picture, the 2026-09-21 "the pictures stay still" decision noted at the ring's CSS, as asked. The
+   frame around the pair is overflow:visible and transparent, so the 3-4.5 % growth is not clipped. Nothing else on the page moves. */
 /* [P5-READ-ALOUD] (2026-10-01) page 5 (G1 = ?slide=3, the first sentence-box question; listed in REC_BY_SLIDE): its sentence is
    now बच्चे गेंद से खेल रहे हैं। (card data.stim_hi; audio.word_name = vo_sent_children_ball, from vo_2.wav, 2.64 s, timings in
    WORD_TIMES_BY_AUDIO) and the mic chip beside the sentence box runs the pages 2-4 read-aloud beat: the FIRST chip tap no longer
@@ -7375,6 +7395,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   var REC_MS = 12000;                                      // [P2-READ-ALOUD] the read-aloud beat: the sound wave plays and the words pace over these ms
   var REC_WORD_MS = 1000;                                  // [T1-T3-REC-PER-WORD] story pages 2-4 (T1-T3): the beat lasts this long PER WORD of the sentence instead (6 / 5 / 7 words -> 6 / 5 / 7 s)
   var CUE_PULSE_MS = 3400;                                 // [T2-T3-SILENT-CUE] pages 3-4: the silent mic-chip pulse at the cue point lasts as long as the cue line would (vo_tap_speaker_sentence_story, 3.4 s)
+  var MARK_POP_MS = 3400;                                  // [P4-MARK-POP] page 4: the marked picture's pop-and-hold lasts as long as its line (vo_t3_explain, 3.36 s; = the p4MarkPop keyframes' duration)
   var WRONG_BEAT_MS = 1000;                                 // [P6-WRONG-QUIET] the kit's wrong beat (wiggle + red release, ~0.9 s) a wrong tap's feedback waits for
   // slide index -> one SFX per pop step, in picture order (the user counts pages from the landing page: ?slide=N is page N+2)
   var PLAN_BY_SLIDE = {
@@ -7581,6 +7602,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   };
   // [P4-TAP-ONLY] slide index -> while the follow-up line (FOLLOW_BY_SLIDE) speaks after a tapped sentence, ring picture #mark
   // of the pair (.p4-mark) and fade the others (.p4-dim); the mark stays until the page is left, as before
+  // [P4-MARK-POP] (2026-10-07) ... and picture #mark gives a small silent pop-and-hold for the line's length (markFor -> .p4-pop)
   var MARK_BY_SLIDE = {
     2: { line: "vo_t3_explain", mark: 1 }                                                // page 4: इस वाक्य के लिए यह चित्र सही है। -> the girl watering the plants (image_ids[1])
   };
@@ -8002,6 +8024,12 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     var m = MARK_BY_SLIDE[idx]; if(!m || FOLLOW_BY_SLIDE[idx] !== m.line) return;
     var pics = Array.prototype.slice.call(document.querySelectorAll("#slideHost .story-frame-pair .story-img"));
     pics.forEach(function(im, k){ im.classList.toggle("p4-mark", k === m.mark); im.classList.toggle("p4-dim", k !== m.mark); });
+    var pic = pics[m.mark];                                                   // [P4-MARK-POP] the meant picture pops out slightly with the line (.p4-pop, #P2-BIRD-POP-CSS) and holds while it speaks
+    if(pic && !stillMode()){
+      pic.classList.add("p4-pop");
+      pic.addEventListener("animationend", function(){ pic.classList.remove("p4-pop"); }, { once:true });
+      timers.push(setTimeout(function(){ pic.classList.remove("p4-pop"); }, MARK_POP_MS + 250));   // fallback tidy-up, as the other pops
+    }
   }
   // [VO-BATCH] pages 5-12 with a sentence box: its tap (and the header chip) replays the sentence alone, not the whole chain
   function wireReplay(idx){
