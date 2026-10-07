@@ -7312,6 +7312,15 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    sentence is lit for REC_WORD_MS = 1 s, one after the other, so the beat lasts words x 1 s (page 2 लड़का पेड़ के नीचे बैठा है। = 6 s,
    page 3 = 5 s, page 4 = 7 s; wordPace over that span) and the flow after it (wave off, chip disabled, speak()) starts the moment
    the last word's second is over. Only the beat's length changed; REC_MS (12 s) still rules the sentence-box pages 5, 7, 9, 11. */
+/* [T2-T3-SILENT-CUE] (2026-10-07) pages 3-4 (T2, T3 = slides 1-2, CUE_SILENT_FIRST_BY_SLIDE): the "tap the mic and read the
+   sentence" cue (vo_tap_speaker_sentence_story) no longer SPEAKS at the scheduled cue point (CUE_GAP_MS after the pop beat on
+   page 3, after the narration on page 4): there the mic chip only pulses, silently, for CUE_PULSE_MS = 3.4 s (the line's length;
+   silentPulse puts .p2-cue on the caption pill, whose CSS moves only the chip, and any tap settles it early, as the [P5-WRONG-PULSE]
+   pulse does), and the page's inactivity count starts right then (idleArm; CUE_IDLE_BY_SLIDE[1] and [2] = 7000, was 5000). If the
+   child does nothing for those 7 s the cue line speaks with its chip pulse - the [P2-CUE-IDLE] repeat exactly as before - and it
+   speaks again after every further 7 s of silence until the chip is tapped and आगे appears ([P2-QUIET-AFTER-NAV]). Page 2 (T1)
+   is untouched: its cue line speaks at the cue point and repeats after 5 s of silence, as shipped. The guards before the cue point
+   (sentence already heard, the read-aloud beat running, a narration replay playing) are unchanged and apply to the silent pulse too. */
 /* [P5-READ-ALOUD] (2026-10-01) page 5 (G1 = ?slide=3, the first sentence-box question; listed in REC_BY_SLIDE): its sentence is
    now बच्चे गेंद से खेल रहे हैं। (card data.stim_hi; audio.word_name = vo_sent_children_ball, from vo_2.wav, 2.64 s, timings in
    WORD_TIMES_BY_AUDIO) and the mic chip beside the sentence box runs the pages 2-4 read-aloud beat: the FIRST chip tap no longer
@@ -7347,6 +7356,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   var DELAY_MS = 3000, POP_MS = 2000, VOL = 0.7, NAV_AFTER_MS = 1000, AFTER_VO_MS = 500, CUE_GAP_MS = 1500, REVIEW_GAP_MS = 500;
   var REC_MS = 12000;                                      // [P2-READ-ALOUD] the read-aloud beat: the sound wave plays and the words pace over these ms
   var REC_WORD_MS = 1000;                                  // [T1-T3-REC-PER-WORD] story pages 2-4 (T1-T3): the beat lasts this long PER WORD of the sentence instead (6 / 5 / 7 words -> 6 / 5 / 7 s)
+  var CUE_PULSE_MS = 3400;                                 // [T2-T3-SILENT-CUE] pages 3-4: the silent mic-chip pulse at the cue point lasts as long as the cue line would (vo_tap_speaker_sentence_story, 3.4 s)
   var WRONG_BEAT_MS = 1000;                                 // [P6-WRONG-QUIET] the kit's wrong beat (wiggle + red release, ~0.9 s) a wrong tap's feedback waits for
   // slide index -> one SFX per pop step, in picture order (the user counts pages from the landing page: ?slide=N is page N+2)
   var PLAN_BY_SLIDE = {
@@ -7369,6 +7379,13 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     0: { src: "assets/Audio/vo_tap_speaker_sentence_story.ogg", pulse: "#slideHost .story-caption" },  // page 2: "Tap speaker icon" line, the caption pill + its speaker chip
     1: { src: "assets/Audio/vo_tap_speaker_sentence_story.ogg", pulse: "#slideHost .story-caption" },  // page 3: the same cue ([VO-BATCH])
     2: { src: "assets/Audio/vo_tap_speaker_sentence_story.ogg", pulse: "#slideHost .story-caption" }   // page 4: CUE_GAP_MS after the narration (no pop), then the idle repeat ([P4-TAP-ONLY])
+  };
+  // slide index -> true: at the scheduled cue point the mic chip only PULSES (silentPulse on cue.pulse for CUE_PULSE_MS, no line);
+  // the cue line first speaks once the child has been inactive for CUE_IDLE_BY_SLIDE ms (7 s) from that pulse on, and again after
+  // every further such silence - the idle repeat as it is. Page 2 (T1) is not listed: it speaks the line at the cue point ([T2-T3-SILENT-CUE])
+  var CUE_SILENT_FIRST_BY_SLIDE = {
+    1: true,                                                                             // page 3 (T2)
+    2: true                                                                              // page 4 (T3)
   };
   // slide index -> true: a tap on the bird (.tut-mascot) repeats the page's narration ([P2-BIRD-REPLAY])
   var BIRD_REPLAY_BY_SLIDE = {
@@ -7419,8 +7436,8 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   // slide index -> ms of inactivity (no tap, nothing speaking) after which the cue plays again, from the scheduled cue point on ([P2-CUE-IDLE])
   var CUE_IDLE_BY_SLIDE = {
     0: 5000,                                                                             // page 2
-    1: 5000,                                                                             // page 3 ([P3-SAME-AS-P2])
-    2: 5000,                                                                             // page 4 ([P4-BAR])
+    1: 7000,                                                                             // page 3 ([P3-SAME-AS-P2]; 5000 -> 7000 with [T2-T3-SILENT-CUE]: the line first speaks after 7 s of inactivity)
+    2: 7000,                                                                             // page 4 ([P4-BAR]; 5000 -> 7000 with [T2-T3-SILENT-CUE])
     3: 5000,                                                                             // page 5: until its speaker chip is tapped ([P5-SPK-CUE])
     5: 5000,                                                                             // page 7 (G3) ([P5-ALL-SENT-PAGES])
     7: 5000,                                                                             // page 9 (P1) ([P5-ALL-SENT-PAGES])
@@ -7727,6 +7744,12 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     if(recEl && recEl.__p2Rec){ idleArm(); return; }
     if(document.body.classList.contains("vo-playing")){                       // the child is replaying the narration: wait for it
       timers.push(setTimeout(function(){ startCue(frame, cue, repeat); }, 250)); return;
+    }
+    if(!repeat && CUE_SILENT_FIRST_BY_SLIDE[(typeof state === "object" && state) ? state.idx : -1] === true){   // [T2-T3-SILENT-CUE] pages 3-4's cue point: the chip pulses alone, nothing speaks
+      var sil = document.querySelector(cue.pulse);
+      if(sil) silentPulse(sil, CUE_PULSE_MS);                                 // the [P5-WRONG-PULSE] pulse: .p2-cue for CUE_PULSE_MS (the chip, by CSS), any tap settles it early
+      idleArm();                                                              // the inactivity count (7 s on these pages) runs from this silent cue; when it fires the line speaks, as a repeat
+      return;
     }
     if(typeof play !== "function") return;
     var el = document.querySelector(cue.pulse);
