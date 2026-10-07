@@ -4050,7 +4050,9 @@ const SlideModules = {
       const STATION = slide.ref_scene === 'station';
       // [P13-14-FIGMA295] (2026-10-07) slide.ref_scene "figma" (pages 13-14 now): the Figma 295-26 layout - the train art of that frame
       // (assets/Images/train_figma.png, the frame's "Colorful Cartoon Train with White Coaches", 948x317 picture px = the frame's own
-      // px) shown 987.3px wide (x1.0414, the frame -> stage scale) and centred, standing on the frame's full-width rail (a stage
+      // px; [P13-14-TRAIN-PIC] since the evening of 2026-10-07 the user's own picture of that train, the same art with thinner
+      // strokes, laid onto the same 2170x725 canvas - so this grid and every box below still hold)
+      // shown 987.3px wide (x1.0414, the frame -> stage scale) and centred, standing on the frame's full-width rail (a stage
       // background, <style id="P13-14-FIGMA295-CSS">); the run is 118% of the picture so the nose enters from the stage's right edge
       // and the tail leaves past the left. The picture grid is no longer the 987x234 of the toy-train art: PIC_PW / PIC_PH below
       const FIGMA = slide.ref_scene === 'figma';
@@ -4076,14 +4078,17 @@ const SlideModules = {
         // The layer rides the train's runs (CSS .ref-wheels = refTrainIn / refTrainOut); the cut-out's spin (refWheelIn /
         // refWheelOut, the same curves) covers the run's distance — 92% of the 1025px panel width — rolling on the wheel's
         // outer radius r (picture px), anticlockwise as the train moves left. Built by the scratchpad make_wheels.py.
-        // [P13-14-FIGMA295]: the Figma train's two red six-spoke wheels - ring centres (130.9,250.3) / (209.8,250.4) picture px, ring
-        // r 29.7 inside / 36.3 outside, hub r 7.9 (a least-squares fit of the ring on the raw art; the scratchpad's
-        // figma295/make_figma_train_v3.py) - roll on the outer radius exactly as before. Only the six SPOKES (and their outlines) are
-        // cut out and spun (train_wheel_f1/f2.png, 84.8x84.8 picture px boxes at the raw art's resolution): the red ring and the yellow
-        // hub are round, so they stay in the body with the coupling rod, and what sits behind each spoke is painted into
-        // train_figma.png itself (inpainted row by row), so no separate backplate - bg is null here
-        const WHEELS = FIGMA ? [{ cx:130.9, cy:250.3, r:36.3, hs:42.4, src:'train_wheel_f1', bg:null },
-                                { cx:209.8, cy:250.4, r:36.3, hs:42.4, src:'train_wheel_f2', bg:null }]
+        // [P13-14-FIGMA295]: the Figma train's two red six-spoke wheels roll on the outer radius exactly as before. Only the six SPOKES
+        // (with their outlines) are cut out and spun (train_wheel_f1/f2.png, 84.8x84.8 picture px boxes at the raw art's resolution):
+        // the red ring and the yellow hub are round, so they stay in the body with the coupling rod, and what sits behind each spoke
+        // is painted into train_figma.png itself, so no separate backplate - bg is null here.
+        // [P13-14-TRAIN-PIC] (2026-10-07, the user's picture): ring centres (130.6,250.3) / (210.0,250.3) picture px, a least-squares
+        // fit of the red ring on the user's art laid onto the old canvas (ring r 29.2 inside / 36.8 outside; r stays 36.3 here so
+        // --turn, the spin, is exactly what it was). The split (the scratchpad's wheels/make_figma_train_v4.py): the six spoke bars
+        // are repainted by radial zone - hub yellow / outline black / the backdrop colour of the same ROW (green cab, grey chassis,
+        // black line, transparent below) / rim-outline black / red - so nothing of a spoke stays behind the spinning ones
+        const WHEELS = FIGMA ? [{ cx:130.6, cy:250.3, r:36.3, hs:42.4, src:'train_wheel_f1', bg:null },
+                                { cx:210.0, cy:250.3, r:36.3, hs:42.4, src:'train_wheel_f2', bg:null }]
                              : [{ cx:204.2, cy:174.4, r:32.9, hs:27, src:'train_wheel_1', bg:'train_wheel_bg_1' },
                                 { cx:273.1, cy:174.3, r:32.9, hs:27, src:'train_wheel_2', bg:'train_wheel_bg_2' }];
         const wheels = document.createElement('div'); wheels.className = 'ref-wheels';
@@ -9199,8 +9204,11 @@ html.rotated body.station-page::before{inset:auto;left:50%;top:50%;width:100vh;h
    948x317 at (166,208) -> 987.3x330.1 at (172.9,216.6): centred on the stage) with the frame's own vectors over its three white
    coaches - a white dashed drop box (180x115, 2px dashed rgba(0,0,0,.6), r8) at y 264 and a cream #FCF5DD strip (180x58, r8) at
    y 382 per coach, x 452 / 672 / 892 - drawn here by the module as .ref-coachart (they ride the train). The art is the frame's raw
-   image (assets/Images/train_figma.png, 2170x725 = 2.289 raw px per picture px, transparent around the train), its two loco wheel
-   discs replaced by what sits behind them so the cut-out wheels (train_wheel_f1/f2.png) can spin on top exactly as before.
+   image (assets/Images/train_figma.png, 2170x725 = 2.289 raw px per picture px, transparent around the train), its two loco wheels'
+   spokes replaced by what sits behind them so the cut-out spokes (train_wheel_f1/f2.png) can spin on top exactly as before.
+   [P13-14-TRAIN-PIC] (2026-10-07 evening, user request "use this train instead"): train_figma.png is now the user's own picture of
+   the same train (2172x724, the same drawing with thinner strokes) pasted at (-1,+2) onto that 2170x725 canvas - its wheel centres
+   land within 0.3 picture px of the frame export's, so this layout, the coach art and the grid are untouched; only the pixels changed.
    The picture's own rail band is gone with the grid (the module's PIC_PW / PIC_PH = 948 / 317), so the hidden .ref-rail copy keeps
    its box for the drop test and the glide hint, and the train copy is not clipped. Everything else is the station layout, value for
    value: the slide host is the positioned box under the 140px header row (tops below = stage y - 140), the panel is a transparent,
