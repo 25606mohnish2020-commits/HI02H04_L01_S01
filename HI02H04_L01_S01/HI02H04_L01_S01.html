@@ -8888,6 +8888,14 @@ body.vo-bg .sq-sentence-box .tut-audio.playing .wv1,body.vo-bg .sq-sentence-box 
   filter:grayscale(1) drop-shadow(0 3px 6px rgba(0,0,0,.22));}
 .stage.tut .story-caption.p2-cue .tut-audio.p2-mic-locked{animation:none !important;}
 </style>
+<style id="VO-SHIELD-CSS">
+/* [VO-SHIELD] (2026-10-07) every page: #voShield (made by #VO-SHIELD-JS at the end of the body) is a transparent full-screen layer
+   above everything else on the page (the phase gate and the hint box sit at z-index 100021 and below) that is shown while a voice
+   line speaks (body.vo-playing) and takes every pointer event, so nothing beneath can be tapped until the line is over. It is only
+   a hit-test layer: nothing visible changes. */
+#voShield{position:fixed;inset:0;z-index:2147483000;background:transparent;cursor:default;touch-action:none;-webkit-tap-highlight-color:transparent;}
+#voShield[hidden]{display:none;}
+</style>
 <style id="G1-PROMPT-IDLE-CSS">
 /* [G1-G3-P1-P3-PROMPT-IDLE] (2026-10-07; rev 2 the same day: a pop-and-hold, not a breathing pulse) pages 5, 7, 9, 11 (G1, G3, P1,
    P3; BOX_POP_BY_SLIDE in #P2-BIRD-POP-JS): while the instruction line वाक्य पढ़िए और सही चित्र चुनिए। speaks - at the mount and on every
@@ -9162,6 +9170,36 @@ html.rotated body.station-page::before{inset:auto;left:50%;top:50%;width:100vh;h
   if(gate && gate.classList.contains("hidden") && typeof state === "object" && state) onSlide(state.idx | 0);   // ?slide=N: mounted before this block
   window.__bgm = { get el(){ return el; }, get wanted(){ return wanted; }, get sounding(){ return sounding.size; },
     get nodesDuckMs(){ return Math.max(0, nodesUntil() - Date.now()); }, get level(){ return level; }, get target(){ return target; } };
+})();
+</script>
+<script id="VO-SHIELD-JS">
+/* [VO-SHIELD] (2026-10-07, user request) EVERY page: while a voice line speaks, the child cannot tap anywhere on the screen.
+   body.vo-playing is the engine's own "a line is speaking" flag - setPlaying(true) at the start of every play() line (narrations,
+   instructions, cues, sentences, feedback, the phase gates' lines) and of the landing's welcome, setPlaying(false) when the line
+   ends, errors (the 1.2 s beat), is cut by stopAudio(), or is refused by the browser (the landing's "blocked" path, so the first
+   tap that is meant to start it is never blocked). While the flag is on, a transparent full-screen layer (#voShield, CSS in
+   #VO-SHIELD-CSS, above everything) takes every pointer event: options, the sentence pill and its mic, the bird, the header
+   speaker, आगे, the start disc, the train's cards - none of them can be tapped until the line is over; the moment it is, the
+   layer goes and every tap works as before. Sound effects (pop sounds, correct / wrong, confetti, the train, the music bed) play
+   on their own elements and never raise the flag, so they block nothing. A MutationObserver on body's class drives the layer (not
+   CSS alone) so a safety ceiling can release it if the flag were ever left on (SHIELD_MAX_MS = 15 s; the longest line is 7.2 s,
+   and the engine's own paths always clear the flag - this is belt and braces). A pointer already captured when a line starts (a
+   drag under way) keeps receiving its events, as the layer only decides where NEW pointer events land. Nothing else changes. */
+(function(){ "use strict";
+  var SHIELD_MAX_MS = 15000;
+  var shield = document.createElement("div");
+  shield.id = "voShield"; shield.hidden = true; shield.setAttribute("aria-hidden", "true");
+  document.body.appendChild(shield);
+  var ceiling = null;
+  function sync(){
+    var on = document.body.classList.contains("vo-playing");
+    if(on === !shield.hidden) return;                                        // no change (another body class moved)
+    if(ceiling){ clearTimeout(ceiling); ceiling = null; }
+    shield.hidden = !on;
+    if(on) ceiling = setTimeout(function(){ ceiling = null; shield.hidden = true; }, SHIELD_MAX_MS);
+  }
+  new MutationObserver(sync).observe(document.body, { attributes:true, attributeFilter:["class"] });
+  sync();                                                                    // a line may be speaking already (a ?slide=N dev load)
 })();
 </script>
 </body>
