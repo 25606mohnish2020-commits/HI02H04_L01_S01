@@ -7152,7 +7152,9 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    vo_t3_explain while the meant picture is ringed and the other fades (MARK_BY_SLIDE via markFor in the tap handler; the
    mark stays until the page is left), आगे NAV_AFTER_MS after those lines and never before the first tap (NAV_AFTER_TAP), the
    idle cue every 5 s until आगे appears ([P2-QUIET-AFTER-NAV]). AUTO_SENTENCE_BY_SLIDE is empty; autoSentence() is unused.
-   [P5-SPK-CUE] (2026-09-24) pages in SPK_CUE_BY_SLIDE (page 5 = G1 = ?slide=3, the sentence-box question; pages 7, 9 and 11 too
+   [P5-SPK-CUE] (2026-09-24; WITHDRAWN 2026-10-07 by [G1-G3-P1-P3-NO-MIC], noted after [P4-MARK-POP] below: these four pages have no
+   mic chip, no cue, no read-aloud beat and no first hearing any more - what follows here and in [P5-TAP-ONLY], [P5-ALL-SENT-PAGES],
+   [P5-READ-ALOUD], [P5-SAME-ON-7-9-11] is the shipped history, kept for the record) pages in SPK_CUE_BY_SLIDE (page 5 = G1 = ?slide=3, the sentence-box question; pages 7, 9 and 11 too
    since [P5-ALL-SENT-PAGES] below): after the page's
    background lines - the engine's autoPlayChain: the instruction vo_prompt_sent_to_pic and (until [P5-TAP-ONLY] below took it
    out) the automatic read-out of the sentence vo_sent_cat_ok - CUE_GAP_MS later the "tap the speaker" line (vo_tap_speaker_sentence) speaks while ONLY the
@@ -7359,6 +7361,32 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    it at the animation's end (fallback timer MARK_POP_MS + 250 ms, as the other pops). Reduced motion (stillMode) skips the pop.
    This withdraws, for this one picture, the 2026-09-21 "the pictures stay still" decision noted at the ring's CSS, as asked. The
    frame around the pair is overflow:visible and transparent, so the 3-4.5 % growth is not clipped. Nothing else on the page moves. */
+/* [G1-G3-P1-P3-NO-MIC] (2026-10-07) pages 5, 7, 9 and 11 (G1 = ?slide=3, G3 = ?slide=5, P1 = ?slide=7, P3 = ?slide=9: the four
+   sentence-box questions, NO_MIC_BY_SLIDE): the mic button beside the sentence box is gone, and with it everything it started -
+   the "tap the mic and read the sentence" cue and its idle repeat (SPK_CUE_BY_SLIDE and CUE_IDLE_BY_SLIDE no longer list these
+   pages; wireSpkCue finds nothing and is now unused), the 12 s read-aloud beat with the box's words pacing (REC_BY_SLIDE no longer
+   lists them), and the first hearing of the sentence that followed the beat, words lit. The page now runs: the instruction
+   वाक्य पढ़िए और सही चित्र चुनिए। (card audio.prompt) speaks at the mount while the pictures take no tap (.spk-locked) and the bar takes
+   none either (.spk-only, as it always was - the box was never tappable on these pages); the engine's automatic request for the
+   sentence (audio.word_name, next in autoPlayChain) is still skipped (autoSentenceOff, [P5-TAP-ONLY]), and the moment nothing
+   speaks any more the pictures unlock (wireNoMic: the chip element removed at mount, the lock, whenQuiet). The child reads the box
+   and taps. From there NOTHING changed: the wrong tap's wiggle + vo_try_again_read_sentence (its silent chip pulse,
+   WRONG_PULSE_BY_SLIDE, now has no chip to move - inert), the second wrong tap's hint = the sentence with its box words lit
+   (autoSentenceOff lets it through: the chain's one request was skipped and remembered, box.__autoOver, where the chip tap used to
+   open the way), the reveal after the third wrong tap and its guided tap, the correct tap's SFX hold + ding + confetti + vo_ok_pic.
+   The header speaker still replays the sentence on request (state.replayAudio, replayVia), as it did. Pages 6, 8, 10, 12 and
+   every other page are untouched. */
+/* [G1-G3-P1-P3-PROMPT-IDLE] (2026-10-07, later) the same four pages (slides 3, 5, 7, 9): (1) the instruction line वाक्य पढ़िए और सही
+   चित्र चुनिए। (card audio.prompt, vo_prompt_sent_to_pic, 3.28 s) now REPEATS after every 7 s of inactivity - the [P6-PROMPT-IDLE]
+   machinery of pages 6, 8, 10, 12 (PROMPT_IDLE_BY_SLIDE: 7000 here, 5000 there; wireIdlePrompt arms the count once the page's own
+   lines are over, any pointerdown restarts it, a count that runs out while a line speaks starts over from that line's end); no
+   element pops with it here (no PROMPT_IDLE_POP entry). (2) The FIRST tap on an option picture ends the repeat for good
+   (PROMPT_IDLE_STOP_ON_TAP_BY_SLIDE: a pointerdown on the option grid marks the .q-row __spkTapped and drops the count; pages 6, 8,
+   10, 12 keep repeating as shipped). (3) While the instruction speaks - at the mount and on every repeat - the whole blue sentence
+   box breathes (BOX_PULSE_BY_SLIDE: the play() wrapper sees the line start, boxPulseFor / boxPulse put .q-box-pop on the box, a
+   1 -> 1.04 -> 1 pop every 0.8 s, #G1-PROMPT-IDLE-CSS) and settles at the end of a breath when the line ends or is cut (ended /
+   pause on play()'s element; BOX_PULSE_MAX_MS safety). The pictures' lock during the entry line, the skipped first hearing, the
+   wrong-tap line, the hint, the reveal and the correct tap's celebration are as in [G1-G3-P1-P3-NO-MIC]. */
 /* [P5-READ-ALOUD] (2026-10-01) page 5 (G1 = ?slide=3, the first sentence-box question; listed in REC_BY_SLIDE): its sentence is
    now बच्चे गेंद से खेल रहे हैं। (card data.stim_hi; audio.word_name = vo_sent_children_ball, from vo_2.wav, 2.64 s, timings in
    WORD_TIMES_BY_AUDIO) and the mic chip beside the sentence box runs the pages 2-4 read-aloud beat: the FIRST chip tap no longer
@@ -7469,11 +7497,9 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   var REC_BY_SLIDE = {
     0: true,                                                                             // page 2
     1: true,                                                                             // page 3
-    2: true,                                                                             // page 4
-    3: true,                                                                             // page 5 (G1): the chip beside the sentence box ([P5-READ-ALOUD], wireSpkCue)
-    5: true,                                                                             // page 7 (G3) ([P5-SAME-ON-7-9-11])
-    7: true,                                                                             // page 9 (P1) ([P5-SAME-ON-7-9-11])
-    9: true                                                                              // page 11 (P3) ([P5-SAME-ON-7-9-11])
+    2: true                                                                              // page 4
+    // pages 5, 7, 9, 11 (G1, G3, P1, P3) were listed from [P5-READ-ALOUD] / [P5-SAME-ON-7-9-11] (2026-10-01) until
+    // [G1-G3-P1-P3-NO-MIC] (2026-10-07): they have no mic chip any more, so no beat
   };
   // slide index -> the explanation that follows the FIRST hearing of the sentence, once per page open ([VO-BATCH])
   var EXPLAIN_BY_SLIDE = {
@@ -7484,11 +7510,9 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   var CUE_IDLE_BY_SLIDE = {
     0: 5000,                                                                             // page 2
     1: 7000,                                                                             // page 3 ([P3-SAME-AS-P2]; 5000 -> 7000 with [T2-T3-SILENT-CUE]: the line first speaks after 7 s of inactivity)
-    2: 7000,                                                                             // page 4 ([P4-BAR]; 5000 -> 7000 with [T2-T3-SILENT-CUE])
-    3: 5000,                                                                             // page 5: until its speaker chip is tapped ([P5-SPK-CUE])
-    5: 5000,                                                                             // page 7 (G3) ([P5-ALL-SENT-PAGES])
-    7: 5000,                                                                             // page 9 (P1) ([P5-ALL-SENT-PAGES])
-    9: 5000                                                                              // page 11 (P3) ([P5-ALL-SENT-PAGES])
+    2: 7000                                                                              // page 4 ([P4-BAR]; 5000 -> 7000 with [T2-T3-SILENT-CUE])
+    // pages 5, 7, 9, 11 (G1, G3, P1, P3; 5000 each, [P5-SPK-CUE] / [P5-ALL-SENT-PAGES]) left this table with [G1-G3-P1-P3-NO-MIC]
+    // (2026-10-07): their "tap the mic" cue is gone, so there is nothing to repeat
   };
   // slide index -> word starts (s) in the pill's sentence recording, then the end of the last word ([P2-WORD-SYNC]); must have
   // one more entry than the pill has words (else no highlight). Page 2.wav = vo_sent_boy_sit, 2.64 s, speech 0.29-2.27 s:
@@ -7609,10 +7633,21 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   // [P5-SPK-CUE] slide index -> the speaker cue of a sentence-box page: src = the "tap the speaker" line, pulse = the box whose
   // chip pulses with it (.p2-cue) and is the only tappable thing until tapped (see wireSpkCue)
   var SPK_CUE_BY_SLIDE = {
-    3: { src: "assets/Audio/vo_tap_speaker_sentence_story.ogg", pulse: "#slideHost .sq-sentence-box" },  // page 5 (G1): बच्चे गेंद से खेल रहे हैं। ([P5-READ-ALOUD] rev 2: the story pages' "tap the mic and read" cue = vo_1.wav; the tap starts the read-aloud beat)
-    5: { src: "assets/Audio/vo_tap_speaker_sentence_story.ogg", pulse: "#slideHost .sq-sentence-box" },  // page 7 (G3): माँ अखबार पढ़ रही है। ([P5-ALL-SENT-PAGES]; the story cue since [P5-SAME-ON-7-9-11])
-    7: { src: "assets/Audio/vo_tap_speaker_sentence_story.ogg", pulse: "#slideHost .sq-sentence-box" },  // page 9 (P1): लड़का पानी भर रहा है। ([P5-ALL-SENT-PAGES]; the story cue since [P5-SAME-ON-7-9-11])
-    9: { src: "assets/Audio/vo_tap_speaker_sentence_story.ogg", pulse: "#slideHost .sq-sentence-box" }   // page 11 (P3): बिल्ली सो रही है। ([P5-ALL-SENT-PAGES]; the story cue since [P5-SAME-ON-7-9-11])
+    // pages 5, 7, 9, 11 (G1, G3, P1, P3) spoke vo_tap_speaker_sentence_story here with their box's chip pulsing ([P5-SPK-CUE],
+    // [P5-ALL-SENT-PAGES], [P5-SAME-ON-7-9-11]) until [G1-G3-P1-P3-NO-MIC] (2026-10-07): the chip is gone, so the cue is too.
+    // The table is empty; wireSpkCue() below finds no cue and bows out (kept for the history)
+  };
+  // [G1-G3-P1-P3-NO-MIC] (2026-10-07) slide index -> true: a sentence-box question WITHOUT the mic chip - the chip element is removed
+  // at mount (wireNoMic), there is no cue, no read-aloud beat and no first hearing of the sentence (the engine's automatic request
+  // for it is still skipped, autoSentenceOff): the child reads the box and taps a picture. The bar itself stays un-tappable
+  // (.spk-only, as it always was) and the pictures take no tap (.spk-locked) only while the page's own line, the instruction
+  // वाक्य पढ़िए और सही चित्र चुनिए।, speaks. From there on everything runs as shipped: the wrong tap's wiggle + vo_try_again_read_sentence,
+  // the second wrong tap's hint (the sentence, its box words lit by the play() wrapper), the reveal, the correct tap's SFX + शाबाश
+  var NO_MIC_BY_SLIDE = {
+    3: true,                                                                             // page 5 (G1): बच्चे गेंद से खेल रहे हैं।
+    5: true,                                                                             // page 7 (G3): माँ अखबार पढ़ रही है।
+    7: true,                                                                             // page 9 (P1): लड़का पानी भर रहा है।
+    9: true                                                                              // page 11 (P3): बिल्ली सो रही है।
   };
   // [P5-TAP-ONLY] slide index -> true: the page's sentence (card audio.word_name) speaks ONLY on the speaker-chip tap; the engine's
   // automatic chain (autoPlayChain: prompt, then word_name) skips it (autoSentenceOff in the play() wrapper)
@@ -7672,9 +7707,13 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   // of [P2-CUE-IDLE] (wireIdlePrompt: any pointerdown restarts the count, a count that runs out while a line speaks starts over from
   // that line's end, leaving the page cancels it); nothing pulses with the line (the picture named below pops with it instead)
   var PROMPT_IDLE_BY_SLIDE = {
+    3: 7000,                                                                             // page 5 (G1): वाक्य पढ़िए और सही चित्र चुनिए। ([G1-G3-P1-P3-PROMPT-IDLE], 2026-10-07: 7 s; stops at the first option tap, see PROMPT_IDLE_STOP_ON_TAP_BY_SLIDE)
     4: 5000,                                                                             // page 6 (G2): इस चित्र के लिए सही वाक्य चुनिए।
+    5: 7000,                                                                             // page 7 (G3): वाक्य पढ़िए और सही चित्र चुनिए। ([G1-G3-P1-P3-PROMPT-IDLE])
     6: 5000,                                                                             // page 8 (G4): the same line ([P8-10-12-SAME-AS-P6-R2])
+    7: 7000,                                                                             // page 9 (P1): वाक्य पढ़िए और सही चित्र चुनिए। ([G1-G3-P1-P3-PROMPT-IDLE])
     8: 5000,                                                                             // page 10 (P2): the same line ([P8-10-12-SAME-AS-P6-R2])
+    9: 7000,                                                                             // page 11 (P3): वाक्य पढ़िए और सही चित्र चुनिए। ([G1-G3-P1-P3-PROMPT-IDLE])
    10: 5000                                                                              // page 12 (P4): the same line ([P8-10-12-SAME-AS-P6-R2])
   };
   // [P6-PROMPT-IDLE] rev 2 slide index -> the element that shows the small, silent pop-and-hold (.p6-pop, PROMPT_POP_MS long:
@@ -7686,6 +7725,25 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    10: "#slideHost .story-q-stim .story-q-thumb"                                        // page 12 (P4): the recall picture (the bird pecking grain) ([P8-10-12-SAME-AS-P6-R2])
   };
   var PROMPT_POP_MS = 3200;                                                              // = the length of the line (vo_prompt_pic_to_sent, 3.16 s)
+  // [G1-G3-P1-P3-PROMPT-IDLE] (2026-10-07) slide index -> true: on this page the idle repeat above ends FOR GOOD at the first tap on an
+  // option picture (wireIdlePrompt: a pointerdown on the option grid marks the .q-row __spkTapped - startCue / idleArm / idleFire bow
+  // out on it - and drops the count at once). Pages 6, 8, 10, 12 are not listed: there the repeat goes on as shipped
+  var PROMPT_IDLE_STOP_ON_TAP_BY_SLIDE = {
+    3: true,                                                                             // page 5 (G1)
+    5: true,                                                                             // page 7 (G3)
+    7: true,                                                                             // page 9 (P1)
+    9: true                                                                              // page 11 (P3)
+  };
+  // [G1-G3-P1-P3-PROMPT-IDLE] slide index -> true: while this page's instruction line (card audio.prompt) speaks - at the mount and on
+  // every idle repeat - the whole blue sentence box breathes (.q-box-pop, #G1-PROMPT-IDLE-CSS; boxPulse, hooked in the play() wrapper)
+  // and settles at the end of a breath once the line is over or cut
+  var BOX_PULSE_BY_SLIDE = {
+    3: true,                                                                             // page 5 (G1)
+    5: true,                                                                             // page 7 (G3)
+    7: true,                                                                             // page 9 (P1)
+    9: true                                                                              // page 11 (P3)
+  };
+  var BOX_PULSE_MAX_MS = 6000;                                                           // safety: the box settles by then even if the line never reports back (vo_prompt_sent_to_pic is 3.28 s)
   // [TRAIN-WORDS] slide index -> true: the sentence written in a coach lights up word by word while its line speaks (trainWordsFor)
   var TRAIN_WORDS_BY_SLIDE = {
    11: true,                                                                             // page 13 (P5): sentence pills -> coaches
@@ -7702,13 +7760,14 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   var navHideToken = 0;                                     // [P2-NAV-HIDE] the latest pill tap's pending आगे return (older ones are stale)
   var optWords = null;                                      // [P6-OPT-WORDS] audio id -> {els, times} of this page's option pills (null when none)
   var reviewing = false;                                    // [P6-REVIEW] a read-out of the option pills is running
+  var boxPulseEl = null, boxPulseA = null;                  // [G1-G3-P1-P3-PROMPT-IDLE] the sentence box breathing with the instruction right now, and the line's element (null when none)
   function cancel(){
     timers.forEach(function(t){ clearTimeout(t); }); timers = [];
     if(sfx){ try{ sfx.pause(); }catch(e){} sfx = null; }
     if(navTimer){ clearTimeout(navTimer); navTimer = null; }
     gateFrame = null; navRevealAt = 0;
     voFrame = null; voPlan = null; voCue = null; voIdx = -1; narrEl = null;
-    settleCue(true); idleCancel(); wordStop(); navHideToken++; optWords = null; reviewing = false; silentEl = null;
+    settleCue(true); idleCancel(); wordStop(); navHideToken++; optWords = null; reviewing = false; silentEl = null; boxPulseEl = null; boxPulseA = null;
   }
   // pop-and-hold el while src plays on its own player. onDone(popLeftMs), when given, fires once the SOUND is over (ended,
   // error, blocked, or a POP_MS + 3s safety) with the ms still left of the pop, so a caller can wait for both to finish.
@@ -8043,10 +8102,12 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     var ix = (typeof state === "object" && state) ? state.idx : -1;
     if(SENTENCE_TAP_ONLY_BY_SLIDE[ix] !== true || replayVia) return false;
     var box = document.querySelector("#slideHost .sq-sentence-box");           // [P5-WRONG-SENT] the chip has been tapped: the automatic chain is long over, so a later
-    if(box && (box.__spkTapped || box.__p2RecDone)) return false;              // request for the sentence (page 5's hint rung after the second wrong tap) is meant and speaks
-    var sl = (typeof CARD === "object" && CARD && CARD.slides) ? CARD.slides[ix] : null;
+    if(box && (box.__spkTapped || box.__p2RecDone || box.__autoOver)) return false;   // request for the sentence (page 5's hint rung after the second wrong tap) is meant and speaks
+    var sl = (typeof CARD === "object" && CARD && CARD.slides) ? CARD.slides[ix] : null;   // ([G1-G3-P1-P3-NO-MIC]: __autoOver - the chain's one request has been skipped already, so this is a later, meant one)
     var id = sl && sl.audio && sl.audio.word_name;
-    return !!id && String(src).split("/").pop() === srcOf(id).split("/").pop();
+    var off = !!id && String(src).split("/").pop() === srcOf(id).split("/").pop();
+    if(off && box) box.__autoOver = true;                                      // [G1-G3-P1-P3-NO-MIC] the automatic chain's request (the only one before any tap): skipped once, remembered
+    return off;
   }
   // [P5-BOX-WORDS] page 5: split the sentence box's text into words and map them to the page's sentence id for the play() wrapper
   function wireBoxWords(idx){
@@ -8204,6 +8265,51 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     // cue CUE_GAP_MS after they end
     whenQuiet(box, function(){ if(!box.__spkTapped) armCue(box, cue, 0); });
   }
+  // [G1-G3-P1-P3-NO-MIC] pages in NO_MIC_BY_SLIDE: the mic chip beside the sentence box is removed at mount (no cue, no beat, no
+  // first hearing: the chain's request for the sentence is skipped by autoSentenceOff as before); the bar stays un-tappable
+  // (.spk-only) and the pictures take no tap (.spk-locked) while the page's own line speaks - they unlock once nothing speaks any more
+  function wireNoMic(idx){
+    if(NO_MIC_BY_SLIDE[idx] !== true) return;
+    var box = document.querySelector("#slideHost .sq-sentence-box");
+    if(!box || box.__noMicWired) return;
+    box.__noMicWired = true;
+    var chip = box.querySelector(".tut-audio");
+    if(chip && chip.parentNode) chip.parentNode.removeChild(chip);              // no mic button on this page
+    box.classList.add("spk-only");                                             // the bar takes no tap (CSS #P5-SPK-CUE-CSS), as before
+    var grid = document.querySelector("#slideHost .opt-grid");
+    if(grid){
+      grid.classList.add("spk-locked");                                        // the pictures wait for the instruction to end ...
+      whenQuiet(box, function(){ grid.classList.remove("spk-locked"); });      // ... then they take the tap (the chain started inside mountSlide, so vo-playing is already on here)
+    }
+  }
+  // [G1-G3-P1-P3-PROMPT-IDLE] this play() is the instruction line (card audio.prompt) of a page in BOX_PULSE_BY_SLIDE: the sentence box
+  // to breathe with it, else null
+  function boxPulseFor(src){
+    var ix = (typeof state === "object" && state) ? state.idx : -1;
+    if(BOX_PULSE_BY_SLIDE[ix] !== true || !src) return null;
+    var sl = (typeof CARD === "object" && CARD && CARD.slides) ? CARD.slides[ix] : null;
+    var p = (sl && typeof audioFor === "function") ? audioFor(sl, "prompt") : null;
+    if(!p || String(src).split("/").pop() !== String(p).split("/").pop()) return null;
+    return document.querySelector("#slideHost .sq-sentence-box");
+  }
+  // the box breathes (.q-box-pop) while a (play()'s element for the line) speaks; it settles at the end of a breath when the line
+  // ends or is cut (pause: another line, an option tap's feedback), or by BOX_PULSE_MAX_MS at the latest
+  function boxPulse(box, a){
+    if(!box || stillMode()) return;
+    boxPulseEnd(true);
+    boxPulseEl = box; boxPulseA = a; box.classList.add("q-box-pop");
+    var fin = function(){ if(boxPulseEl === box && boxPulseA === a) boxPulseEnd(false); };   // this line's own end only: the previous line's element is paused by stopAudio as the next one starts, and that stale pause must not end the new pulse
+    if(a){ a.addEventListener("ended", fin, { once:true }); a.addEventListener("pause", fin, { once:true }); }
+    timers.push(setTimeout(fin, BOX_PULSE_MAX_MS));
+  }
+  function boxPulseEnd(now){
+    var el = boxPulseEl; boxPulseEl = null; boxPulseA = null;
+    if(!el) return;
+    if(now){ el.classList.remove("q-box-pop"); return; }
+    var done = false, fin = function(){ if(done) return; done = true; el.classList.remove("q-box-pop"); };
+    el.addEventListener("animationiteration", fin, { once:true });
+    setTimeout(fin, 900);
+  }
   // [P6-PROMPT-IDLE] pages in PROMPT_IDLE_BY_SLIDE: once the page's own lines are over, the instruction repeats after every
   // PROMPT_IDLE_BY_SLIDE ms of inactivity (idleFrame / idleCue / idleArm of [P2-CUE-IDLE]; the cue's pulse selector matches nothing;
   // rev 2: its pop selector, PROMPT_IDLE_POP_BY_SLIDE, names the element that pops with each repeat)
@@ -8214,6 +8320,10 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     var frame = document.querySelector("#slideHost .q-row"); if(!frame || frame.__idleWired) return;
     frame.__idleWired = true;
     var cue = { src: src, pulse: "#slideHost .p6-no-pulse", pop: PROMPT_IDLE_POP_BY_SLIDE[idx] || null };   // no element breathes with the line; the picture pops ([P6-PROMPT-IDLE] rev 2)
+    if(PROMPT_IDLE_STOP_ON_TAP_BY_SLIDE[idx] === true){                       // [G1-G3-P1-P3-PROMPT-IDLE] the first tap on an option picture ends the repeat for good
+      var grid = document.querySelector("#slideHost .opt-grid");               // (the document's own pointerdown listener has restarted the count just before; this drops it)
+      if(grid) grid.addEventListener("pointerdown", function(){ frame.__spkTapped = true; idleCancel(); }, true);
+    }
     whenQuiet(frame, function(){                                               // the page's own lines first: the count runs from their end
       if(!frame.isConnected || typeof state !== "object" || !state || state.idx !== idx) return;
       idleFrame = frame; idleCue = cue; idleMs = ms; idleArm();
@@ -8306,6 +8416,8 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
         return;
       }
       var r = origPlay.call(this, src, onEnd);
+      var bp = boxPulseFor(src);                                                // [G1-G3-P1-P3-PROMPT-IDLE] the instruction speaks (entry or repeat): the sentence box breathes with it
+      if(bp) boxPulse(bp, (typeof currentAudio !== "undefined") ? currentAudio : null);
       if(optWords && src){
         var id = String(src).split("/").pop().replace(/\.[A-Za-z0-9]+$/, "");
         var w = optWords[id];
@@ -8434,14 +8546,14 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     var r = orig.apply(this, arguments);
     var f = frameOf(idx);
     if(f) schedule(f, PLAN_BY_SLIDE[idx], AFTER_VO_BY_SLIDE[idx] === true, CUE_BY_SLIDE[idx] || null, idx);
-    wireBird(idx); wirePill(idx); wireReplay(idx); wireOptWords(idx); wireBoxWords(idx); wireSpkCue(idx); wireIdlePrompt(idx);
+    wireBird(idx); wirePill(idx); wireReplay(idx); wireOptWords(idx); wireBoxWords(idx); wireSpkCue(idx); wireNoMic(idx); wireIdlePrompt(idx);
     return r;
   };
   // a ?slide=N dev load mounts inside the engine script, before this block runs
   var cur = (typeof state === "object" && state) ? state.idx : -1;
   var now = frameOf(cur);
   if(now) schedule(now, PLAN_BY_SLIDE[cur], AFTER_VO_BY_SLIDE[cur] === true, CUE_BY_SLIDE[cur] || null, cur);
-  wireBird(cur); wirePill(cur); wireReplay(cur); wireOptWords(cur); wireBoxWords(cur); wireSpkCue(cur); wireIdlePrompt(cur);
+  wireBird(cur); wirePill(cur); wireReplay(cur); wireOptWords(cur); wireBoxWords(cur); wireSpkCue(cur); wireNoMic(cur); wireIdlePrompt(cur);
 })();
 </script>
 <script id="P5-CORRECT-SFX-JS">
@@ -8780,6 +8892,14 @@ body.vo-bg .sq-sentence-box .tut-audio.playing .wv1,body.vo-bg .sq-sentence-box 
 .stage.tut .tut-audio.p2-mic-locked{pointer-events:none !important;cursor:default;opacity:.45;
   filter:grayscale(1) drop-shadow(0 3px 6px rgba(0,0,0,.22));}
 .stage.tut .story-caption.p2-cue .tut-audio.p2-mic-locked{animation:none !important;}
+</style>
+<style id="G1-PROMPT-IDLE-CSS">
+/* [G1-G3-P1-P3-PROMPT-IDLE] (2026-10-07) pages 5, 7, 9, 11 (G1, G3, P1, P3; BOX_PULSE_BY_SLIDE in #P2-BIRD-POP-JS): while the
+   instruction line वाक्य पढ़िए और सही चित्र चुनिए। speaks - at the mount and on every 7 s idle repeat - the whole blue sentence box
+   breathes: a little pop out to 1.04 and back every 0.8 s (qBoxPop), settled at the end of a breath once the line is over or cut.
+   The box's press-down (:active translateY) is already off on these pages (.spk-only); nothing else on the page moves. */
+@keyframes qBoxPop{0%,100%{transform:scale(1);}50%{transform:scale(1.04);}}
+.sq-sentence-box.q-box-pop{animation:qBoxPop .8s ease-in-out infinite;transform-origin:50% 50%;will-change:transform;}
 </style>
 <style id="P5-SPK-CUE-CSS">
 /* [P5-SPK-CUE] (2026-09-24) page 5 (G1 = ?slide=3; pages 7, 9 and 11 too since [P5-ALL-SENT-PAGES]): after the page's background line (its instruction; the automatic sentence
