@@ -9600,5 +9600,18 @@ html.rotated body.station-page::before{inset:auto;left:50%;top:50%;width:100vh;h
     window.__celWarm = [A.shabaash.src, A.talk.src, A.idle.src].map(u => { const i = new Image(); i.src = u; if(i.decode) i.decode().catch(()=>{}); return i; }); } } catch(e){} }, 1500);
 })();
 </script>
+<style id="G1-P4-REVEAL-DISABLED-CSS">
+/* [G1-P4-REVEAL-DISABLED] (2026-10-08, user request) pages 5-12 (G1 = ?slide=3 ... P4 = ?slide=10, the eight question pages: the
+   picture options of pages 5, 7, 9 and 11 - .opt-grid.pic-opts - and the sentence pills of pages 6, 8, 10 and 12 - .opt-grid.sent-opts):
+   on the THIRD wrong tap the engine's reveal (revealAnswer, scaffold_rules.max_attempts = 3) still puts the pointing hand
+   (.reveal-hand) and the green guide-pulse (.opt-guided) on the right option, but the two wrong options are no longer BLURRED:
+   .opt-dim's 3px blur (the TOTA-DECK-LADDER rule) is replaced on these two grids by a DISABLED look - greyed (grayscale) at half
+   opacity, the look the lesson's own disabled mic chip wears (.p2-rec-done) - and they stay dead to taps exactly as before
+   (pointer-events:none here as in that rule, plus the TOTA-WRONG-LOCKOUT capture listener). The .3s fade of .opt-dim is kept.
+   Nothing else on these pages changes: the guided tap, its SFX hold, the ding and confetti ([P5-GUIDED-TAP]) and the
+   revealed-answer record are as shipped; the generic .opt-dim rule itself is untouched (no other page of this lesson uses it). */
+.opt-grid.pic-opts .opt-cell.opt-dim,
+.opt-grid.sent-opts .opt-cell.opt-dim{filter:grayscale(1) !important;opacity:.5 !important;pointer-events:none !important;cursor:default !important;}
+</style>
 </body>
 </html>
