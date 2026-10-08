@@ -9918,5 +9918,30 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
   width:140px !important;min-width:140px !important;max-width:140px !important;height:140px !important;bottom:2px !important;
   background-size:140px 140px !important;}
 </style>
+<style id="NO-RED-WRONG">
+/* [NO-RED-WRONG] (2026-10-08, user request) a WRONG option / a WRONG drop never turns red. Everything else of the wrong beat
+   stays exactly as it was - the tile's shake (the kit's wgNo on the tap pages, refShake on the drag pages), its timing, the
+   incorrect sound, the bird's "try again" mood, the feedback line, the .crossed hold while it speaks, the 2nd-tap read-out and
+   the 3rd-tap reveal (the hand, the greyed decoys); only the red colour is switched off. Where the red was in this lesson,
+   measured in Chrome before this change:
+   - pages 4-11 (G1-P4: bare pictures, .opt-grid.pic-opts, and sentence pills, .opt-grid.sent-opts): the kit's wrong-select
+     beat (M.wrongSelect.play -> .wg-wrong, then .wg-rel for the release) drew a 6px red outline on the picture / the pill
+     for ~0.85 s and a red ring (.wg-pulse) swelling out and fading over the first ~0.25 s. Both are drawn TRANSPARENT now:
+     the outline and the ring still exist and run, invisibly, so the beat's timing is untouched;
+   - pages 12-13 (P5-P6, the drag pages): a wrong drop's .ref-wrong = a 6px red outline on the pill / the picture while it
+     shakes for .65 s. The outline is transparent; the shake stays;
+   - the engine's generic option card (2px #EEF3FA border, white face; used by no page of this lesson) and the no-kit fallback
+     (.opt-redglow-1s / totaWrongPulse): the red border, the pink flood and the red glow are held at the card's resting values.
+   An !important declaration wins over a keyframe animation in the cascade, so this also silences picWrongPulse /
+   totaWrongPulse, which animate colours only. Not touched: the feedback popup's own text colour (.hint-text.wrong), and the
+   wrong states of mechanics this lesson does not have (.dd-zone, .seq-slot, .cdm-box, .tis-hot, .prompt-band.fb-wrong, the
+   sorting bins). */
+.opt-grid.pic-opts .opt-cell.wg-wrong,.opt-grid.pic-opts .opt-cell.wg-rel,.opt-grid.pic-opts .opt-cell.wg-out,.opt-grid.pic-opts .opt-cell.opt-redglow-1s,
+.opt-grid.sent-opts .opt-cell.wg-wrong .so-pill,.opt-grid.sent-opts .opt-cell.wg-rel .so-pill,.opt-grid.sent-opts .opt-cell.wg-out .so-pill,.opt-grid.sent-opts .opt-cell.opt-redglow-1s .so-pill{outline-color:transparent !important;}
+.wg-fx .wg-pulse{border-color:transparent !important;}
+.ref-opts .ref-opt.ref-wrong,.ref-pics .ref-pic.ref-wrong{outline-color:transparent !important;}
+.opt-cell.wg-wrong,.opt-cell.wg-rel,.opt-cell.wg-out,.opt-cell.opt-redglow,.opt-cell.opt-redglow-1s,.opt-cell.crossed.opt-redglow-1s,.opt-cell.wrong{
+  border-color:#EEF3FA !important;background:#fff !important;box-shadow:0 5px 14px rgba(11,61,140,.10) !important;}
+</style>
 </body>
 </html>
