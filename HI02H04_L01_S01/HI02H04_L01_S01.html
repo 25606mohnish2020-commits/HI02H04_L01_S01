@@ -1034,8 +1034,8 @@ body.loaded .sg-icon{animation-play-state:running;}
   <div class="end-subtitle" id="endSubtitle"></div>
   <img class="end-mascot" src="assets/UI/sw_lg_celebrating_anim.webp" alt="Swiftee"
        onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'end-mascot',textContent:'🎉'}))">
-  <!-- [END-FINISH-BTN] drawn by assets/UI/btn-finish-pill/-arrow.svg (see <style id="END-FINISH-BTN">); the text is the accessible name only -->
-  <button class="end-btn" id="endBtn">आगे बढ़ें →</button>
+  <!-- [END-FINISH-BTN] (2026-10-08) the reference's button, markup included: the arrow is drawn by #endBtn::after (see <style id="END-FINISH-BTN">), «आगे बढ़ें» is the accessible name only -->
+  <button class="end-btn" id="endBtn" aria-label="आगे बढ़ें"></button>
 </div>
 
 <!-- teacher/dev nav — bottom-left: skip current page, or jump to any page (hidden unless ?dev=1) -->
@@ -8890,26 +8890,36 @@ body.is-start #navBtn{display:none !important;}
 .stage.no-nav #navBtn{display:none !important;}
 </style>
 <style id="END-FINISH-BTN">
-/* [END-FINISH-BTN] (2026-09-24) Page 15 (the celebration screen): the आगे बढ़ें pill (#endBtn) is drawn by the user's finish-button
-   art (btn-finish.svg: yellow #FCB717 pill, white ring, navy arrow) instead of its text, in the SAME box at the SAME spot: the
-   button's own box is untouched (its now-transparent text and the --scale-d padding still size it: ~209x81 design px, e.g. 201x78
-   at --scale .96, centred 22 px under the mascot), it still pops in with .show exactly when it did (hintPop) and its tap still does
-   exactly what it did (eb.onclick in the celebration mount). The art is two layers on ::before/::after, as on the आगे button
-   ([NAV-NEXT-BTN]): the PILL (btn-finish-pill.svg, preserveAspectRatio none, redrawn at that 209x81 box so its ring and shadow come
-   out ~1:1) fills a canvas = the border box + the art's 14 px shadow margin all round (x --scale, like the button's own font and
-   padding on this unscaled full-bleed screen; insets count from the padding box, hence the extra 4.54 px border), and the ARROW
-   (btn-finish-arrow.svg) at its own 40x28 (x --scale) centred, never stretched. The pill's own fill, ring colour, shadows and text
-   colour are switched off (the art has its own shadow; the text is the accessible name only). The user's original btn-finish.svg is
-   kept beside the two layers unused. position:relative (was static) only anchors the two layers - in a flex row it lays out the same. */
-#endBtn{position:relative !important;background:transparent !important;border-color:transparent !important;box-shadow:none !important;
-  color:transparent !important;text-shadow:none !important;overflow:visible !important;}
-#endBtn:active{box-shadow:none !important;}
-#endBtn::before,#endBtn::after{content:"";position:absolute;pointer-events:none;
-  left:calc(-14px * var(--scale,1) - 4.54px);right:calc(-14px * var(--scale,1) - 4.54px);
-  top:calc(-14px * var(--scale,1) - 4.54px);bottom:calc(-14px * var(--scale,1) - 4.54px);
-  background-repeat:no-repeat;background-position:center;}
-#endBtn::before{background-image:url("assets/UI/btn-finish-pill.svg");background-size:100% 100%;}
-#endBtn::after{background-image:url("assets/UI/btn-finish-arrow.svg");background-size:calc(40px * var(--scale,1)) calc(28px * var(--scale,1));}
+/* [END-FINISH-BTN] Page 15 (the celebration screen): the finish button (#endBtn).
+   2026-10-08 (user request, github.com/CodeWithPiyush0/MTG204_L01_S01): THE BUTTON IS THAT LESSON'S CELEBRATION BUTTON, value for
+   value and in its place - the arrow-only pill of its .end-btn (itself HI02H11_L02_S02's): #FCB717, a 4.54 px white ring, radius
+   44.56, padding 14 x 44 around a 52 px «→» glyph (the content of ::after, Baloo 2, navy; so the pill is sized by the glyph + the
+   padding, ~143 x 94 design px), the 0 6px 6px black shadow with the inner highlight / shade, hintPop in, a 3 px press. The
+   markup is the reference's too (no text, «आगे बढ़ें» as the aria-label). Every length is x --scale because this end screen is
+   body-level and unscaled (the reference's sits inside its scaled 1333x750 stage); its position is the reference's as well:
+   22 design px under the 358 px mascot box (the .end-screen gap, scaled like the box - the last rule), the pair centred on the
+   screen. The tap does exactly what it did (eb.onclick in the celebration mount); the cel-wait / cel-ready states of
+   <style id="CEL-SWIFTIE-CSS"> apply unchanged.
+   History: from 2026-09-24 to 2026-10-08 this block drew the button with the user's finish-button art (btn-finish-pill.svg +
+   btn-finish-arrow.svg on ::before / ::after over a ~209x81 text-sized box); those files stay in assets/UI unused. */
+#endBtn{font-family:var(--font-hi);font-weight:800;color:var(--navy) !important;text-shadow:none !important;overflow:visible !important;
+  font-size:calc(28px * var(--scale,1)) !important;
+  background:#FCB717 !important;border:calc(4.54px * var(--scale,1)) solid #FFFFFF !important;
+  border-radius:calc(44.56px * var(--scale,1)) !important;
+  padding:calc(14px * var(--scale,1)) calc(44px * var(--scale,1)) !important;cursor:pointer;
+  box-shadow:0 calc(6px * var(--scale,1)) calc(6px * var(--scale,1)) rgba(0,0,0,.25),
+             inset calc(4.54px * var(--scale,1)) calc(9.09px * var(--scale,1)) calc(12.12px * var(--scale,1)) rgba(255,255,255,.25),
+             inset calc(-4.54px * var(--scale,1)) calc(-4.54px * var(--scale,1)) calc(13.63px * var(--scale,1)) rgba(116,60,0,.19) !important;}
+#endBtn:active{transform:translateY(calc(3px * var(--scale,1))) !important;
+  box-shadow:0 calc(3px * var(--scale,1)) calc(3px * var(--scale,1)) rgba(0,0,0,.25),
+             inset calc(4.54px * var(--scale,1)) calc(9.09px * var(--scale,1)) calc(12.12px * var(--scale,1)) rgba(255,255,255,.25),
+             inset calc(-4.54px * var(--scale,1)) calc(-4.54px * var(--scale,1)) calc(13.63px * var(--scale,1)) rgba(116,60,0,.19) !important;}
+/* the arrow: the reference's .end-btn::after glyph (the former ::before / ::after art layers are gone) */
+#endBtn::before{content:none !important;}
+#endBtn::after{content:"\2192" !important;position:static !important;inset:auto !important;background:none !important;
+  font-size:calc(52px * var(--scale,1));line-height:1;pointer-events:none;}
+/* the reference's 22 px between the mascot box and the button, scaled like the box itself */
+body > .end-screen{gap:calc(22px * var(--scale,1)) !important;}
 </style>
 <style id="SPK-STILL-BG-CSS">
 /* [SPK-STILL-BG] (2026-09-23) pages 2-5 (slides 0-3): the speaker chip beside the sentence (.tut-audio: in the tut frame on
