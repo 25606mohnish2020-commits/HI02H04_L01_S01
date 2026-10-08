@@ -7334,6 +7334,14 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    the page's recall picture giving its small silent pop-and-hold with each repeat). Already shared with page 6 before this: hide_nav, the
    quiet wrong pill, the read-out, the reveal with the pointing hand and the guided tap without शाबाश, the correct-tap SFX hold + the
    picture's pop (sfx_children / sfx_grazing / sfx_bird_feeder). The pages' pictures, sentences and answers are untouched.
+   [REVIEW-NO-IDLE-POP] (2026-10-08, user request) pages 6, 8, 10 and 12 (G2 = ?slide=4, G4 = ?slide=6, P2 = ?slide=8, P4 = ?slide=10):
+   while the [P6-REVIEW] read-out after the second wrong tap runs - the three pills spoken one by one - the recall picture must not pop
+   and nothing else may sound. The only thing that could: the [P6-PROMPT-IDLE] repeat (the instruction line + the picture's .p6-pop,
+   popWithCue), whose 5 s count read the REVIEW_GAP_MS silences between the read-out's lines as "nothing speaking", so it could arm in
+   one gap and fire in another, or right after the read-out (seen: 1.9 s after it). Now idleArm and idleFire treat the running read-out
+   (`reviewing`, gaps included) exactly as a speaking line: no cue while it runs, and the count starts over from its end, as the
+   [P6-PROMPT-IDLE] note always said it should. The read-out itself (pill lift, words lit, REVIEW_GAP_MS), the first wrong tap's
+   line, the reveal, the correct tap's SFX + pop and the idle repeat outside the read-out are untouched; the other pages do not change.
    [P5-SAME-ON-7-9-11] (2026-10-01) pages 7, 9 and 11 (G3 = ?slide=5, P1 = ?slide=7, P3 = ?slide=9: the other three sentence-box
    questions) now carry page 5's whole interaction, by table and card data only, each with its own sentence clip and correct-tap SFX:
    REC_BY_SLIDE ([P5-READ-ALOUD]: the first mic-chip tap starts the 12 s read-aloud beat - the mic dissolves into the wave, the box's
@@ -7947,6 +7955,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     if(idleTimer){ clearTimeout(idleTimer); idleTimer = null; }
     if(!idleFrame.isConnected){ idleCancel(); return; }
     if(navShowing() || idleFrame.__spkTapped){ idleCancel(); return; }                             // [P2-QUIET-AFTER-NAV] / [P5-SPK-CUE]
+    if(reviewing){ timers.push(setTimeout(idleArm, 250)); return; }                                 // [REVIEW-NO-IDLE-POP] the read-out runs (its gaps included): count from ITS end
     if(document.body.classList.contains("vo-playing")){ whenQuiet(idleFrame, idleArm); return; }   // a line speaks: count from its end
     idleTimer = setTimeout(idleFire, idleMs);
   }
@@ -7955,6 +7964,7 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     if(!idleFrame || !idleFrame.isConnected){ idleCancel(); return; }
     if(navShowing() || idleFrame.__spkTapped){ idleCancel(); return; }                             // [P2-QUIET-AFTER-NAV] / [P5-SPK-CUE]
     if(document.body.classList.contains("vo-playing")){ idleArm(); return; }
+    if(reviewing){ idleArm(); return; }                                                              // [REVIEW-NO-IDLE-POP] the count ran out inside the read-out: no cue now, over from its end
     startCue(idleFrame, idleCue, true);
   }
   document.addEventListener("pointerdown", function(){ if(idleFrame && idleFrame.isConnected) idleArm(); }, true);   // any tap restarts the count
