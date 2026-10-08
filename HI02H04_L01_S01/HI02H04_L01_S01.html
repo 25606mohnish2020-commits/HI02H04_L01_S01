@@ -9793,5 +9793,50 @@ html.no-anim .phase-gate.pg-ref #phaseGateImg,html.no-anim .phase-gate.pg-ref .p
   };
 })();
 </script>
+<style id="CONFETTI-REF-CSS">
+/* [CONFETTI-REF] (2026-10-08, user request) the correct-answer confetti is the one of the reference lesson MTG2A04_L02_S01
+   (Downloads\MTG2A04_L02_S01: its app.js confettiCannon + style.css [13] + index.html #fxLayer), ported value for value. Both
+   lessons already draw the FLN animation kit's recipe 7 (the same .fx-confetti pieces, keyframes and VIBGYOR pairs - the kit
+   blocks are byte-identical here and there); what the reference changed, and what changes here:
+   - WHERE IT FALLS: over the WHOLE window, in a body-level fixed layer (.fx-layer#fxLayer, z-index 5000; made by the script
+     below) - the letterbox beside the stage included - instead of inside .stage-inner, where it was clipped to the stage;
+   - HOW MANY: 100 pieces (the kit's 80 across the wider field);
+   - HOW BIG: every piece 1.5x the kit's size (--fx-size, same shapes and aspect ratios), sized with the stage (--scale, set on
+     <html> by the engine) so it looks the same next to the game at any window size;
+   - HOW FAST: the fall option [1.6, 2.6] s (the kit's [1.1, 1.8] made ~40% slower, before the depth divisor): pieces cross the
+     window in ~1.4-3.5 s, the burst clears in ~3.8 s;
+   - WHEN: on every correct answer, no phase gating (phases: []).
+   Measured on the reference in Chrome at 1333x750: 100 pieces, 17.8px stars, spread -24..1314px, clear at ~3.3-3.8 s.
+   Everything that CALLS confettiCannon is untouched (the tap-option pages, the train pages' last drop, the shared
+   celebrateThenAdvance), as are its sound ([STD-SFX] sfx_std_confetti.ogg at 0.45, played inside the burst - the reference plays
+   the same file at the same level), afterConfetti's wait for the pieces to land, the celebration page's star burst (not a
+   correct-answer confetti) and its no-confetti rule (body.is-end .fx-confetti is hidden wherever it falls). */
+.fx-layer{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:5000;--fx-size:1.5;}
+.fx-layer .fx-confetti .f{width:calc(var(--w) * var(--z) * var(--scale, 1) * var(--fx-size, 1));
+  height:calc(var(--h) * var(--z) * var(--scale, 1) * var(--fx-size, 1));}
+</style>
+<script id="CONFETTI-REF-JS">
+/* [CONFETTI-REF] (2026-10-08, user request) see <style id="CONFETTI-REF-CSS"> above. The kit's confetti-wire re-pointed the
+   engine's confettiCannon at M.confetti.burst({ phase }) - the kit defaults: inside .stage-inner, 80 pieces, kit size, fall
+   [1.1, 1.8], guided/practice/mastery only. Re-pointed once more here, at the reference's call: the body-level #fxLayer (made
+   here, once; re-made if it is ever missing), 100 pieces, fall [1.6, 2.6], no phase gate. The burst itself (shapes, colours,
+   flutter / tumble, lifetime, its sound) is the kit's, as before. */
+(function(){ "use strict";
+  var M = window.FLNMotion; if(!M || !M.confetti) return;
+  function layer(){
+    var l = document.getElementById("fxLayer");
+    if(!l){ l = document.createElement("div"); l.className = "fx-layer"; l.id = "fxLayer"; l.setAttribute("aria-hidden", "true"); document.body.appendChild(l); }
+    return l;
+  }
+  layer();
+  window.confettiCannon = function(){
+    M.guard(function(){
+      var sl = (typeof CARD !== "undefined" && typeof state !== "undefined" && CARD.slides) ? CARD.slides[state.idx] : null;
+      layer();
+      M.confetti.burst({ host: "#fxLayer", phase: sl ? sl.phase : undefined, phases: [], count: 100, fall: [1.6, 2.6] });
+    });
+  };
+})();
+</script>
 </body>
 </html>
