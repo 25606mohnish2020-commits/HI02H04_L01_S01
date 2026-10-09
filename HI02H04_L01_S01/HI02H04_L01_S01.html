@@ -8651,7 +8651,17 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    with state.locked still true (so cell.onclick's correct branch stays out and onGuidedTap runs exactly as shipped) and
    the ding + confetti are fired alongside it. The slide is still recorded as a revealed answer (completeSlide(false)).
    On page 5 the शाबाश line of that guided tap (vo_ok_pic) is skipped since [P5-NO-OK-AFTER-REVEAL] (2026-09-24, #P2-BIRD-POP-JS
-   play() wrapper); the advance still follows 700 ms after the hand-over. */
+   play() wrapper); the advance still follows 700 ms after the hand-over.
+   [G1-P4-REVEAL-QUIET] (2026-10-09, user request) pages 5-12 (G1 = ?slide=3 ... P4 = ?slide=10, the eight question pages = every
+   page in CORRECT_SFX_BY_SLIDE): the guided tap is no longer handed over to revealAnswer's onGuidedTap at all. After the hold
+   (the page SFX, and the pop where one is listed) the tap ends the page by itself: the ding (sfx_std_correct) and the confetti
+   with its own sound (confettiCannon -> M.confetti.burst, sfx_std_confetti), the green mark already on the answer, the header
+   bird back to its resting face, and completeSlide(false) 700 ms later - which waits for the confetti to land and then mounts
+   the next page (or the phase gate) on its own. Nothing else plays or moves after the tap: no kit correct-select, no happy
+   bird, no word line (the sentence pills' own clip), no शाबाश line, no idle repeat of the instruction ([P6-PROMPT-IDLE] is
+   stopped for good through its own __spkTapped flag on the page's .q-row), and no hand-over to the engine's correct branch. The
+   wrong taps, the reveal itself (hand, guide-pulse, disabled decoys, [GUIDED-EASY-TAP]) and the first-try correct tap are as
+   shipped; the revealed answer is still recorded as before (answer_revealed at the reveal, slide_completed success:false). */
 (function(){ "use strict";
   var VOL = 0.7, POP_MS = 2000;
   // slide index -> {src, hold_ms, pop?, vol?} (the user counts pages from the landing page: ?slide=N is page N+2); vol defaults to VOL
@@ -8714,11 +8724,17 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     timer = setTimeout(function(){
       timer = null; holding = false;
       if(!cell.isConnected || state.idx !== idx) return;                     // the page was left during the hold
+      if(guided){                                                             // [G1-P4-REVEAL-QUIET] (2026-10-09, user request): the guided tap ends the page with the ding + confetti alone
+        try{ setSwMood("talk"); }catch(x){}                                   // the header bird back to its resting face (no happy animation)
+        var fr = document.querySelector("#slideHost .q-row"); if(fr) fr.__spkTapped = true;   // [P6-PROMPT-IDLE]'s repeat of the instruction ends here for good (its own stop flag, the one [G1-G3-P1-P3-PROMPT-IDLE] sets on the pictures' first tap), so no line comes while the confetti falls
+        try{ sfxCorrect(); }catch(x){} try{ confettiCannon(); }catch(x){}    // the ding, and the confetti with its own sound (M.confetti.burst plays sfx_std_confetti)
+        setTimeout(function(){ if(cell.isConnected && state.idx === idx) completeSlide(false); }, 700);   // the revealed-answer record as before; completeSlide waits for the confetti to land, then the next page comes by itself
+        return;                                                               // no hand-over to revealAnswer's onGuidedTap: no kit correct-select, no word line, no शाबाश line, nothing else on the page
+      }
       cell.classList.remove("correct");                                       // hand the tap over exactly as it arrived
-      if(!guided) state.locked = false;                                       // guided: locked stays true, so cell.onclick bows out and revealAnswer's onGuidedTap takes the tap
+      state.locked = false;
       passthrough = true;
       try{ cell.click(); } finally { passthrough = false; }
-      if(guided){ try{ sfxCorrect(); }catch(x){} try{ confettiCannon(); }catch(x){} }   // the ding + confetti of the normal correct branch; onGuidedTap already plays kit correct-select, happy mascot, the word VO, then completeSlide
     }, cfg.hold_ms);
   }, true);
   // leaving the page during the hold: stop the sound and drop the pending tap
