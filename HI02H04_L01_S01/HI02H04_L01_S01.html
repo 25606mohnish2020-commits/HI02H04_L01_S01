@@ -8919,6 +8919,25 @@ body.is-start #navBtn{display:none !important;}
    page shows the disabled art any more; the story pages 2-4 and the train pages 13-14 are as they were. */
 .stage.no-nav #navBtn{display:none !important;}
 </style>
+<style id="NAV-PULSE">
+/* [NAV-PULSE] (2026-10-09, user request): the moment आगे is ENABLED it pulsates like the sentence speaker chip does after it
+   becomes tappable ([SPK-ONLY-CUE] spkCuePulse: scale 1 -> 1.10 -> 1, .8 s ease-in-out, repeating, origin centre) - the same
+   keyframes, timing and amplitude, on every page where the button exists (story pages 2-4 once आगे appears, train pages 13-14 once
+   the train has left; the pick pages never enable it). "Enabled" is #navBtn.active, which setNavActive(true) sets at the same
+   instant it clears `disabled` (the kit's reveal hold and the pages' first-tap rule still decide WHEN that happens - untouched).
+   The pulse runs on the ENABLED art layer (#navBtn::after = btn-next-pill + arrow, which already covers the pill and its shadow
+   margin), not on the button box: the box keeps its translateX(-50%) centring and its hover lift / press transforms exactly as
+   before (a `scale` on the box would also scale that translate and the pill would drift sideways on every beat), the disabled
+   art (::before) never moves, and the hit area is unchanged. The 4.5 s hand nudge (nudgeNavBtn) is left as it is; on pages 2-4
+   [P2-QUIET-AFTER-NAV] still suppresses that hand - this pulse is the one repeating motion the user asked for there. Still mode
+   (html.no-anim, prefers-reduced-motion) stops it like the chip's. If 1.10 reads too big on the 190 px pill, 1.06 is the one
+   number to change below. */
+@keyframes navCuePulse{0%,100%{scale:1;}50%{scale:1.10;}}
+#navBtn.active::after{animation:navCuePulse .8s ease-in-out infinite;transform-origin:50% 50%;will-change:scale;}
+#navBtn:not(.active)::after{animation:none;scale:1;}
+@media (prefers-reduced-motion:reduce){ #navBtn.active::after{animation:none;scale:1;} }
+html.no-anim #navBtn.active::after{animation:none !important;scale:1;}
+</style>
 <style id="END-FINISH-BTN">
 /* [END-FINISH-BTN] Page 15 (the celebration screen): the finish button (#endBtn).
    2026-10-08 (user request, github.com/CodeWithPiyush0/MTG204_L01_S01): THE BUTTON IS THAT LESSON'S CELEBRATION BUTTON, value for

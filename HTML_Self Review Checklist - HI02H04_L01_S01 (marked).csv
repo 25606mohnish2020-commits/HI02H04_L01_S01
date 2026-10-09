@@ -27,7 +27,7 @@ Teaching Screens,"चलिए, शुरू करते हैं| and the Fol
 ,"On-screen text appears only when Swiftee says ""चलिए, शुरू करते हैं|""",FALSE,⚠,"Timing ✓: the headline wipes in at 3.66 s, exactly when the line reaches its last phrase. Wording ✗: the phrase is “चलिए, शुरू करें!” (see row 21).",Fixed by row 21.
 ,The standard Next button enabled is used across screens to transition unless the transition is automatic. ,TRUE,✓,assets/UI/btn-next-pill.svg + btn-next-arrow.svg are the standard btn-next.svg (198×90) split into pill and arrow layers; the disabled pair likewise.,
 ,The Next button disabled is used till the VO and CTA for a screen is complete. ,TRUE,✓,आगे is disabled until the narration ends; pages with a sentence pill also wait for the first pill tap (P2-NAV-AFTER-TAP).,
-,The Next button pulsates immediately after the VO and the CTA for a screen is complete. ,FALSE,✗,"No pulse on आगे when it becomes active; a hand taps it after 4.5 s of inactivity (nudgeNavBtn, line 1390).",Add a pulse class on setNavActive(true) (e.g. the sgBtnPulse keyframes on .nav-btn.active) and keep the hand as the 7 s idle nudge.
+,The Next button pulsates immediately after the VO and the CTA for a screen is complete. ,TRUE,✓,"Since 2026-10-09 the enabled आगे pulses the moment it is enabled ([NAV-PULSE]: the sentence chip’s cue keyframes, scale 1 → 1.10, 0.8 s, on the enabled art layer); the hand nudge still follows after 4.5 s of inactivity.",
 ,,,,,
 Guided Practice,"चलिए, साथ मे करें| and the  Following Screens",TRUE,✓,"Guided gate headline “चलिए, साथ में करें!” with vo_pt_guided.",
 ,Standard Swiftee transition animation plays immediately to begin the guided practice section. ,FALSE,✗,"Same as row 22: the reference bird, not the standard transition.",Same fix as row 22 (one setting covers all three gates).
@@ -65,4 +65,4 @@ End Screen,The standard Swiftee end animation is used.,TRUE,✓,"The celebration
 
 बहुत बढ़िया, दोस्त! तुमने कमाल कर दिया! 
 अरे वाह, दोस्त! तुम तो छा गए! 
-शाबाश! आज तो कमाल कर दिया!",FALSE,✗,vo_well_done says “शाबाश! आपने चित्रों और वाक्यों को मिलाना सीख लिया!” — not one of the three standard lines.,"Re-record with one of the three (e.g. “शाबाश! आज तो कमाल कर दिया!”). Note: the other two use तुम forms, which conflicts with the आप ruling; prefer the third."
+शाबाश! आज तो कमाल कर दिया!",TRUE,✓,"Since 2026-10-09 the closing line is MTG2A04_L01_S01’s own vo_cel_prompt: “बहुत बढ़िया, दोस्त! तुमने कमाल कर दिया!” (2.94 s), applied under the vo_well_done id with that card’s lip-sync frames.",The line is −2.5 dB louder than this lesson’s other clips (−15.8 vs ≈−18 LUFS); level-match if the reviewer hears the jump.
