@@ -1,0 +1,68 @@
+﻿Section,Item,Checkbox (TRUE = matches),Result,What HI02H04_L01_S01 does,To match the checklist
+,,,,,
+,The user should see a loading screen before a title screen. ,TRUE,✓,"A solid boot loader holds 2 s before the title card (auto-dismiss, r4 rule).",
+Title Screen,The standard Play button is used with size 140 × 140 px,TRUE,✓,"140×140 box (style LANDING-PLAY-BTN, line 9934); the art is byte-identical to “Standard play button.svg”.",
+,"On the title screen, the Play button appears only when the VO is complete.",TRUE,✓,"#sgBtn is display:none until .ready, which is added when vo_landing ends (LANDING-START-AFTER-VO).",
+,The Play button is placed at the bottom centre of the screen.,TRUE,✓,"left:50% / translateX(-50%), bottom:2px of the card.",
+,The Play button is clearly visible against the background. ,TRUE,✓,Gold disc on the white card; the waiting state is the grey standard disc.,
+,Standard Swiftee is placed on the left with the standard speaker button on the bottom with the button's size 70 px.,TRUE,✓,Swiftee bottom-left of the card; speaker chip at her hip is 70×70 (line 9876).,
+,Swiftee's VO plays as soon as the title screen loads. ,TRUE,✓,playLanding() fires as soon as the loader clears (2 s). Note: a file opened from disk needs the autoplay launcher; in the app it plays on its own.,
+,"The VO should at least have the following:
+-Swiftee saying ""नमस्ते दोस्त!""
+-Introduction to the Title
+-should be of no more than 10 seconds.",TRUE,✓,vo_landing: “नमस्ते दोस्त! मैं हूँ स्विफ्टी! आज हम सीखेंगे—चित्रों को उनके सही वाक्यों से मिलाना।” — 6.9 s.,
+,"The speaker button remains disabled when the VO is spoken. Once the VO is complete, it will be enabled again. The button when disabled will be shown in a slightly greyish tone. ",TRUE,✓,"body.vo-playing .sg-vo → pointer-events:none, opacity .5, grayscale (line 9877); re-enabled when the line ends.",
+,The Play button pulsates on the title screen immediately after the VO is complete.,TRUE,✓,"Pop-in (0.52 s) at the end of the VO, then .sg-breathe = sgBtnPulse scale 1.04, 1.4 s loop (line 8842).",
+,"When the Play button is pulsating, nothing else should move on the screen except the subtle background elements. ",TRUE,✓,Landing Swiftee plays once and is still by then; chip waves stop with the VO; the old bird cue is removed; only the sky deco remains.,
+,The standard Play button SFX is used when the user clicks on the button.,TRUE,✓,"stdSfx(""play"") on the start tap (sfx_std_play.wav).",
+,,,,,
+General,The entire experience has one of the standard background music tracks. ,TRUE,✓,"bgm_standard_2.wav — the same 4:00 cut as “Standard Background Music 2”, ducked under every voice line.",Ships as a 46 MB WAV; consider Ogg/MP3 (see audit PDF item 6).
+,The background music plays after the play button is tapped. ,TRUE,✓,"The bed starts when slide 0 mounts (BGM-DUCK: FIRST=0), i.e. after the play tap and the transition; silent on the title.",
+,There should be some nudges for inactivity in the entire experience. ,TRUE,✓,Question pages: idle hand on the stimulus; tutorial pages: the speaker cue repeats; train page: the glide demo repeats; आगे: a tapping hand. None on the title or end screen.,
+,Inactivity nudges are activated after 7 seconds. ,FALSE,✗,Question pages fire at 5 s (scaffold_rules.nudge_timeout_ms.guided = 5000); train demo repeats every 5 s; आगे hand at 4.5 s; tutorial cue = the beat length (≈7 s on page 4).,"Set nudge_timeout_ms.guided to 7000, auto_drag.repeat_ms to 7000 on P5, and the आगे nudge timer (line 1390) to 7000."
+,The standard hand nudge is used wherever a hand nudge is added in the entire file.,TRUE,✓,nudge_hand_new.svg + nudge_fx rings/sparks — byte-identical to the kit hand in MTG2A04_L02_S01.,
+,,,,,
+Teaching Screens,"चलिए, शुरू करते हैं| and the Following Screens",FALSE,✗,"The tutorial gate says “चलिए, शुरू करें!” (headline PHASE_GATE_TITLE.tutorial, line 4670, and the end of vo_pt_tutorial), not “चलिए, शुरू करते हैं”.","Change the headline to “चलिए, शुरू करते हैं!” and re-record the end of vo_pt_tutorial to match (keep GATE_CAPTION_AT_MS.tutorial in sync)."
+,Standard Swiftee transition animation plays immediately after the play button is tapped.,FALSE,✗,"The gate opens immediately on the tap ✓, but it shows the reference lesson's peeking bird (peeking_talk_up.webp, GATE-REF-ANIM 2026-10-08); the standard Swiftee transition cut (swiftee_transition.webp) ships but is never shown.",Point GATE_REF_SRC (line 9730) back to assets/UI/swiftee_transition.webp and delete peeking_talk_up.webp.
+,"On-screen text appears only when Swiftee says ""चलिए, शुरू करते हैं|""",FALSE,⚠,"Timing ✓: the headline wipes in at 3.66 s, exactly when the line reaches its last phrase. Wording ✗: the phrase is “चलिए, शुरू करें!” (see row 21).",Fixed by row 21.
+,The standard Next button enabled is used across screens to transition unless the transition is automatic. ,TRUE,✓,assets/UI/btn-next-pill.svg + btn-next-arrow.svg are the standard btn-next.svg (198×90) split into pill and arrow layers; the disabled pair likewise.,
+,The Next button disabled is used till the VO and CTA for a screen is complete. ,TRUE,✓,आगे is disabled until the narration ends; pages with a sentence pill also wait for the first pill tap (P2-NAV-AFTER-TAP).,
+,The Next button pulsates immediately after the VO and the CTA for a screen is complete. ,FALSE,✗,"No pulse on आगे when it becomes active; a hand taps it after 4.5 s of inactivity (nudgeNavBtn, line 1390).",Add a pulse class on setNavActive(true) (e.g. the sgBtnPulse keyframes on .nav-btn.active) and keep the hand as the 7 s idle nudge.
+,,,,,
+Guided Practice,"चलिए, साथ मे करें| and the  Following Screens",TRUE,✓,"Guided gate headline “चलिए, साथ में करें!” with vo_pt_guided.",
+,Standard Swiftee transition animation plays immediately to begin the guided practice section. ,FALSE,✗,"Same as row 22: the reference bird, not the standard transition.",Same fix as row 22 (one setting covers all three gates).
+,"On-screen text appears only when Swiftee says ""चलिए, साथ मे करें|""",TRUE,✓,"Headline wipes in at 3.94 s, when the line says “चलिए, साथ में करें!”.",
+,The standard Next button enabled is used across screens to transition unless the transition is automatic. ,TRUE,✓,Guided pages judge on tap and advance automatically after the correct answer; no Next button is needed.,
+,The next two pointers apply only if you're using a next button in the guided pratice section:,,,,
+,The Next button disabled is used unless the VO and CTA for a screen is complete. ,FALSE,N/A,No Next button in the guided section (auto-advance).,
+,The Next button pulsates after the VO and the CTA for a screen is complete. ,FALSE,N/A,No Next button in the guided section (auto-advance).,
+,The standard correct feedback SFX is used.,TRUE,✓,sfxCorrect() → sfx_std_correct.wav on every correct answer and every correct train drop.,
+,The standard incorrect feedback SFX is used.,TRUE,✓,sfxWrongSoft() → sfx_std_incorrect.wav on every wrong tap and wrong drop.,
+,The standard confetti animation is used for correct feedback.,TRUE,✓,"The FLN animation kit's confetti burst (M.confetti.burst, top-fall, 80 pieces) on every correct answer.",
+,The standard confetti SFX is used for correct feedback.,TRUE,✓,The burst plays sfx_std_confetti.wav from inside the kit's burst.,
+,Incorrect responses should trigger a wiggle. ,TRUE,✓,"Wrong tap runs the kit's wrong beat wgNo (a side-to-side wiggle, line 6206) on the tapped card; train wrong drops shake and ease back.",
+,The visual feedback for an incorrect response should never be in red colour. ,TRUE,✓,"The final rule for wrong cells (line 9959) is border #EEF3FA, white fill, transparent outline — the engine's red border and the TOTA red flash are overridden.",
+,Guided practice section should have some support from the first incorrect attempt itself.,TRUE,✓,Layer 1 fires on the first wrong tap: “वाक्य फिर से पढ़िए और उससे मिलते हुए चित्र पर टैप करिए।” / “चित्र को ध्यान से देखिए और उससे मिलते हुए वाक्य पर टैप करिए।”.,
+,There are 3 layers of feedback for incorrect responses.,TRUE,✓,Three layers: re-listen (try_again) → hint → reveal at the third wrong tap (scaffold_rules.max_attempts 3).,
+,"The first incorrect response triggers clarification, repeats the prompt, or brings focus to the specific thing the child needs to do.",TRUE,✓,The first wrong tap repeats the task and points the child back to the sentence or the picture.,
+,"The second incorrect response gives a strong hint that provides explicit support to arrive at the answer. 
+For example, In Hindi, this could be support with reading the options via VO. In Math, this could be a direct hint explaining the procedure of arriving at the answer.",FALSE,⚠,"Sentence→picture pages: the hint re-reads the sentence with word highlight ✓. Picture→sentence pages (G2, G4, P2, P4) have no hint line, so layer 2 only repeats the layer-1 line; the options are not read out.",Author a hint for the picture→sentence pages that reads the three option sentences aloud (their clips vo_sent_* already exist).
+,"The third incorrect response nudges the child towards the correct answer through a hand nudge, glow, or another relevant visual cue.",TRUE,✓,"Third wrong tap: decoys blur and go dead, the answer gets a green pulse and the pointing hand (capture in the audit PDF, item 1). The reveal line vo_reveal has no file, so this step is silent.",Record vo_reveal (“यह सही जोड़ा है।”).
+,Incorrect responses can be locked/disabled/made unclickable in the third feedback layer.,TRUE,✓,Decoys are pointer-events:none and blurred in the reveal state; state.locked holds until the child taps the answer.,
+,Questions progress from lower to higher rigour. ,FALSE,⚠,G1–G4 and P1–P4 are the same two item types at the same difficulty (3 options each); the step up in rigour is the train pages (3 pairs to match). Within the eight question pages the rigour is flat.,"If a progression is required inside the guided set, order the items by sentence length / distractor closeness."
+,Questions of the same type are grouped together.,FALSE,✗,"The two types alternate: sentence→picture (G1, G3, P1, P3) and picture→sentence (G2, G4, P2, P4).","Reorder to G1, G3, P1, P3 then G2, G4, P2, P4 (and re-label), or record the alternation as a deliberate design choice."
+,,,,,
+Independent Practice,अब आपकी बारी | and the  Following Screens,TRUE,✓,Practice gate headline “अब आपकी बारी!” with vo_pt_practice (“वाह! अब आपकी बारी।”).,
+,Independent practice has system-level or game-level nudges as feedback. ,TRUE,✓,"Wrong drop: the pill shakes, plays the incorrect SFX and eases back; correct drop: chime + cream strip; P5 demonstrates the first drag and repeats it every 5 s of inactivity.",
+,Independent practice is conducted through a game or a gamified activity. ,TRUE,✓,"A train game: drag each sentence pill to its cargo coach (P5), then each picture to its sentence coach (P6); the train departs when all are placed.",
+,The background music matches the game environment.,TRUE,✓,"The one standard bed runs through the game at the same level, with the train whistle, chuffing and departure SFX layered on it.",
+,The game has positive/encouraging SFX added for every interaction/nudge/click. ,TRUE,✓,"Chime on every correct drop, incorrect SFX on a wrong drop, whistle on arrival, steam-engine sound on departure; pills speak their sentence on tap. The idle glide demo itself is silent.",
+,"The game background feels like an environment, not a plain screen.",FALSE,⚠,"The page is a plain light stage with a full-width rail and the train (Figma frame 295-26, requested 2026-10-07); the earlier station backdrop was removed. It reads as a minimal scene rather than an environment.","If the checklist wants an environment, bring back a light station/landscape layer behind the rail (keep the cream pills readable)."
+,"The game background is minimal. It should not have too many elements, or a colour on which the elements on top are not visible. ",TRUE,✓,"Light background, three pills and the train; everything on top stays readable.",
+,,,,,
+End Screen,The standard Swiftee end animation is used.,TRUE,✓,"The celebration screen carries the standard three-sheet lip-synced Swiftie (cel_idle / cel_talk / cel_shabaash) ported from MTG2A04_L01_S01 on 2026-10-08, with the star burst and the arrow button.",sw_lg_celebrating_anim.webp is still in the markup but hidden; drop it from the bundle.
+,"One of the three standard Swiftee end-screen dialogues is used in the VO:
+
+बहुत बढ़िया, दोस्त! तुमने कमाल कर दिया! 
+अरे वाह, दोस्त! तुम तो छा गए! 
+शाबाश! आज तो कमाल कर दिया!",FALSE,✗,vo_well_done says “शाबाश! आपने चित्रों और वाक्यों को मिलाना सीख लिया!” — not one of the three standard lines.,"Re-record with one of the three (e.g. “शाबाश! आज तो कमाल कर दिया!”). Note: the other two use तुम forms, which conflicts with the आप ruling; prefer the third."
