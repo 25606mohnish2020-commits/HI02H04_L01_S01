@@ -5740,8 +5740,14 @@ body.gating .start-gate{
 /* landing: this lesson has ONE hero picture (card.landing_hero) with its sentence under it — the story-slide
    caption pill (.story-caption) verbatim. Stack = title → 2:1 picture (220px tall) → caption, above the start
    button; the card grows from the reference's 456px to 560px so the stack keeps the reference's top/bottom air */
-.start-gate .sg-card{height:560px;}
-.start-gate .sg-content{margin-bottom:126px;gap:14px;}
+/* [LANDING-FRAME-ART] (2026-10-13, user request): the title card is the Figma frame "start_activity_html_layout"
+   (FLN by MJ, node 373-43) rendered as ONE picture - assets/UI/start_card_art.webp, 1114x456: the white rounded card
+   with the park scene, the cloud title sticker and the girl with the ball painted in, exactly as the design places them.
+   It replaces the stack above (title text -> hero picture -> caption pill), which is HIDDEN, not removed: the engine
+   still fills #sgTitle / #sgHero / #sgCaption and nothing else changes. The bird, the speaker chip, the play button and
+   every VO are untouched; the card is back at the fleet's 1114x456 (the 560px stretch only existed for that stack). */
+.start-gate .sg-card{height:456px;background-image:url("assets/UI/start_card_art.webp");}
+.start-gate .sg-content{display:none;}
 .start-gate .sg-sub:empty{display:none;}
 .start-gate .sg-icons{margin-top:0;}
 .start-gate .sg-icon img{height:220px !important;width:auto !important;object-fit:contain !important;
@@ -6404,8 +6410,9 @@ body.is-start{background-image:url("assets/UI/startnew_bg_plain.webp");}
       z-index:1 would paint the sky OVER the landing card. At 0 the sky paints in DOM order: above
       the body art and .end-bg (earlier in the DOM), below .stage-wrap and the end screen (later). */
 .sg-glow,.sg-sky{z-index:0;}
-/* 3. THE HOLE. This card is 1114x560, not the fleet's 1114x456; same 40px inset. */
-.sg-sky{--sg-hole-h:calc(520px * var(--scale,1));}
+/* 3. THE HOLE. This card was 1114x560 (hole 520px) until [LANDING-FRAME-ART] (2026-10-13) put it back at the
+      fleet's 1114x456; same 40px inset, so the kit's own 416px is restated here. */
+.sg-sky{--sg-hole-h:calc(416px * var(--scale,1));}
 /* 4. The phase gate reads as a quiet blue field here (TOTA-GATE-NO-STARS): no sky while gating. */
 body.gating .sg-glow,body.gating .sg-sky{display:none;}
 /* ===== FLN ANIMATION KIT: sky-adapt END ===== */
