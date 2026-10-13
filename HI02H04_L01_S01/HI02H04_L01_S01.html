@@ -8074,12 +8074,18 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
         speak(null);                                                          // the sentence with its word sync, then the rest of the flow as before
       }, recMs));
     };
+    // [MIC-TAP-SFX] (2026-10-13, user request) a tap on the ENABLED mic button sounds exactly as a tap on the आगे button does:
+    // stdSfx("next") (sfx_std_next.wav at STD_SFX_VOL.next on its own Audio element, [STD-SFX] - so startRec's stopAudio() does not
+    // cut it), fired only where the tap takes effect: the lock, a running beat and the disabled chip swallow the tap silently, as a
+    // disabled आगे never fires click. Nothing else changes.
+    var micTapSfx = function(){ if(typeof stdSfx === "function") stdSfx("next"); };
     var onTap = function(e){
       if(pill.__p2Locked){ if(e) e.stopPropagation(); return; }                // [T1-T3-MIC-LOCK] the mic button is not enabled yet: the tap does nothing
-      if(REC_BY_SLIDE[idx] !== true){ speak(e); return; }
+      if(REC_BY_SLIDE[idx] !== true){ micTapSfx(); speak(e); return; }         // [MIC-TAP-SFX] the next-button sound, then the sentence as before
       if(e) e.stopPropagation();
       if(!pill.isConnected || typeof state !== "object" || !state || state.idx !== idx) return;
       if(pill.__p2Rec || pill.__p2RecDone) return;                            // the beat runs, or the chip is disabled
+      micTapSfx();                                                            // [MIC-TAP-SFX] the next-button sound on the enabled mic's tap
       startRec();
     };
     pill.addEventListener("click", onTap);
