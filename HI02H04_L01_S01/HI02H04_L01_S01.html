@@ -10071,10 +10071,11 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
      thickens to 6px (still inset, so nothing grows), a soft yellow glow breathes around it every ~0.86 s and the picture pops out
      slightly (1.03) and HOLDS - the page-2 pop-and-hold shape ([P2-BIRD-POP]) - then everything eases back to the resting look
      over the last ~0.4 s, inside the keyframes, so taking the class off afterwards changes nothing. Its length is set per run by
-     the script as an inline animation-duration. Page 2 (siHl94): the second line's length + HL_AFTER_MS (rev 2, 2026-10-16, user
-     request: the highlight stays on after that line ends, in silence - 3 s then, 5 s at rev 3, 7 s since rev 4, all the same
-     day); the 9.4 s here is the nominal value (2.4 s + 7 s). Page 3 (siHl70, .si-hl-7): the same look alone, in silence, for
-     HL_MS = 7 s - no line under it; both keyframe sets are timed to their nominal length so the breath keeps its period;
+     the script as an inline animation-duration. Page 2 (siHl54): the second line's length + HL_AFTER_MS (rev 2, 2026-10-16, user
+     request: the highlight stays on after that line ends, in silence - 3 s then, 5 s at rev 3, 7 s at rev 4, 3 s again since
+     rev 5, all the same day); the 5.4 s here is the nominal value (2.4 s + 3 s). Page 3 (siHl30, .si-hl-3): the same look alone,
+     in silence, for HL_MS = 3 s (7 s until rev 5) - no line under it; both keyframe sets are timed to their nominal length so the
+     breath keeps its period (the 9.4 s and 7 s sets of rev 4 were replaced by these two at rev 5);
    - the sentence pill (.story-caption) - on page 3 with the mic chip inside it - is hidden (and not hit-testable) until its turn,
      then rises in (siSentIn, 0.45 s; the script takes .si-sent-in off again at the animation's end, so the cue's .p2-cue - whose
      rule sets animation:none on the pill, [SPK-ONLY-CUE] - going on and off never replays the rise-in: [T2-INTRO] rev 2);
@@ -10084,52 +10085,34 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
 .stage.tut.story-intro .story-img.si-shown{opacity:1;}
 @keyframes siPicIn{0%{opacity:0;transform:scale(.90);}100%{opacity:1;transform:scale(1);}}
 .stage.tut.story-intro .story-img.si-pic-in{animation:siPicIn .9s cubic-bezier(.2,.8,.3,1) 1 both;transform-origin:50% 50%;will-change:transform,opacity;}
-@keyframes siHl94{   /* page 2 - percentages of a nominal 9.4 s: in by 0.32 s, a breath every ~0.86 s (10 of them), held to 94.9 %, back to rest over the last 0.48 s */
+@keyframes siHl54{   /* page 2 - percentages of a nominal 5.4 s (2.4 s line + 3 s): in by 0.32 s, a breath every ~0.86 s (5 of them), held to 91.1 %, back to rest over the last 0.48 s */
   0%{outline-color:#DADADA;outline-width:4px;outline-offset:-4px;box-shadow:0 0 0 0 rgba(255,224,102,0),0 0 0 0 rgba(255,214,0,0);transform:scale(1);animation-timing-function:cubic-bezier(.2,.8,.3,1);}
-  3.4%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
-  8.0%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  12.6%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  17.1%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  21.7%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  26.3%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  30.9%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  35.4%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  40.0%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  44.6%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  49.2%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  53.7%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  58.3%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  62.9%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  67.5%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  72.0%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  76.6%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  81.2%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  85.8%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  90.3%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  94.9%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
-  100%{outline-color:#DADADA;outline-width:4px;outline-offset:-4px;box-shadow:0 0 0 0 rgba(255,224,102,0),0 0 0 0 rgba(255,214,0,0);transform:scale(1);}
-}
-@keyframes siHl70{   /* page 3 - percentages of a nominal 7 s: in by 0.32 s, a breath every ~0.86 s (7 of them), held to 93.1 %, back to rest over the last 0.48 s */
-  0%{outline-color:#DADADA;outline-width:4px;outline-offset:-4px;box-shadow:0 0 0 0 rgba(255,224,102,0),0 0 0 0 rgba(255,214,0,0);transform:scale(1);animation-timing-function:cubic-bezier(.2,.8,.3,1);}
-  4.6%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
-  10.7%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  16.9%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  23.0%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  29.1%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  35.3%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  41.4%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  47.6%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  5.9%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
+  13.9%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  21.9%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
+  29.8%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  37.8%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
+  45.7%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
   53.7%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  59.9%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  66.0%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  72.1%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  78.3%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  84.4%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  93.1%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
+  61.7%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  69.6%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
+  77.6%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  85.6%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
+  91.1%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
   100%{outline-color:#DADADA;outline-width:4px;outline-offset:-4px;box-shadow:0 0 0 0 rgba(255,224,102,0),0 0 0 0 rgba(255,214,0,0);transform:scale(1);}
 }
-.stage.tut.story-intro .story-img.si-hl{animation:siHl94 9.4s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform,box-shadow;}
-.stage.tut.story-intro .story-img.si-hl.si-hl-7{animation-name:siHl70;animation-duration:7s;}
+@keyframes siHl30{   /* page 3 - percentages of a nominal 3 s: in by 0.32 s, a breath every ~0.86 s (2 of them), held to 84.0 %, back to rest over the last 0.48 s */
+  0%{outline-color:#DADADA;outline-width:4px;outline-offset:-4px;box-shadow:0 0 0 0 rgba(255,224,102,0),0 0 0 0 rgba(255,214,0,0);transform:scale(1);animation-timing-function:cubic-bezier(.2,.8,.3,1);}
+  10.7%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
+  25.0%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  39.3%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
+  53.7%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  68.0%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
+  84.0%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
+  100%{outline-color:#DADADA;outline-width:4px;outline-offset:-4px;box-shadow:0 0 0 0 rgba(255,224,102,0),0 0 0 0 rgba(255,214,0,0);transform:scale(1);}
+}
+.stage.tut.story-intro .story-img.si-hl{animation:siHl54 5.4s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform,box-shadow;}
+.stage.tut.story-intro .story-img.si-hl.si-hl-3{animation-name:siHl30;animation-duration:3s;}
 .stage.tut.story-intro .story-caption{opacity:0;visibility:hidden;}
 .stage.tut.story-intro .story-caption.si-shown{opacity:1;visibility:visible;}
 @keyframes siSentIn{0%{opacity:0;transform:translateY(14px) scale(.96);}100%{opacity:1;transform:translateY(0) scale(1);}}
@@ -10162,12 +10145,12 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
    (nothing else refers to them).
    PAGE 2 GOES (times are the recordings' lengths + GAP_MS between beats; PLAN[0] below):
      mount -> line a speaks and, the moment it is heard playing, the picture fades and grows in (0.9 s; #STORY-INTRO-CSS siPicIn)
-           -> GAP_MS -> line b speaks and, as it starts, the picture is highlighted (siHl94: light-yellow stroke, breathing glow, a
-              small pop-and-hold) for the whole line AND hlAfterMs = 7 s more after the line has ended, in silence (rev 2,
+           -> GAP_MS -> line b speaks and, as it starts, the picture is highlighted (siHl54: light-yellow stroke, breathing glow, a
+              small pop-and-hold) for the whole line AND hlAfterMs = 3 s more after the line has ended, in silence (rev 2,
               2026-10-16, user request: 3 s after the line - the first cut ran the highlight 3 s from the line's start; rev 3,
-              the same day: 5 s; rev 4, the same day: 7 s), easing back to the resting look over its last ~0.4 s - the keyframes
-              get the run's real length (the line's duration + hlAfterMs) as an inline animation-duration when the class goes on,
-              so the ease-back lands at the end of those 7 s
+              the same day: 5 s; rev 4, the same day: 7 s; rev 5, the same day, user request: 3 s again, on pages 2 and 3 alike),
+              easing back to the resting look over its last ~0.4 s - the keyframes get the run's real length (the line's duration
+              + hlAfterMs) as an inline animation-duration when the class goes on, so the ease-back lands at the end of those 3 s
            -> GAP_MS -> line c speaks in the background (nothing moves)
            -> GAP_MS -> the sentence pill rises in (siSentIn, SENT_IN_MS) -> the sentence vo_sent_boy_sit speaks with the word-by-word
               highlight of [P2-WORD-SYNC] (the same .p2-word.on look, the same timings, PLAN[0].times = WORD_TIMES_BY_SLIDE[0])
@@ -10185,7 +10168,8 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
    (PLAN[1]); its two lines are the user's audio_4/5.wav, copied as assets/Audio/vo_t2_intro_a.wav (2.80 s, "चलिए, एक और चित्र
    देखते हैं") and vo_t2_cue.wav (3.32 s, "अब इस बटन पर टैप करिए और वाक्य को पढ़िए"), approximate wording as above:
      mount -> line a speaks and the picture fades and grows in with it (only the picture: the pill and its mic are hidden)
-           -> GAP_MS -> the picture is highlighted exactly as on page 2, but alone and in silence, for HL_MS = 7 s (siHl70)
+           -> GAP_MS -> the picture is highlighted exactly as on page 2, but alone and in silence, for HL_MS = 3 s (siHl30; 7 s
+              until [T1-INTRO] rev 5, the same day)
            -> GAP_MS -> the sentence pill WITH the mic chip inside it rises in (siSentIn), no line
            -> SENT_IN_MS -> the cue: the mic chip pulses ([SPK-ONLY-CUE]'s pulse, .p2-cue on the pill, the chip alone moves) while
               vo_t2_cue speaks, settling at the end of a breath when the line ends or is cut; then, as [P2-CUE-IDLE] did with the old
@@ -10252,10 +10236,10 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
   // line: the pictures' line; idleMs: its repeat after that much inactivity; correct: the index of the right picture; ok: the line
   // (id) spoken on the correct tap, or null.
   var PLAN = {
-    0: { lineA: "assets/Audio/vo_t1_intro_a.wav", lineB: "assets/Audio/vo_t1_intro_b.wav", hlAfterMs: 7000, lineC: "assets/Audio/vo_t1_intro_c.wav",
+    0: { lineA: "assets/Audio/vo_t1_intro_a.wav", lineB: "assets/Audio/vo_t1_intro_b.wav", hlAfterMs: 3000, lineC: "assets/Audio/vo_t1_intro_c.wav",
          noMic: true, auto: { sent: "vo_sent_boy_sit", explain: "vo_t1_explain", times: [0.29, 0.90, 1.25, 1.42, 1.79, 2.12, 2.27] },   // times = WORD_TIMES_BY_SLIDE[0] (vo_sent_boy_sit, 2.64 s)
          sfx: /sfx_morning_birds\.[a-z0-9]+$/i },
-    1: { lineA: "assets/Audio/vo_t2_intro_a.wav", hlMs: 7000,
+    1: { lineA: "assets/Audio/vo_t2_intro_a.wav", hlMs: 3000,
          cue: "assets/Audio/vo_t2_cue.wav", cueIdleMs: 7000,                                                                       // = CUE_IDLE_BY_SLIDE[1]
          sfx: /sfx_bicycle_bell\.[a-z0-9]+$/i },
     2: { cue: "assets/Audio/vo_t3_cue.wav", cueIdleMs: 7000,                                                                       // [T3-PICK] page 4: no picture beat - the pill + mic rise in at once, then this cue (cueIdleMs = CUE_IDLE_BY_SLIDE[2])
@@ -10366,11 +10350,11 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
     };
     // the highlight: on with the run's whole length as its duration (the keyframes ease back at its end); off at the animation's
     // own end (fallback: the planned end + 250 ms)
-    var hlOff = function(){ img.classList.remove("si-hl", "si-hl-7"); img.style.animationDuration = ""; };
-    var hlOn = function(ms, seven){
+    var hlOff = function(){ img.classList.remove("si-hl", "si-hl-3"); img.style.animationDuration = ""; };
+    var hlOn = function(ms, solo){                                         // solo: page 3's set (no line under it; .si-hl-3)
       img.classList.remove("si-pic-in");
       img.style.animationDuration = Math.round(ms) + "ms";
-      if(seven) img.classList.add("si-hl-7");
+      if(solo) img.classList.add("si-hl-3");
       img.classList.add("si-hl");
       img.addEventListener("animationend", function(e){ if(e.target === img && /^siHl/.test(e.animationName)) hlOff(); }, { once:true });
     };
