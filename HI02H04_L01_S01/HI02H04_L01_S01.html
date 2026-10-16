@@ -10046,5 +10046,19 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
    other page are untouched; btn-play-waiting.svg stays in assets/UI, unused on this page. */
 .start-gate .sg-btn:not(.ready){display:none !important;}
 </style>
+<style id="TUT-NO-PROMPT">
+/* [TUT-NO-PROMPT] (2026-10-16, user request) PAGES 2-4 (T1, T2, T3 - the tutorial pages, the only ones mounted in .tut-card):
+   the navy heading above the pictures (.tut-prompt, filled from slide.prompt_hi: "चित्र देखिए और वाक्य पढ़िए।",
+   "क्या यह वाक्य सही है?", "वाक्य के लिए सही चित्र चुनिए।") is no longer shown and the pictures grow into its 92px row.
+   The element is still built by the engine (nothing reads it back) - it is hidden, not removed, so the card data, the
+   narration VOs and the JS are untouched. The stack keeps 28px of air under the card's top border (page 4 already had that
+   as the pill's margin-top; it moves to the content padding so all three pages share it):
+   pages 2-3 = 28px -> picture (306px tall, was 242) -> 12px -> pill;  page 4 = 28px -> pill -> 36px -> the two pictures
+   (282px tall, was 190). The pill, the mic chip beside it, the 44px to the आगे button, the mascot band and every other
+   page are untouched. */
+.stage.tut .tut-card .tut-prompt{display:none;}
+.stage.tut .tut-content{padding-top:28px;}
+.stage.tut .story-scene-pair .story-caption{margin-top:0;}
+</style>
 </body>
 </html>
