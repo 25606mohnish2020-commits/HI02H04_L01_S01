@@ -10060,28 +10060,29 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
 .stage.tut .tut-content{padding-top:28px;}
 .stage.tut .story-scene-pair .story-caption{margin-top:0;}
 </style>
-<style id="T1-INTRO-CSS">
-/* [T1-INTRO] (2026-10-16, user request) PAGE 2 ONLY (T1 = ?slide=0): the mic button beside the sentence pill and everything it
-   started are gone from this page, and the page opens with a scripted picture-then-sentence intro instead - see <script
-   id="T1-INTRO-JS"> at the end of the body for the flow and the sounds. These rules are all keyed on .t1-intro, which that script
-   puts on #stage while page 2 is open and takes off on every other page, so pages 3-4 (T2, T3) and the rest are untouched.
-   - the picture (.story-img) is hidden at the mount and appears with the first line: a 0.9 s fade-and-grow (t1PicIn: 0.90 -> 1);
-   - the highlight (t1Hl, .t1-hl): the picture's inset grey stroke ([GREY-STROKE]: 4px #DADADA) turns a light yellow (#FFE066)
-     and thickens to 6px (still inset, so nothing grows), a soft yellow glow breathes around it about once a second and the
-     picture pops out slightly (1.03) and HOLDS - the page-2 pop-and-hold shape ([P2-BIRD-POP]) - then everything eases back to
-     the resting look over the last 0.4 s, inside the keyframes, so taking the class off afterwards changes nothing. Its length
-     is set per run by the script as an inline animation-duration: the second line's length + HL_AFTER_MS (rev 2, 2026-10-16,
-     user request: the highlight stays on after that line ends, in silence - 3 s then, 5 s at rev 3, 7 s since rev 4, all the
-     same day); the 9.4 s here is the nominal value (2.4 s + 7 s), and the keyframes are timed to it so the breath keeps its
-     ~0.86 s period;
-   - the sentence pill (.story-caption) is hidden until the third line is over, then rises in (t1SentIn, 0.45 s) before it is read;
+<style id="STORY-INTRO-CSS">
+/* [T1-INTRO] (2026-10-16, user request) PAGE 2 (T1 = ?slide=0) and, since [T2-INTRO] later the same day, PAGE 3 (T2 = ?slide=1):
+   each opens with a scripted picture-then-sentence intro instead of its old narration + pop beat - see <script id="STORY-INTRO-JS">
+   at the end of the body for the flows and the sounds. These rules are all keyed on .story-intro, which that script puts on #stage
+   while one of those pages is open and takes off on every other page, so page 4 (T3) and the rest are untouched.
+   - the picture (.story-img) is hidden at the mount and appears with the first line: a 0.9 s fade-and-grow (siPicIn: 0.90 -> 1);
+   - the highlight (.si-hl): the picture's inset grey stroke ([GREY-STROKE]: 4px #DADADA) turns a light yellow (#FFE066) and
+     thickens to 6px (still inset, so nothing grows), a soft yellow glow breathes around it every ~0.86 s and the picture pops out
+     slightly (1.03) and HOLDS - the page-2 pop-and-hold shape ([P2-BIRD-POP]) - then everything eases back to the resting look
+     over the last ~0.4 s, inside the keyframes, so taking the class off afterwards changes nothing. Its length is set per run by
+     the script as an inline animation-duration. Page 2 (siHl94): the second line's length + HL_AFTER_MS (rev 2, 2026-10-16, user
+     request: the highlight stays on after that line ends, in silence - 3 s then, 5 s at rev 3, 7 s since rev 4, all the same
+     day); the 9.4 s here is the nominal value (2.4 s + 7 s). Page 3 (siHl70, .si-hl-7): the same look alone, in silence, for
+     HL_MS = 7 s - no line under it; both keyframe sets are timed to their nominal length so the breath keeps its period;
+   - the sentence pill (.story-caption) - on page 3 with the mic chip inside it - is hidden (and not hit-testable) until its turn,
+     then rises in (siSentIn, 0.45 s);
    - the old pop beat's class (.p2-pop) still reaches the frame for 2 s while that chain fizzles (see the script): no motion here. */
-.stage.tut.t1-intro .story-frame.p2-pop{animation:none !important;}
-.stage.tut.t1-intro .story-img{opacity:0;}
-.stage.tut.t1-intro .story-img.t1-shown{opacity:1;}
-@keyframes t1PicIn{0%{opacity:0;transform:scale(.90);}100%{opacity:1;transform:scale(1);}}
-.stage.tut.t1-intro .story-img.t1-pic-in{animation:t1PicIn .9s cubic-bezier(.2,.8,.3,1) 1 both;transform-origin:50% 50%;will-change:transform,opacity;}
-@keyframes t1Hl{   /* percentages of a nominal 9.4 s: in by 0.32 s, a breath every ~0.86 s (10 of them), held to 94.9 %, back to rest over the last 0.48 s */
+.stage.tut.story-intro .story-frame.p2-pop{animation:none !important;}
+.stage.tut.story-intro .story-img{opacity:0;}
+.stage.tut.story-intro .story-img.si-shown{opacity:1;}
+@keyframes siPicIn{0%{opacity:0;transform:scale(.90);}100%{opacity:1;transform:scale(1);}}
+.stage.tut.story-intro .story-img.si-pic-in{animation:siPicIn .9s cubic-bezier(.2,.8,.3,1) 1 both;transform-origin:50% 50%;will-change:transform,opacity;}
+@keyframes siHl94{   /* page 2 - percentages of a nominal 9.4 s: in by 0.32 s, a breath every ~0.86 s (10 of them), held to 94.9 %, back to rest over the last 0.48 s */
   0%{outline-color:#DADADA;outline-width:4px;outline-offset:-4px;box-shadow:0 0 0 0 rgba(255,224,102,0),0 0 0 0 rgba(255,214,0,0);transform:scale(1);animation-timing-function:cubic-bezier(.2,.8,.3,1);}
   3.4%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
   8.0%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
@@ -10106,71 +10107,118 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
   94.9%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
   100%{outline-color:#DADADA;outline-width:4px;outline-offset:-4px;box-shadow:0 0 0 0 rgba(255,224,102,0),0 0 0 0 rgba(255,214,0,0);transform:scale(1);}
 }
-.stage.tut.t1-intro .story-img.t1-hl{animation:t1Hl 9.4s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform,box-shadow;}
-.stage.tut.t1-intro .story-caption{opacity:0;}
-.stage.tut.t1-intro .story-caption.t1-shown{opacity:1;}
-@keyframes t1SentIn{0%{opacity:0;transform:translateY(14px) scale(.96);}100%{opacity:1;transform:translateY(0) scale(1);}}
-.stage.tut.t1-intro .story-caption.t1-sent-in{animation:t1SentIn .45s cubic-bezier(.2,.8,.3,1) 1 both;transform-origin:50% 50%;}
+@keyframes siHl70{   /* page 3 - percentages of a nominal 7 s: in by 0.32 s, a breath every ~0.86 s (7 of them), held to 93.1 %, back to rest over the last 0.48 s */
+  0%{outline-color:#DADADA;outline-width:4px;outline-offset:-4px;box-shadow:0 0 0 0 rgba(255,224,102,0),0 0 0 0 rgba(255,214,0,0);transform:scale(1);animation-timing-function:cubic-bezier(.2,.8,.3,1);}
+  4.6%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
+  10.7%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  16.9%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
+  23.0%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  29.1%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
+  35.3%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  41.4%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
+  47.6%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  53.7%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
+  59.9%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  66.0%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
+  72.1%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  78.3%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
+  84.4%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  93.1%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
+  100%{outline-color:#DADADA;outline-width:4px;outline-offset:-4px;box-shadow:0 0 0 0 rgba(255,224,102,0),0 0 0 0 rgba(255,214,0,0);transform:scale(1);}
+}
+.stage.tut.story-intro .story-img.si-hl{animation:siHl94 9.4s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform,box-shadow;}
+.stage.tut.story-intro .story-img.si-hl.si-hl-7{animation-name:siHl70;animation-duration:7s;}
+.stage.tut.story-intro .story-caption{opacity:0;visibility:hidden;}
+.stage.tut.story-intro .story-caption.si-shown{opacity:1;visibility:visible;}
+@keyframes siSentIn{0%{opacity:0;transform:translateY(14px) scale(.96);}100%{opacity:1;transform:translateY(0) scale(1);}}
+.stage.tut.story-intro .story-caption.si-sent-in{animation:siSentIn .45s cubic-bezier(.2,.8,.3,1) 1 both;transform-origin:50% 50%;}
 </style>
-<script id="T1-INTRO-JS">
-/* [T1-INTRO] (2026-10-16, user request) PAGE 2 ONLY (T1 = ?slide=0, the boy under the tree). Asked: take the mic button and the
+<script id="STORY-INTRO-JS">
+/* [T1-INTRO] (2026-10-16, user request) PAGE 2 (T1 = ?slide=0, the boy under the tree). Asked: take the mic button and the
    voice line tied to it off this page for good, and open the page with this flow instead - the picture appears smoothly with a
-   first line, is highlighted for 3 s with a light-yellow stroke and a suitable animation with a second line, then a third line
-   speaks in the background, after which the sentence appears under the picture and is read word by word as it is today; from
-   there the page runs exactly as before. Every other page is untouched (everything here is keyed on slide 0).
-   The three new lines are the user's audio_1/2/3.wav (Downloads/VOs, 2026-10-16), copied as assets/Audio/vo_t1_intro_a.wav
+   first line, is highlighted with a light-yellow stroke and a suitable animation with a second line and for 7 s after it, then a
+   third line speaks in the background, after which the sentence appears under the picture and is read word by word as it is
+   today; from there the page runs exactly as before.
+   The three lines are the user's audio_1/2/3.wav (Downloads/VOs, 2026-10-16), copied as assets/Audio/vo_t1_intro_a.wav
    (2.48 s, "आइए, एक चित्र देखते हैं"), vo_t1_intro_b.wav (2.36 s, "इस चित्र में क्या हो रहा है?") and vo_t1_intro_c.wav (3.16 s,
    "अब इस चित्र के बारे में एक वाक्य पढ़ते हैं") - wording from a local speech-to-text pass, approximate; they are not in the card
    (nothing else refers to them).
-   THE PAGE NOW GOES (times are the recordings' lengths + GAP_MS between beats):
-     mount -> line a speaks and, the moment it is heard playing, the picture fades and grows in (0.9 s; #T1-INTRO-CSS t1PicIn)
-           -> GAP_MS -> line b speaks and, as it starts, the picture is highlighted (t1Hl: light-yellow stroke, breathing glow, a
-              small pop-and-hold) for the whole line AND HL_AFTER_MS = 7 s more after the line has ended, in silence (rev 2,
+   PAGE 2 GOES (times are the recordings' lengths + GAP_MS between beats; PLAN[0] below):
+     mount -> line a speaks and, the moment it is heard playing, the picture fades and grows in (0.9 s; #STORY-INTRO-CSS siPicIn)
+           -> GAP_MS -> line b speaks and, as it starts, the picture is highlighted (siHl94: light-yellow stroke, breathing glow, a
+              small pop-and-hold) for the whole line AND hlAfterMs = 7 s more after the line has ended, in silence (rev 2,
               2026-10-16, user request: 3 s after the line - the first cut ran the highlight 3 s from the line's start; rev 3,
-              the same day: 5 s; rev 4, the same day: 7 s), easing back to the resting
-              look over its last 0.4 s - the keyframes get the run's real length (the line's duration + HL_AFTER_MS) as an inline
-              animation-duration when the class goes on, so the ease-back lands at the end of those 3 s
+              the same day: 5 s; rev 4, the same day: 7 s), easing back to the resting look over its last ~0.4 s - the keyframes
+              get the run's real length (the line's duration + hlAfterMs) as an inline animation-duration when the class goes on,
+              so the ease-back lands at the end of those 7 s
            -> GAP_MS -> line c speaks in the background (nothing moves)
-           -> GAP_MS -> the sentence pill rises in (t1SentIn, SENT_IN_MS) -> the sentence vo_sent_boy_sit speaks with the word-by-word
-              highlight of [P2-WORD-SYNC] (the same .p2-word.on look, the same timings, WORD_TIMES below = WORD_TIMES_BY_SLIDE[0])
+           -> GAP_MS -> the sentence pill rises in (siSentIn, SENT_IN_MS) -> the sentence vo_sent_boy_sit speaks with the word-by-word
+              highlight of [P2-WORD-SYNC] (the same .p2-word.on look, the same timings, PLAN[0].times = WORD_TIMES_BY_SLIDE[0])
            -> the explanation vo_t1_explain right after it (as the first hearing always brought it, [VO-BATCH])
            -> आगे NAV_AFTER_MS after the last line (as after the first tap before; its hand nudge stays off, [P2-QUIET-AFTER-NAV]).
-   GONE FROM THIS PAGE: the mic chip (.tut-audio, removed at the mount - as [G1-G3-P1-P3-NO-MIC] does on the question pages), its
+   GONE FROM PAGE 2: the mic chip (.tut-audio, removed at the mount - as [G1-G3-P1-P3-NO-MIC] does on the question pages), its
    "tap the mic and read the sentence" cue vo_tap_speaker_sentence_story with the chip pulse and the 5 s idle repeat
    ([P2-SPEAKER-CUE] / [P2-CUE-IDLE]), the read-aloud beat ([P2-READ-ALOUD]), the mic-tap sound ([MIC-TAP-SFX]) and the mic lock
    ([T1-T3-MIC-LOCK]); also the opening narration vo_t1_instr ("इस चित्र को ध्यान से देखिए और नीचे दिए गए वाक्य को पढ़िए।") as the page's
    first line and the picture's pop with the bird-song SFX that followed it ([P2-VO-FIRST] / [P2-BIRD-POP]) - the three new lines
    take their place. KEPT: the bird's tap (it still repeats vo_t1_instr, [P2-BIRD-REPLAY]; ignored while the intro's own lines
    run, as it is during the read-aloud beat), the feet speaker chip ([FEET-SPEAKER], same replay), the sentence's words and
-   timings, the explanation, आगे's timing and quiet, the VO shield, the music bed's ducking, and pages 3-4 in full.
+   timings, the explanation, आगे's timing and quiet, the VO shield, the music bed's ducking.
+   [T2-INTRO] (2026-10-16, later, user request) PAGE 3 (T2 = ?slide=1, the girl on the bicycle) opens the same way, by the table
+   (PLAN[1]); its two lines are the user's audio_4/5.wav, copied as assets/Audio/vo_t2_intro_a.wav (2.80 s, "चलिए, एक और चित्र
+   देखते हैं") and vo_t2_cue.wav (3.32 s, "अब इस बटन पर टैप करिए और वाक्य को पढ़िए"), approximate wording as above:
+     mount -> line a speaks and the picture fades and grows in with it (only the picture: the pill and its mic are hidden)
+           -> GAP_MS -> the picture is highlighted exactly as on page 2, but alone and in silence, for HL_MS = 7 s (siHl70)
+           -> GAP_MS -> the sentence pill WITH the mic chip inside it rises in (siSentIn), no line
+           -> SENT_IN_MS -> the cue: the mic chip pulses ([SPK-ONLY-CUE]'s pulse, .p2-cue on the pill, the chip alone moves) while
+              vo_t2_cue speaks, settling at the end of a breath when the line ends or is cut; then, as [P2-CUE-IDLE] did with the old
+              line, the same cue (line + pulse) again after every CUE_IDLE_MS = 7 s of inactivity - no tap anywhere and nothing
+              speaking; any tap restarts the count - until the mic is tapped or आगे has appeared
+           -> the mic tap and everything after it are the page's own, untouched ([P2-READ-ALOUD] / [T1-T3-REC-PER-WORD]: the 5 s
+              read-aloud beat with the words pacing, then the sentence vo_sent_girl_cycle with its words lit, the explanation
+              vo_t2_explain, आगे NAV_AFTER_MS later, the mic disabled for good; [MIC-TAP-SFX]; the bird's and the feet chip's replay of
+              vo_t2_instr).
+   GONE FROM PAGE 3: the opening narration vo_t2_instr as the page's first line, the picture's pop with the bicycle-bell SFX, the
+   silent first pulse at the cue point ([T2-T3-SILENT-CUE]) and the old cue line vo_tap_speaker_sentence_story (the new line is the
+   cue, at the cue point and on every repeat). Page 4 (T3) and every other page are untouched (everything here is keyed on PLAN).
    HOW, without touching #P2-BIRD-POP-JS (its tables are private): this block is the outermost wrapper of mountSlide and play().
-   On page 2's mount the engine's STORY_SCENE asks play() for the narration; that one call is not played and its end-of-narration
-   callback fires at once instead, so the old chain runs and FIZZLES, invisibly: the pop class on the frame has no animation here
-   (#T1-INTRO-CSS), its bird-song SFX is silenced (the HTMLMediaElement.prototype.play door below answers that one file with an
-   immediate "ended" while page 2 is open), the mic unlock finds no chip, and the cue never speaks because the frame is marked
-   __spkTapped at the mount - the very flag the mic tap set, on which startCue / idleArm / idleFire bow out. आगे: the old chain's
-   activations are swallowed by [P2-NAV-AFTER-TAP] until the pill is "heard" (pill.__p2Heard), which this block sets when it reads
-   the sentence, exactly where the tap's speak() set it; its own setNavActive(true) then passes through as the tap's did.
+   On a listed page's mount the engine's STORY_SCENE asks play() for the narration; that one call is not played and its
+   end-of-narration callback fires at once instead, so the old chain runs and FIZZLES, invisibly: the pop class on the frame has no
+   animation here (#STORY-INTRO-CSS), its SFX is silenced (the HTMLMediaElement.prototype.play door below answers that page's SFX file
+   with an immediate "ended" while the page is open), the mic unlock runs harmlessly (page 2: no chip; page 3: the chip is still
+   hidden, and enabled from here on), and the old cue never comes because the frame is marked __spkTapped at the mount - the very
+   flag the mic tap set, on which startCue / idleArm / idleFire bow out. आगे: the old chain's activations are swallowed by
+   [P2-NAV-AFTER-TAP] until the pill is "heard" (pill.__p2Heard) - page 2 sets it when it reads the sentence, exactly where the
+   tap's speak() set it, and its own setNavActive(true) then passes through as the tap's did; page 3 leaves it to the mic tap.
    The bird is held off during the intro by pill.__p2Rec (the read-aloud flag its tap handler already respects); a line the child
    starts in one of the GAP_MS gaps (the feet speaker) is waited for, not cut (every beat waits for silence first). A direct
-   ?slide=0 load mounts the page before this block runs: the narration already speaking is stopped and the intro starts then.
+   ?slide=N load mounts the page before this block runs: the narration already speaking is stopped and the intro starts then.
    Reduced motion (FLNMotion.still): the lines speak and the picture / pill simply appear. */
 (function(){ "use strict";
-  var IDX = 0;
-  var LINE_A = "assets/Audio/vo_t1_intro_a.wav", LINE_B = "assets/Audio/vo_t1_intro_b.wav", LINE_C = "assets/Audio/vo_t1_intro_c.wav";
-  var SENT_ID = "vo_sent_boy_sit", EXPLAIN_ID = "vo_t1_explain";
-  var WORD_TIMES = [0.29, 0.90, 1.25, 1.42, 1.79, 2.12, 2.27];   // = WORD_TIMES_BY_SLIDE[0] in #P2-BIRD-POP-JS (vo_sent_boy_sit, 2.64 s)
-  var HL_AFTER_MS = 7000, LINE_B_MS = 2400;                   // the highlight stays HL_AFTER_MS after line b ends (rev 2: 3 s; rev 3: 5 s; rev 4, 2026-10-16, user request: 7 s); LINE_B_MS = its length when the element cannot tell (2.36 s)
+  // slide index -> the page's intro. lineA: spoken as the picture appears. lineB (page 2): spoken with the highlight, which then
+  // stays hlAfterMs more; hlMs (page 3): the highlight alone, in silence. lineC (page 2): the background line before the pill.
+  // noMic: the mic chip is removed at the mount. auto: the pill is read by the page itself (sentence id, explanation id, the word
+  // starts of [P2-WORD-SYNC]); cue: the mic cue line spoken with the chip pulse once the pill is in, repeating after cueIdleMs of
+  // inactivity. sfx: the old pop beat's SFX file of that page (PLAN_BY_SLIDE in #P2-BIRD-POP-JS), silenced while the page is open.
+  var PLAN = {
+    0: { lineA: "assets/Audio/vo_t1_intro_a.wav", lineB: "assets/Audio/vo_t1_intro_b.wav", hlAfterMs: 7000, lineC: "assets/Audio/vo_t1_intro_c.wav",
+         noMic: true, auto: { sent: "vo_sent_boy_sit", explain: "vo_t1_explain", times: [0.29, 0.90, 1.25, 1.42, 1.79, 2.12, 2.27] },   // times = WORD_TIMES_BY_SLIDE[0] (vo_sent_boy_sit, 2.64 s)
+         sfx: /sfx_morning_birds\.[a-z0-9]+$/i },
+    1: { lineA: "assets/Audio/vo_t2_intro_a.wav", hlMs: 7000,
+         cue: "assets/Audio/vo_t2_cue.wav", cueIdleMs: 7000,                                                                       // = CUE_IDLE_BY_SLIDE[1]
+         sfx: /sfx_bicycle_bell\.[a-z0-9]+$/i }
+  };
+  var LINE_B_MS = 2400;                                        // page 2's line b length when its element cannot tell (2.36 s)
   var GAP_MS = 300, SENT_IN_MS = 450, SYNC_FALLBACK_MS = 400, NAV_AFTER_MS = 1000;   // NAV_AFTER_MS as in #P2-BIRD-POP-JS
-  var OLD_SFX = /sfx_morning_birds\.[a-z0-9]+$/i;              // the old pop beat's SFX on this page (PLAN_BY_SLIDE[0])
-  var live = false, mounting = false, run = 0, timers = [], wordRaf = 0, wordEls = null;
+  var live = null, mounting = -1, run = 0, timers = [], wordRaf = 0, wordEls = null, cueCtl = null;
   function $id(id){ return document.getElementById(id); }
   function tail(p){ return String(p || "").split("/").pop(); }
   function srcOf(id){ var c = (typeof CARD === "object" && CARD) ? CARD : null; return (c && c.assets && c.assets.audio && c.assets.audio[id]) || ("assets/Audio/" + id + "." + (typeof AUDIO_EXT === "string" ? AUDIO_EXT : "wav")); }
   function narrOf(idx){ var c = (typeof CARD === "object" && CARD && CARD.slides) ? CARD.slides[idx] : null; return (c && typeof audioFor === "function") ? audioFor(c, "narration") : null; }
   function still(){ return !!(window.FLNMotion && FLNMotion.still && FLNMotion.still()); }
   function cur(){ return (typeof currentAudio !== "undefined") ? currentAudio : null; }
-  function cancel(){ run++; live = false; timers.forEach(function(t){ clearTimeout(t); }); timers = []; wordStop(); }
+  function has(idx){ return Object.prototype.hasOwnProperty.call(PLAN, idx); }
+  function cancel(){ run++; live = null; cueCtl = null; timers.forEach(function(t){ clearTimeout(t); }); timers = []; wordStop(); }
   function wordStop(){ if(wordRaf){ cancelAnimationFrame(wordRaf); wordRaf = 0; } if(wordEls){ wordEls.forEach(function(w){ w.classList.remove("on"); }); wordEls = null; } }
   // [P2-WORD-SYNC] verbatim: word k carries .on while times[k] <= currentTime < times[k+1]; stops at the end or when the line is cut
   function wordSync(a, els, times){
@@ -10188,22 +10236,22 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
       wordRaf = requestAnimationFrame(tick);
     })();
   }
-  // ---- door 1: the shared play(). Page 2's mount asks for its narration: not spoken, its callback fires at once (see the note)
+  // ---- door 1: the shared play(). A listed page's mount asks for its narration: not spoken, its callback fires at once (see the note)
   var origPlay = window.play;
   if(typeof origPlay === "function"){
     window.play = function(src, onEnd){
-      if(mounting && src && tail(src) === tail(narrOf(IDX))){
+      if(mounting >= 0 && src && tail(src) === tail(narrOf(mounting))){
         if(typeof onEnd === "function") timers.push(setTimeout(onEnd, 0));
         return;
       }
       return origPlay.apply(this, arguments);
     };
   }
-  // ---- door 2: the old pop beat's bird-song SFX (its own Audio element) while page 2 is open: silent, "ended" at once
+  // ---- door 2: the old pop beat's SFX (its own Audio element) while a listed page is open: silent, "ended" at once
   if(typeof HTMLMediaElement !== "undefined" && HTMLMediaElement.prototype.play){
     var protoPlay = HTMLMediaElement.prototype.play;
     HTMLMediaElement.prototype.play = function(){
-      if(live && OLD_SFX.test(String(this.src || ""))){
+      if(live && live.sfx && live.sfx.test(String(this.src || ""))){
         var m = this; setTimeout(function(){ try{ m.dispatchEvent(new Event("ended")); }catch(e){} }, 0);
         return Promise.resolve();
       }
@@ -10211,16 +10259,16 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
     };
   }
   // ---- the intro itself
-  function intro(){
+  function intro(idx, cfg){
     var tok = run;
     var host = $id("slideHost"), stage = $id("stage"); if(!host || !stage) return;
     var frame = host.querySelector(".story-frame"), img = host.querySelector(".story-frame .story-img"), pill = host.querySelector(".story-caption");
     var chip = host.querySelector(".tut-card .tut-audio");
-    if(chip && chip.parentNode) chip.parentNode.removeChild(chip);          // no mic button on this page
-    if(frame) frame.__spkTapped = true;                                      // no "tap the mic" cue, no idle repeat (startCue / idleArm / idleFire bow out)
-    if(!frame || !img || !pill){ stage.classList.remove("t1-intro"); return; }   // not the story page expected: show it as it is
+    if(cfg.noMic && chip && chip.parentNode){ chip.parentNode.removeChild(chip); chip = null; }   // page 2: no mic button
+    if(frame) frame.__spkTapped = true;                                      // no old cue, no old idle repeat (startCue / idleArm / idleFire bow out)
+    if(!frame || !img || !pill){ stage.classList.remove("story-intro"); return; }   // not the story page expected: show it as it is
     pill.__p2Rec = true;                                                     // the bird waits while the intro's own lines run
-    var ok = function(){ return tok === run && frame.isConnected && typeof state === "object" && state && state.idx === IDX; };
+    var ok = function(){ return tok === run && frame.isConnected && typeof state === "object" && state && state.idx === idx; };
     var after = function(ms, fn){ timers.push(setTimeout(function(){ if(ok()) fn(); }, ms)); };
     var quiet = function(fn){ (function poll(){ if(!ok()) return; if(document.body.classList.contains("vo-playing")){ timers.push(setTimeout(poll, 200)); return; } fn(); })(); };
     // speak src through the shared play(); then() once - at its end, or, if another line cut it, once nothing speaks any more (as speak() in #P2-BIRD-POP-JS)
@@ -10237,36 +10285,47 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
       if(a){ if(!a.paused && a.currentTime > 0) go(); else a.addEventListener("playing", go, { once:true }); }
       timers.push(setTimeout(go, SYNC_FALLBACK_MS));
     };
+    // the highlight: on with the run's whole length as its duration (the keyframes ease back at its end); off at the animation's
+    // own end (fallback: the planned end + 250 ms)
+    var hlOff = function(){ img.classList.remove("si-hl", "si-hl-7"); img.style.animationDuration = ""; };
+    var hlOn = function(ms, seven){
+      img.classList.remove("si-pic-in");
+      img.style.animationDuration = Math.round(ms) + "ms";
+      if(seven) img.classList.add("si-hl-7");
+      img.classList.add("si-hl");
+      img.addEventListener("animationend", function(e){ if(e.target === img && /^siHl/.test(e.animationName)) hlOff(); }, { once:true });
+    };
+    var hlDone = function(){ if(still()) hlOff(); else timers.push(setTimeout(hlOff, 250)); after(GAP_MS, stepC); };
     var stepA = function(){ quiet(function(){
-      say(LINE_A, function(){ after(GAP_MS, stepB); });
-      onPlaying(function(){ img.classList.add("t1-shown"); if(!still()) img.classList.add("t1-pic-in"); });
+      say(cfg.lineA, function(){ after(GAP_MS, stepB); });
+      onPlaying(function(){ img.classList.add("si-shown"); if(!still()) img.classList.add("si-pic-in"); });
     }); };
     var stepB = function(){ quiet(function(){
-      // the highlight goes on as the line starts and comes off HL_AFTER_MS after the line has ended (rev 2); the keyframes are
-      // given that whole span as their duration, so they ease back exactly then; the class comes off at the animation's own end
-      // (fallback: the same moment + 250 ms), and the flow moves on from the line's end + HL_AFTER_MS either way
-      var hlOff = function(){ img.classList.remove("t1-hl"); img.style.animationDuration = ""; };
-      say(LINE_B, function(){ after(HL_AFTER_MS, function(){ if(still()) hlOff(); else timers.push(setTimeout(hlOff, 250)); after(GAP_MS, stepC); }); });
-      onPlaying(function(){
-        if(still()) return;
-        var a = cur(), left = (a && isFinite(a.duration) && a.duration > 0) ? Math.max(0, a.duration - a.currentTime) * 1000 : LINE_B_MS;
-        img.classList.remove("t1-pic-in");
-        img.style.animationDuration = Math.round(left + HL_AFTER_MS) + "ms";
-        img.classList.add("t1-hl");
-        img.addEventListener("animationend", function(e){ if(e.target === img && e.animationName === "t1Hl") hlOff(); }, { once:true });
-      });
+      if(cfg.lineB){                                                         // page 2: the line, the highlight from its start to its end + hlAfterMs
+        say(cfg.lineB, function(){ after(cfg.hlAfterMs, hlDone); });
+        onPlaying(function(){
+          if(still()) return;
+          var a = cur(), left = (a && isFinite(a.duration) && a.duration > 0) ? Math.max(0, a.duration - a.currentTime) * 1000 : LINE_B_MS;
+          hlOn(left + cfg.hlAfterMs, false);
+        });
+      } else {                                                               // page 3: the highlight alone, in silence, hlMs long
+        if(!still()) hlOn(cfg.hlMs, true);
+        after(cfg.hlMs, hlDone);
+      }
     }); };
-    // (stepC follows the line's end + HL_AFTER_MS, not the class: GAP_MS later line c speaks)
-    var stepC = function(){ quiet(function(){ say(LINE_C, function(){ after(GAP_MS, stepD); }); }); };
+    var stepC = function(){
+      if(!cfg.lineC){ stepD(); return; }
+      quiet(function(){ say(cfg.lineC, function(){ after(GAP_MS, stepD); }); });
+    };
     var stepD = function(){ quiet(function(){
-      pill.__p2Rec = false;                                                  // the bird may be tapped again from here, as after the beat before
-      pill.classList.add("t1-shown"); if(!still()) pill.classList.add("t1-sent-in");
-      after(still() ? 0 : SENT_IN_MS, readSentence);
+      pill.__p2Rec = false;                                                  // the bird (and, on page 3, the mic) may be tapped again from here
+      pill.classList.add("si-shown"); if(!still()) pill.classList.add("si-sent-in");
+      after(still() ? 0 : SENT_IN_MS, cfg.auto ? readSentence : (cfg.cue ? cueLoop : function(){}));
     }); };
-    // the sentence with its word highlight, the explanation, then आगे - the tap's speak() of #P2-BIRD-POP-JS, line for line
+    // page 2: the sentence with its word highlight, the explanation, then आगे - the tap's speak() of #P2-BIRD-POP-JS, line for line
     var readSentence = function(){
       pill.__p2Heard = true; pill.__p2Tapped = true;                         // heard: [P2-NAV-AFTER-TAP] lets आगे through from here
-      var sent = srcOf(SENT_ID), exp = srcOf(EXPLAIN_ID);
+      var sent = srcOf(cfg.auto.sent), exp = srcOf(cfg.auto.explain);
       try{ if(typeof stopNudge === "function") stopNudge(); }catch(x){}
       if(typeof window.setNavActive === "function") window.setNavActive(false);
       if(typeof play !== "function") return;
@@ -10274,36 +10333,65 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
         if(exp && !pill.__p2Explained && pill.isConnected){ pill.__p2Explained = true; play(exp, function(){}); }
       });
       var words = pill.__p2Words || Array.prototype.slice.call(pill.querySelectorAll(".p2-word"));
-      wordSync(cur(), words, WORD_TIMES);
+      wordSync(cur(), words, cfg.auto.times);
       quiet(function(){ after(NAV_AFTER_MS, function(){ if(typeof window.setNavActive === "function") window.setNavActive(true); }); });
     };
+    // page 3: the cue line with the mic pulse, again after cueIdleMs of inactivity, until the mic is tapped or आगे shows
+    var cueTimer = null;
+    var micTaken = function(){ return !!(pill.__p2Rec || pill.__p2RecDone || (chip && (chip.classList.contains("p2-rec") || chip.classList.contains("p2-rec-done")))); };
+    var navShowing = function(){ var b = $id("navBtn"); return !!(b && b.classList.contains("active")); };
+    var cueOver = function(){ return !ok() || micTaken() || navShowing(); };
+    var settle = function(){                                                 // the pulse stops at the end of its current breath (the chip's animationiteration bubbles to the pill; 900 ms safety) - as settleCue(false)
+      var done = false, fin = function(){ if(done) return; done = true; pill.classList.remove("p2-cue"); };
+      pill.addEventListener("animationiteration", fin, { once:true });
+      timers.push(setTimeout(fin, 900));
+    };
+    var cueArm = function(){
+      if(cueTimer){ clearTimeout(cueTimer); cueTimer = null; }
+      if(cueOver()){ cueCtl = null; return; }
+      cueTimer = setTimeout(cueFire, cfg.cueIdleMs); timers.push(cueTimer);
+    };
+    var cueFire = function(){
+      cueTimer = null;
+      if(cueOver()){ cueCtl = null; return; }
+      if(document.body.classList.contains("vo-playing")){ quiet(cueArm); return; }   // a line speaks (a replay): count again from its end
+      speakCue();
+    };
+    var speakCue = function(){
+      if(cueOver()){ cueCtl = null; return; }
+      if(!still()) pill.classList.add("p2-cue");
+      say(cfg.cue, function(){ settle(); cueArm(); });
+      var a = cur(); if(a) a.addEventListener("pause", function(){ settle(); }, { once:true });   // cut (a bird replay): the pulse settles; the count runs from the quiet
+    };
+    var cueLoop = function(){ cueCtl = { arm: cueArm }; speakCue(); };
     stepA();
   }
+  document.addEventListener("pointerdown", function(){ if(cueCtl) cueCtl.arm(); }, true);   // any tap restarts page 3's cue count ([P2-CUE-IDLE]); the mic tap ends it (micTaken)
   function open(idx){
     var stage = $id("stage"); if(!stage) return;
-    stage.classList.toggle("t1-intro", idx === IDX);
-    if(idx !== IDX) return;
-    live = true;
-    intro();
+    stage.classList.toggle("story-intro", has(idx));
+    if(!has(idx)) return;
+    live = PLAN[idx];
+    intro(idx, PLAN[idx]);
   }
   var origMount = window.mountSlide;
   if(typeof origMount === "function"){
     window.mountSlide = function(idx){
       cancel();
-      mounting = ((idx | 0) === IDX);
+      mounting = has(idx | 0) ? (idx | 0) : -1;
       var r;
-      try{ r = origMount.apply(this, arguments); } finally { mounting = false; }
+      try{ r = origMount.apply(this, arguments); } finally { mounting = -1; }
       try{ open(idx | 0); }catch(e){}
       return r;
     };
   }
-  [LINE_A, LINE_B, LINE_C].forEach(function(s){ try{ var a = new Audio(); a.preload = "auto"; a.src = s; }catch(e){} });   // warm the three files so the first beat lands with its line
-  // a direct ?slide=0 load mounted the page (and started its narration) before this block ran
+  Object.keys(PLAN).forEach(function(k){ var p = PLAN[k]; [p.lineA, p.lineB, p.lineC, p.cue].forEach(function(s){ if(!s) return; try{ var a = new Audio(); a.preload = "auto"; a.src = s; }catch(e){} }); });   // warm the files so each beat lands with its line
+  // a direct ?slide=N load mounted the page (and started its narration) before this block ran
   try{
     var gate = $id("startGate");
-    if(gate && gate.classList.contains("hidden") && typeof state === "object" && state && state.idx === IDX && document.querySelector("#slideHost .story-frame")){
+    if(gate && gate.classList.contains("hidden") && typeof state === "object" && state && has(state.idx) && document.querySelector("#slideHost .story-frame")){
       if(typeof stopAudio === "function") stopAudio();
-      open(IDX);
+      open(state.idx);
     }
   }catch(e){}
 })();
