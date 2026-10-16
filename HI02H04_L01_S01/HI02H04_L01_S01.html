@@ -10071,7 +10071,8 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
      picture pops out slightly (1.03) and HOLDS - the page-2 pop-and-hold shape ([P2-BIRD-POP]) - then everything eases back to
      the resting look over the last 0.4 s, inside the keyframes, so taking the class off afterwards changes nothing. Its length
      is set per run by the script as an inline animation-duration: the second line's length + HL_AFTER_MS (rev 2, 2026-10-16,
-     user request: the highlight stays 3 s after that line ends, in silence); the 5.4 s here is the nominal value (2.4 s + 3 s);
+     user request: the highlight stays on after that line ends, in silence - 3 s then, 5 s since rev 3 the same day); the 7.4 s
+     here is the nominal value (2.4 s + 5 s), and the keyframes are timed to it so the breath keeps its ~0.86 s period;
    - the sentence pill (.story-caption) is hidden until the third line is over, then rises in (t1SentIn, 0.45 s) before it is read;
    - the old pop beat's class (.p2-pop) still reaches the frame for 2 s while that chain fizzles (see the script): no motion here. */
 .stage.tut.t1-intro .story-frame.p2-pop{animation:none !important;}
@@ -10079,23 +10080,28 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
 .stage.tut.t1-intro .story-img.t1-shown{opacity:1;}
 @keyframes t1PicIn{0%{opacity:0;transform:scale(.90);}100%{opacity:1;transform:scale(1);}}
 .stage.tut.t1-intro .story-img.t1-pic-in{animation:t1PicIn .9s cubic-bezier(.2,.8,.3,1) 1 both;transform-origin:50% 50%;will-change:transform,opacity;}
-@keyframes t1Hl{   /* percentages of a nominal 5.4 s: in by 0.32 s, a breath every ~0.86 s, held to 93 %, back to rest over the last 0.38 s */
+@keyframes t1Hl{   /* percentages of a nominal 7.4 s: in by 0.32 s, a breath every ~0.86 s (8 of them), held to 94.9 %, back to rest over the last 0.38 s */
   0%{outline-color:#DADADA;outline-width:4px;outline-offset:-4px;box-shadow:0 0 0 0 rgba(255,224,102,0),0 0 0 0 rgba(255,214,0,0);transform:scale(1);animation-timing-function:cubic-bezier(.2,.8,.3,1);}
-  6%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
-  14%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  22%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  30%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  38%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  46%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  54%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  62%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  70%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  78%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  86%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  93%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
+  4.3%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
+  10.1%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  15.9%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
+  21.7%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  27.5%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
+  33.3%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  39.1%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
+  44.9%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  50.7%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
+  56.5%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  62.3%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
+  68.1%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  73.9%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
+  79.7%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  85.5%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
+  91.3%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
+  94.9%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
   100%{outline-color:#DADADA;outline-width:4px;outline-offset:-4px;box-shadow:0 0 0 0 rgba(255,224,102,0),0 0 0 0 rgba(255,214,0,0);transform:scale(1);}
 }
-.stage.tut.t1-intro .story-img.t1-hl{animation:t1Hl 5.4s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform,box-shadow;}
+.stage.tut.t1-intro .story-img.t1-hl{animation:t1Hl 7.4s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform,box-shadow;}
 .stage.tut.t1-intro .story-caption{opacity:0;}
 .stage.tut.t1-intro .story-caption.t1-shown{opacity:1;}
 @keyframes t1SentIn{0%{opacity:0;transform:translateY(14px) scale(.96);}100%{opacity:1;transform:translateY(0) scale(1);}}
@@ -10114,8 +10120,9 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
    THE PAGE NOW GOES (times are the recordings' lengths + GAP_MS between beats):
      mount -> line a speaks and, the moment it is heard playing, the picture fades and grows in (0.9 s; #T1-INTRO-CSS t1PicIn)
            -> GAP_MS -> line b speaks and, as it starts, the picture is highlighted (t1Hl: light-yellow stroke, breathing glow, a
-              small pop-and-hold) for the whole line AND HL_AFTER_MS = 3 s more after the line has ended, in silence (rev 2,
-              2026-10-16, user request; the first cut ran the highlight 3 s from the line's start), easing back to the resting
+              small pop-and-hold) for the whole line AND HL_AFTER_MS = 5 s more after the line has ended, in silence (rev 2,
+              2026-10-16, user request: 3 s after the line - the first cut ran the highlight 3 s from the line's start; rev 3,
+              the same day, user request: 5 s), easing back to the resting
               look over its last 0.4 s - the keyframes get the run's real length (the line's duration + HL_AFTER_MS) as an inline
               animation-duration when the class goes on, so the ease-back lands at the end of those 3 s
            -> GAP_MS -> line c speaks in the background (nothing moves)
@@ -10148,7 +10155,7 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
   var LINE_A = "assets/Audio/vo_t1_intro_a.wav", LINE_B = "assets/Audio/vo_t1_intro_b.wav", LINE_C = "assets/Audio/vo_t1_intro_c.wav";
   var SENT_ID = "vo_sent_boy_sit", EXPLAIN_ID = "vo_t1_explain";
   var WORD_TIMES = [0.29, 0.90, 1.25, 1.42, 1.79, 2.12, 2.27];   // = WORD_TIMES_BY_SLIDE[0] in #P2-BIRD-POP-JS (vo_sent_boy_sit, 2.64 s)
-  var HL_AFTER_MS = 3000, LINE_B_MS = 2400;                   // the highlight stays HL_AFTER_MS after line b ends (rev 2); LINE_B_MS = its length when the element cannot tell (2.36 s)
+  var HL_AFTER_MS = 5000, LINE_B_MS = 2400;                   // the highlight stays HL_AFTER_MS after line b ends (rev 2: 3 s; rev 3, 2026-10-16, user request: 5 s); LINE_B_MS = its length when the element cannot tell (2.36 s)
   var GAP_MS = 300, SENT_IN_MS = 450, SYNC_FALLBACK_MS = 400, NAV_AFTER_MS = 1000;   // NAV_AFTER_MS as in #P2-BIRD-POP-JS
   var OLD_SFX = /sfx_morning_birds\.[a-z0-9]+$/i;              // the old pop beat's SFX on this page (PLAN_BY_SLIDE[0])
   var live = false, mounting = false, run = 0, timers = [], wordRaf = 0, wordEls = null;
