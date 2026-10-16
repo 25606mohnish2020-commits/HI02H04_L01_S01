@@ -10075,7 +10075,8 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
      day); the 9.4 s here is the nominal value (2.4 s + 7 s). Page 3 (siHl70, .si-hl-7): the same look alone, in silence, for
      HL_MS = 7 s - no line under it; both keyframe sets are timed to their nominal length so the breath keeps its period;
    - the sentence pill (.story-caption) - on page 3 with the mic chip inside it - is hidden (and not hit-testable) until its turn,
-     then rises in (siSentIn, 0.45 s);
+     then rises in (siSentIn, 0.45 s; the script takes .si-sent-in off again at the animation's end, so the cue's .p2-cue - whose
+     rule sets animation:none on the pill, [SPK-ONLY-CUE] - going on and off never replays the rise-in: [T2-INTRO] rev 2);
    - the old pop beat's class (.p2-pop) still reaches the frame for 2 s while that chain fizzles (see the script): no motion here. */
 .stage.tut.story-intro .story-frame.p2-pop{animation:none !important;}
 .stage.tut.story-intro .story-img{opacity:0;}
@@ -10319,7 +10320,17 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
     };
     var stepD = function(){ quiet(function(){
       pill.__p2Rec = false;                                                  // the bird (and, on page 3, the mic) may be tapped again from here
-      pill.classList.add("si-shown"); if(!still()) pill.classList.add("si-sent-in");
+      pill.classList.add("si-shown");
+      if(!still()){
+        pill.classList.add("si-sent-in");
+        // [T2-INTRO] rev 2 (2026-10-16, user report): the rise-in class comes off at its animation's end (fallback SENT_IN_MS + 250 ms),
+        // so the pill rests on .si-shown alone. With the class left on, every cue pulse re-ran the rise-in: .p2-cue sets animation:none
+        // on the pill ([SPK-ONLY-CUE]) while it is on, and each time it came off the rise-in rule applied anew and the pill with the mic
+        // inside it appeared again. (A lit word's own pop bubbles its animationend here too, hence the name check.)
+        var sentDone = function(){ pill.classList.remove("si-sent-in"); };
+        pill.addEventListener("animationend", function(e){ if(e.target === pill && e.animationName === "siSentIn") sentDone(); });
+        timers.push(setTimeout(sentDone, SENT_IN_MS + 250));
+      }
       after(still() ? 0 : SENT_IN_MS, cfg.auto ? readSentence : (cfg.cue ? cueLoop : function(){}));
     }); };
     // page 2: the sentence with its word highlight, the explanation, then आगे - the tap's speak() of #P2-BIRD-POP-JS, line for line
