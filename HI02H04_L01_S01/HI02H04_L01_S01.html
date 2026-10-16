@@ -10154,8 +10154,10 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
            -> GAP_MS -> line c speaks in the background (nothing moves)
            -> GAP_MS -> the sentence pill rises in (siSentIn, SENT_IN_MS) -> the sentence vo_sent_boy_sit speaks with the word-by-word
               highlight of [P2-WORD-SYNC] (the same .p2-word.on look, the same timings, PLAN[0].times = WORD_TIMES_BY_SLIDE[0])
-           -> the explanation vo_t1_explain right after it (as the first hearing always brought it, [VO-BATCH])
-           -> आगे NAV_AFTER_MS after the last line (as after the first tap before; its hand nudge stays off, [P2-QUIET-AFTER-NAV]).
+           -> आगे NAV_AFTER_MS after the sentence and its word highlight are over (as after the first tap before; its hand nudge
+              stays off, [P2-QUIET-AFTER-NAV]). Rev 6 (2026-10-16, user request): the explanation vo_t1_explain ("चित्र में लड़का पेड़
+              के नीचे बैठा है। ... इसलिए यह सही वाक्य है।") that followed the sentence here (as the first hearing always brought it,
+              [VO-BATCH]) is no longer spoken on this page - PLAN[0].auto.explain is null - so आगे now comes straight after the sentence.
    GONE FROM PAGE 2: the mic chip (.tut-audio, removed at the mount - as [G1-G3-P1-P3-NO-MIC] does on the question pages), its
    "tap the mic and read the sentence" cue vo_tap_speaker_sentence_story with the chip pulse and the 5 s idle repeat
    ([P2-SPEAKER-CUE] / [P2-CUE-IDLE]), the read-aloud beat ([P2-READ-ALOUD]), the mic-tap sound ([MIC-TAP-SFX]) and the mic lock
@@ -10163,7 +10165,8 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
    first line and the picture's pop with the bird-song SFX that followed it ([P2-VO-FIRST] / [P2-BIRD-POP]) - the three new lines
    take their place. KEPT: the bird's tap (it still repeats vo_t1_instr, [P2-BIRD-REPLAY]; ignored while the intro's own lines
    run, as it is during the read-aloud beat), the feet speaker chip ([FEET-SPEAKER], same replay), the sentence's words and
-   timings, the explanation, आगे's timing and quiet, the VO shield, the music bed's ducking.
+   timings, आगे's timing after the last line and its quiet, the VO shield, the music bed's ducking (the explanation went at rev 6,
+   see above; vo_t1_explain.wav stays in assets/Audio and in the card, unspoken on this page).
    [T2-INTRO] (2026-10-16, later, user request) PAGE 3 (T2 = ?slide=1, the girl on the bicycle) opens the same way, by the table
    (PLAN[1]); its two lines are the user's audio_4/5.wav, copied as assets/Audio/vo_t2_intro_a.wav (2.80 s, "चलिए, एक और चित्र
    देखते हैं") and vo_t2_cue.wav (3.32 s, "अब इस बटन पर टैप करिए और वाक्य को पढ़िए"), approximate wording as above:
@@ -10229,7 +10232,7 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
 (function(){ "use strict";
   // slide index -> the page's intro. lineA: spoken as the picture appears. lineB (page 2): spoken with the highlight, which then
   // stays hlAfterMs more; hlMs (page 3): the highlight alone, in silence. lineC (page 2): the background line before the pill.
-  // noMic: the mic chip is removed at the mount. auto: the pill is read by the page itself (sentence id, explanation id, the word
+  // noMic: the mic chip is removed at the mount. auto: the pill is read by the page itself (sentence id, explanation id or null, the word
   // starts of [P2-WORD-SYNC]); cue: the mic cue line spoken with the chip pulse once the pill is in, repeating after cueIdleMs of
   // inactivity. sfx: the old pop beat's SFX file of that page (PLAN_BY_SLIDE in #P2-BIRD-POP-JS), silenced while the page is open.
   // pick (page 4, [T3-PICK]): the picture choice after the sentence - follow: the engine's follow-up line (id) door 1b takes over;
@@ -10237,7 +10240,7 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
   // (id) spoken on the correct tap, or null.
   var PLAN = {
     0: { lineA: "assets/Audio/vo_t1_intro_a.wav", lineB: "assets/Audio/vo_t1_intro_b.wav", hlAfterMs: 3000, lineC: "assets/Audio/vo_t1_intro_c.wav",
-         noMic: true, auto: { sent: "vo_sent_boy_sit", explain: "vo_t1_explain", times: [0.29, 0.90, 1.25, 1.42, 1.79, 2.12, 2.27] },   // times = WORD_TIMES_BY_SLIDE[0] (vo_sent_boy_sit, 2.64 s)
+         noMic: true, auto: { sent: "vo_sent_boy_sit", explain: null, times: [0.29, 0.90, 1.25, 1.42, 1.79, 2.12, 2.27] },   // times = WORD_TIMES_BY_SLIDE[0] (vo_sent_boy_sit, 2.64 s); explain: null since rev 6 (was "vo_t1_explain")
          sfx: /sfx_morning_birds\.[a-z0-9]+$/i },
     1: { lineA: "assets/Audio/vo_t2_intro_a.wav", hlMs: 3000,
          cue: "assets/Audio/vo_t2_cue.wav", cueIdleMs: 7000,                                                                       // = CUE_IDLE_BY_SLIDE[1]
@@ -10395,10 +10398,12 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
       }
       after(still() ? 0 : SENT_IN_MS, cfg.auto ? readSentence : (cfg.cue ? cueLoop : function(){}));
     }); };
-    // page 2: the sentence with its word highlight, the explanation, then आगे - the tap's speak() of #P2-BIRD-POP-JS, line for line
+    // page 2: the sentence with its word highlight, the explanation (if the plan names one; none since rev 6), then आगे - the tap's
+    // speak() of #P2-BIRD-POP-JS, line for line
     var readSentence = function(){
       pill.__p2Heard = true; pill.__p2Tapped = true;                         // heard: [P2-NAV-AFTER-TAP] lets आगे through from here
-      var sent = srcOf(cfg.auto.sent), exp = srcOf(cfg.auto.explain);
+      var sent = srcOf(cfg.auto.sent), exp = cfg.auto.explain ? srcOf(cfg.auto.explain) : null;
+      if(!exp) pill.__p2Explained = true;                                    // rev 6: no explanation on this page, by any path (speak()'s once-only flag)
       try{ if(typeof stopNudge === "function") stopNudge(); }catch(x){}
       if(typeof window.setNavActive === "function") window.setNavActive(false);
       if(typeof play !== "function") return;
