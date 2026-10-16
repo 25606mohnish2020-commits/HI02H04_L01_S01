@@ -10064,7 +10064,8 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
 /* [T1-INTRO] (2026-10-16, user request) PAGE 2 (T1 = ?slide=0) and, since [T2-INTRO] later the same day, PAGE 3 (T2 = ?slide=1):
    each opens with a scripted picture-then-sentence intro instead of its old narration + pop beat - see <script id="STORY-INTRO-JS">
    at the end of the body for the flows and the sounds. These rules are all keyed on .story-intro, which that script puts on #stage
-   while one of those pages is open and takes off on every other page, so page 4 (T3) and the rest are untouched.
+   while one of those pages is open and takes off on every other page; since [T3-PICK] (later the same day; its rules close this
+   block) page 4 (T3 = ?slide=2) is listed too, so every other page is untouched.
    - the picture (.story-img) is hidden at the mount and appears with the first line: a 0.9 s fade-and-grow (siPicIn: 0.90 -> 1);
    - the highlight (.si-hl): the picture's inset grey stroke ([GREY-STROKE]: 4px #DADADA) turns a light yellow (#FFE066) and
      thickens to 6px (still inset, so nothing grows), a soft yellow glow breathes around it every ~0.86 s and the picture pops out
@@ -10133,6 +10134,21 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
 .stage.tut.story-intro .story-caption.si-shown{opacity:1;visibility:visible;}
 @keyframes siSentIn{0%{opacity:0;transform:translateY(14px) scale(.96);}100%{opacity:1;transform:translateY(0) scale(1);}}
 .stage.tut.story-intro .story-caption.si-sent-in{animation:siSentIn .45s cubic-bezier(.2,.8,.3,1) 1 both;transform-origin:50% 50%;}
+/* [T3-PICK] (2026-10-16, user request) PAGE 4 (T3 = ?slide=2, the picture pair): the page opens with the sentence pill and its mic
+   alone (siSentIn) - the two pictures (.story-img of .story-frame-pair) stay hidden by the .story-intro rule above - and they appear
+   together (the same siPicIn fade-and-grow) with the "tap the right picture" line once the sentence has been read; see PLAN[2].pick
+   in <script id="STORY-INTRO-JS">. From that line's end the pictures are buttons (.t3-opt: hit-testable - the shared
+   img{pointer-events:none} rule is lifted, as [P2-BIRD-REPLAY] does for the bird - pointer cursor, a light press-down); while a line
+   speaks and once the answer is in, the frame is locked (.t3-locked: no taps). A WRONG picture buzzes once (the kit's lateral "no",
+   wgNo, 0.4 s; the script takes .t3-wrong off at its end) and is then disabled for good (.t3-off: faded to the .p4-dim look, not
+   hit-testable). The correct tap's ring + pop + fade are the page's own .p4-mark / .p4-pop / .p4-dim ([VO-BATCH], [P4-MARK-POP]);
+   .p4-dim is restated here at a higher specificity because the .si-shown rule above (opacity:1, later in the file than the
+   #P2-BIRD-POP-CSS rule) would otherwise outrank it on these pictures. */
+.stage.tut.story-intro .story-frame-pair .story-img.t3-opt{pointer-events:auto !important;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s ease;}
+.stage.tut.story-intro .story-frame-pair .story-img.t3-opt:active{transform:scale(.97);}
+.stage.tut.story-intro .story-frame-pair.t3-locked .story-img{pointer-events:none !important;cursor:default;}
+.stage.tut.story-intro .story-frame-pair .story-img.t3-wrong{animation:wgNo .4s ease-in-out 1;}
+.stage.tut.story-intro .story-frame-pair .story-img.t3-off,.stage.tut.story-intro .story-frame-pair .story-img.p4-dim{opacity:.45;pointer-events:none !important;cursor:default;transition:opacity .4s ease;}
 </style>
 <script id="STORY-INTRO-JS">
 /* [T1-INTRO] (2026-10-16, user request) PAGE 2 (T1 = ?slide=0, the boy under the tree). Asked: take the mic button and the
@@ -10181,13 +10197,44 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
               vo_t2_instr).
    GONE FROM PAGE 3: the opening narration vo_t2_instr as the page's first line, the picture's pop with the bicycle-bell SFX, the
    silent first pulse at the cue point ([T2-T3-SILENT-CUE]) and the old cue line vo_tap_speaker_sentence_story (the new line is the
-   cue, at the cue point and on every repeat). Page 4 (T3) and every other page are untouched (everything here is keyed on PLAN).
+   cue, at the cue point and on every repeat). Every other page is untouched (everything here is keyed on PLAN); page 4 joined
+   with [T3-PICK] below.
+   [T3-PICK] (2026-10-16, later, user request) PAGE 4 (T3 = ?slide=2, the picture pair: the girl picking flowers / the girl watering
+   the plants) opens with the pill and runs a picture CHOICE after the sentence, by the table (PLAN[2]); its two lines are the user's
+   audio_6/7.wav (Downloads/VOs), copied as assets/Audio/vo_t3_cue.wav (2.72 s, "चलिए, अब इस वाक्य को पढ़िए") and vo_t3_pick.wav (3.60 s,
+   "अब इस वाक्य के लिए सही चित्र पर टैप करिए"), approximate wording as above; they are not in the card:
+     mount -> GAP_MS -> the sentence pill WITH the mic chip inside it rises in (siSentIn) at the top, alone - the two pictures stay
+              hidden - no line
+           -> SENT_IN_MS -> the cue: the mic chip pulses while vo_t3_cue speaks, again after every cueIdleMs = 7 s of inactivity,
+              exactly as on page 3 (cueLoop)
+           -> the mic tap and everything up to the sentence are the page's own, untouched ([P2-READ-ALOUD] / [T1-T3-REC-PER-WORD]:
+              the 7 s read-aloud beat with the words pacing, then the sentence vo_sent_girl_water with its words lit, the mic disabled
+              for good; [MIC-TAP-SFX])
+           -> the engine's follow-up line vo_t3_explain, asked for right after the sentence (speak() in #P2-BIRD-POP-JS, just after
+              markFor ringed the meant picture), is NOT spoken and the ring is undone (door 1b below): in its place the two pictures
+              fade and grow in together (siPicIn) as vo_t3_pick speaks, and from its end they are buttons (.t3-opt, #STORY-INTRO-CSS);
+              the line speaks again after every pick.idleMs = 7 s of inactivity (no tap, nothing speaking) until the right picture
+              is tapped - the correct picture is never marked by itself
+           -> a WRONG tap (the girl picking flowers): the incorrect sound (stdSfx "incorrect", [STD-SFX]), the picture buzzes once
+              (the kit's wgNo) and is disabled for good (.t3-off: faded, not tappable), and the hand nudge (the engine's pointNudgeAt,
+              #nudgeHand) taps on the correct picture until it is tapped; no line
+           -> the CORRECT tap (the girl watering the plants, pick.correct = MARK_BY_SLIDE[2].mark): the correct sound (stdSfx
+              "correct"), the page's own green ring + pop on it and the fade of the other (.p4-mark / .p4-pop / .p4-dim - what markFor
+              drew), the hand goes, pick.ok = vo_t3_explain ("इस वाक्य के लिए यह चित्र सही है।") speaks with the pop, and आगे NAV_AFTER_MS
+              after it (door 3 holds the engine's earlier activations - [P2-NAV-HIDE]'s, after the pick line - until then; its hand
+              nudge stays off, [P2-QUIET-AFTER-NAV]).
+   GONE FROM PAGE 4: the opening narration vo_t3_instr as the page's first line, the silent first pulse at the cue point
+   ([T2-T3-SILENT-CUE]) and the old cue line vo_tap_speaker_sentence_story (vo_t3_cue is the cue, at the cue point and on every
+   repeat), the follow-up line straight after the sentence with the automatic ring ([P2-FOLLOW] / [P4-TAP-ONLY] / [P4-MARK-POP]: the
+   same ring, pop and line now come on the correct tap). KEPT: the bird's and the feet chip's replay of vo_t3_instr, the mic lock
+   until the (swallowed) narration is over, the beat, the sentence and its words, the VO shield, the music bed's ducking. Pages 2-3
+   and every other page are untouched.
    HOW, without touching #P2-BIRD-POP-JS (its tables are private): this block is the outermost wrapper of mountSlide and play().
    On a listed page's mount the engine's STORY_SCENE asks play() for the narration; that one call is not played and its
    end-of-narration callback fires at once instead, so the old chain runs and FIZZLES, invisibly: the pop class on the frame has no
    animation here (#STORY-INTRO-CSS), its SFX is silenced (the HTMLMediaElement.prototype.play door below answers that page's SFX file
    with an immediate "ended" while the page is open), the mic unlock runs harmlessly (page 2: no chip; page 3: the chip is still
-   hidden, and enabled from here on), and the old cue never comes because the frame is marked __spkTapped at the mount - the very
+   hidden, and enabled from here on; page 4: as page 3), and the old cue never comes because the frame is marked __spkTapped at the mount - the very
    flag the mic tap set, on which startCue / idleArm / idleFire bow out. आगे: the old chain's activations are swallowed by
    [P2-NAV-AFTER-TAP] until the pill is "heard" (pill.__p2Heard) - page 2 sets it when it reads the sentence, exactly where the
    tap's speak() set it, and its own setNavActive(true) then passes through as the tap's did; page 3 leaves it to the mic tap.
@@ -10201,17 +10248,23 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
   // noMic: the mic chip is removed at the mount. auto: the pill is read by the page itself (sentence id, explanation id, the word
   // starts of [P2-WORD-SYNC]); cue: the mic cue line spoken with the chip pulse once the pill is in, repeating after cueIdleMs of
   // inactivity. sfx: the old pop beat's SFX file of that page (PLAN_BY_SLIDE in #P2-BIRD-POP-JS), silenced while the page is open.
+  // pick (page 4, [T3-PICK]): the picture choice after the sentence - follow: the engine's follow-up line (id) door 1b takes over;
+  // line: the pictures' line; idleMs: its repeat after that much inactivity; correct: the index of the right picture; ok: the line
+  // (id) spoken on the correct tap, or null.
   var PLAN = {
     0: { lineA: "assets/Audio/vo_t1_intro_a.wav", lineB: "assets/Audio/vo_t1_intro_b.wav", hlAfterMs: 7000, lineC: "assets/Audio/vo_t1_intro_c.wav",
          noMic: true, auto: { sent: "vo_sent_boy_sit", explain: "vo_t1_explain", times: [0.29, 0.90, 1.25, 1.42, 1.79, 2.12, 2.27] },   // times = WORD_TIMES_BY_SLIDE[0] (vo_sent_boy_sit, 2.64 s)
          sfx: /sfx_morning_birds\.[a-z0-9]+$/i },
     1: { lineA: "assets/Audio/vo_t2_intro_a.wav", hlMs: 7000,
          cue: "assets/Audio/vo_t2_cue.wav", cueIdleMs: 7000,                                                                       // = CUE_IDLE_BY_SLIDE[1]
-         sfx: /sfx_bicycle_bell\.[a-z0-9]+$/i }
+         sfx: /sfx_bicycle_bell\.[a-z0-9]+$/i },
+    2: { cue: "assets/Audio/vo_t3_cue.wav", cueIdleMs: 7000,                                                                       // [T3-PICK] page 4: no picture beat - the pill + mic rise in at once, then this cue (cueIdleMs = CUE_IDLE_BY_SLIDE[2])
+         pick: { follow: "vo_t3_explain", line: "assets/Audio/vo_t3_pick.wav", idleMs: 7000, correct: 1, ok: "vo_t3_explain" } }   // correct = MARK_BY_SLIDE[2].mark (image_ids[1], the girl watering the plants)
   };
   var LINE_B_MS = 2400;                                        // page 2's line b length when its element cannot tell (2.36 s)
   var GAP_MS = 300, SENT_IN_MS = 450, SYNC_FALLBACK_MS = 400, NAV_AFTER_MS = 1000;   // NAV_AFTER_MS as in #P2-BIRD-POP-JS
-  var live = null, mounting = -1, run = 0, timers = [], wordRaf = 0, wordEls = null, cueCtl = null;
+  var MARK_POP_MS = 3400, WRONG_BUZZ_MS = 400;                 // [T3-PICK] the correct picture's pop-and-hold (= p4MarkPop, as MARK_POP_MS there); the wrong picture's buzz (= wgNo)
+  var live = null, mounting = -1, run = 0, timers = [], wordRaf = 0, wordEls = null, cueCtl = null, pickCtl = null;
   function $id(id){ return document.getElementById(id); }
   function tail(p){ return String(p || "").split("/").pop(); }
   function srcOf(id){ var c = (typeof CARD === "object" && CARD) ? CARD : null; return (c && c.assets && c.assets.audio && c.assets.audio[id]) || ("assets/Audio/" + id + "." + (typeof AUDIO_EXT === "string" ? AUDIO_EXT : "wav")); }
@@ -10219,7 +10272,11 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
   function still(){ return !!(window.FLNMotion && FLNMotion.still && FLNMotion.still()); }
   function cur(){ return (typeof currentAudio !== "undefined") ? currentAudio : null; }
   function has(idx){ return Object.prototype.hasOwnProperty.call(PLAN, idx); }
-  function cancel(){ run++; live = null; cueCtl = null; timers.forEach(function(t){ clearTimeout(t); }); timers = []; wordStop(); }
+  function cancel(){
+    run++; live = null; cueCtl = null; timers.forEach(function(t){ clearTimeout(t); }); timers = []; wordStop();
+    if(pickCtl && pickCtl.hand){ try{ if(typeof stopNudge === "function") stopNudge(); }catch(e){} }   // [T3-PICK] the page is left with the hand on the picture
+    pickCtl = null;
+  }
   function wordStop(){ if(wordRaf){ cancelAnimationFrame(wordRaf); wordRaf = 0; } if(wordEls){ wordEls.forEach(function(w){ w.classList.remove("on"); }); wordEls = null; } }
   // [P2-WORD-SYNC] verbatim: word k carries .on while times[k] <= currentTime < times[k+1]; stops at the end or when the line is cut
   function wordSync(a, els, times){
@@ -10245,6 +10302,13 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
         if(typeof onEnd === "function") timers.push(setTimeout(onEnd, 0));
         return;
       }
+      // ---- door 1b ([T3-PICK]): page 4's follow-up line after the read sentence (vo_t3_explain, asked for by the mic tap's speak() in
+      // #P2-BIRD-POP-JS right after markFor) is not spoken: its callback fires at once and the pictures' beat starts in its place
+      if(pickCtl && !pickCtl.started && src && tail(src) === tail(srcOf(pickCtl.follow))){
+        if(typeof onEnd === "function") timers.push(setTimeout(onEnd, 0));
+        pickCtl.start();
+        return;
+      }
       return origPlay.apply(this, arguments);
     };
   }
@@ -10257,6 +10321,20 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
         return Promise.resolve();
       }
       return protoPlay.apply(this, arguments);
+    };
+  }
+  // ---- door 3 ([T3-PICK]): आगे. On page 4 the engine's activations AFTER the mic tap (the tap's lines being over, [P2-NAV-HIDE]:
+  // NAV_AFTER_MS after the pick line) are held until the correct picture has been tapped; the pick phase then raises its own, with the
+  // hold lifted first. Activations BEFORE the mic tap pass: #P2-BIRD-POP-JS blocks them itself (navBlocked, the pill not "heard" yet)
+  // and needs the first of them - the end-of-narration signal - for its own beat (run(): the mic unlock, [T1-T3-MIC-LOCK]).
+  var origNav = window.setNavActive;
+  if(typeof origNav === "function"){
+    window.setNavActive = function(on){
+      if(on === true && pickCtl && pickCtl.hold){
+        var pl = document.querySelector("#slideHost .story-caption");
+        if(pl && pl.__p2Heard) return;
+      }
+      return origNav.apply(this, arguments);
     };
   }
   // ---- the intro itself
@@ -10375,7 +10453,76 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
       var a = cur(); if(a) a.addEventListener("pause", function(){ settle(); }, { once:true });   // cut (a bird replay): the pulse settles; the count runs from the quiet
     };
     var cueLoop = function(){ cueCtl = { arm: cueArm }; speakCue(); };
-    stepA();
+    // [T3-PICK] page 4: the pictures' beat after the sentence (see the note). ctl is pickCtl while the page is open: door 1b calls
+    // ctl.start() in place of the follow-up line; door 3 holds आगे while ctl.hold; cancel() drops it (and the hand) when the page is left.
+    var pickSetup = function(){
+      var pk = cfg.pick, pics = Array.prototype.slice.call(frame.querySelectorAll(".story-img"));
+      var ctl = { follow: pk.follow, started: false, hold: true, hand: false, start: null };
+      var pickTimer = null, answered = false;
+      var lock = function(on){ frame.classList.toggle("t3-locked", !!on); };
+      var pickArm = function(){                                             // the line again after idleMs of inactivity (no tap, nothing speaking)
+        if(pickTimer){ clearTimeout(pickTimer); pickTimer = null; }
+        if(!ok() || answered) return;
+        pickTimer = setTimeout(pickFire, pk.idleMs); timers.push(pickTimer);
+      };
+      var pickFire = function(){
+        pickTimer = null;
+        if(!ok() || answered) return;
+        if(document.body.classList.contains("vo-playing")){ quiet(pickArm); return; }   // a line speaks (a replay): count again from its end
+        say(pk.line, pickArm);
+      };
+      var onPick = function(im, k){
+        if(!ok() || answered || !ctl.started || im.classList.contains("t3-off") || frame.classList.contains("t3-locked")) return;
+        if(document.body.classList.contains("vo-playing")) return;        // (the VO shield already takes these taps)
+        if(pickTimer){ clearTimeout(pickTimer); pickTimer = null; }
+        if(k === pk.correct){
+          answered = true; cueCtl = null; lock(true);
+          if(ctl.hand){ ctl.hand = false; try{ if(typeof stopNudge === "function") stopNudge(); }catch(x){} }
+          if(typeof stdSfx === "function") stdSfx("correct");            // [STD-SFX] the correct sound, on its own element
+          pics.forEach(function(o, j){ o.classList.remove("si-pic-in", "t3-wrong"); o.classList.toggle("p4-mark", j === k); o.classList.toggle("p4-dim", j !== k); });
+          if(!still()){                                                   // the page's own pop-and-hold with the line ([P4-MARK-POP])
+            im.classList.add("p4-pop");
+            im.addEventListener("animationend", function(e){ if(e.target === im && e.animationName === "p4MarkPop") im.classList.remove("p4-pop"); }, { once:true });
+            timers.push(setTimeout(function(){ im.classList.remove("p4-pop"); }, MARK_POP_MS + 250));
+          }
+          var finish = function(){ ctl.hold = false; quiet(function(){ after(NAV_AFTER_MS, function(){ if(typeof window.setNavActive === "function") window.setNavActive(true); }); }); };
+          if(pk.ok) say(srcOf(pk.ok), finish); else finish();
+        } else {
+          if(typeof stdSfx === "function") stdSfx("incorrect");          // [STD-SFX] the incorrect sound
+          im.classList.remove("si-pic-in");
+          if(!still()){                                                   // one lateral buzz (the kit's wgNo), then the class comes off
+            im.classList.add("t3-wrong");
+            im.addEventListener("animationend", function(e){ if(e.target === im && e.animationName === "wgNo") im.classList.remove("t3-wrong"); }, { once:true });
+            timers.push(setTimeout(function(){ im.classList.remove("t3-wrong"); }, WRONG_BUZZ_MS + 250));
+          }
+          im.classList.add("t3-off"); im.setAttribute("aria-disabled", "true");   // disabled for good
+          var right = pics[pk.correct];
+          if(right && typeof pointNudgeAt === "function"){ ctl.hand = true; pointNudgeAt(right); }   // the hand taps on the correct picture
+          pickArm();
+        }
+      };
+      ctl.start = function(){
+        if(ctl.started || !ok()) return;
+        ctl.started = true;
+        pics.forEach(function(o, j){
+          o.classList.remove("p4-mark", "p4-dim", "p4-pop");              // markFor's ring and fade (put on just before the follow line was asked for): the right picture is never marked by itself
+          o.classList.add("t3-opt"); o.setAttribute("role", "button"); o.setAttribute("aria-label", "चित्र " + (j + 1));
+          o.addEventListener("click", function(){ onPick(o, j); });
+        });
+        lock(true);                                                       // no tap while the line speaks
+        quiet(function(){
+          say(pk.line, function(){
+            if(answered) return;
+            lock(false); pics.forEach(function(o){ o.classList.remove("si-pic-in"); });   // (the rise-in's held end state would outrank the press-down)
+            cueCtl = { arm: pickArm }; pickArm();                         // any tap restarts the count (the document pointerdown listener)
+          });
+          onPlaying(function(){ pics.forEach(function(o){ o.classList.add("si-shown"); if(!still()) o.classList.add("si-pic-in"); }); });   // the pictures appear with the line
+        });
+      };
+      pickCtl = ctl;
+    };
+    if(cfg.pick) pickSetup();
+    if(cfg.lineA) stepA(); else after(GAP_MS, stepD);                    // [T3-PICK] page 4: no picture beat - straight to the pill
   }
   document.addEventListener("pointerdown", function(){ if(cueCtl) cueCtl.arm(); }, true);   // any tap restarts page 3's cue count ([P2-CUE-IDLE]); the mic tap ends it (micTaken)
   function open(idx){
@@ -10396,7 +10543,7 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
       return r;
     };
   }
-  Object.keys(PLAN).forEach(function(k){ var p = PLAN[k]; [p.lineA, p.lineB, p.lineC, p.cue].forEach(function(s){ if(!s) return; try{ var a = new Audio(); a.preload = "auto"; a.src = s; }catch(e){} }); });   // warm the files so each beat lands with its line
+  Object.keys(PLAN).forEach(function(k){ var p = PLAN[k]; [p.lineA, p.lineB, p.lineC, p.cue, p.pick && p.pick.line].forEach(function(s){ if(!s) return; try{ var a = new Audio(); a.preload = "auto"; a.src = s; }catch(e){} }); });   // warm the files so each beat lands with its line
   // a direct ?slide=N load mounted the page (and started its narration) before this block ran
   try{
     var gate = $id("startGate");
