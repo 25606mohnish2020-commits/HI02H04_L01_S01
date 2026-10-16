@@ -7052,8 +7052,18 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   100%{transform:scale(1);}                                                       /* ease back by 2.0s */
 }
 .stage.tut .story-frame.p2-pop{animation:p2BirdPop 2s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
-/* pages 6, 8, 10 and 12: the recall picture above the sentence pills pops on the correct tap (#P5-CORRECT-SFX-JS adds .p2-pop) */
-.story-q-stim .story-q-thumb.p2-pop{animation:p2BirdPop 2s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
+/* pages 6, 8, 10 and 12: the recall picture above the sentence pills pops on the correct tap (#P5-CORRECT-SFX-JS adds .p2-pop)
+   [G1-P4-SFX-1S] (2026-10-16, user request) 1 s instead of 2 s, with its sound (hold_ms 1000 in #P5-CORRECT-SFX-JS): the same shape
+   re-timed - the pop-out (0.2 s), the settle (0.32 s) and the ease-back (0.28 s) keep their own lengths, the hold between them is
+   the 1 s cut (0.32 -> 0.72 s, was 0.32 -> 1.72 s). p2BirdPop itself (2 s) is untouched for its other rule above. */
+@keyframes p2BirdPop1s{
+  0%{transform:scale(1);animation-timing-function:cubic-bezier(.2,.8,.3,1);}      /* pop out: 0 -> 0.20s */
+  20%{transform:scale(1.045);animation-timing-function:ease-in-out;}              /* slight overshoot */
+  32%{transform:scale(1.03);animation-timing-function:linear;}                    /* settle by 0.32s ... */
+  72%{transform:scale(1.03);animation-timing-function:ease-in-out;}               /* ... HOLD until 0.72s */
+  100%{transform:scale(1);}                                                       /* ease back by 1.0s */
+}
+.story-q-stim .story-q-thumb.p2-pop{animation:p2BirdPop1s 1s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
 /* [P2-SPEAKER-CUE] page 2: the caption pill (yellow bar + sentence; the speaker chip is its child and breathes with it, on top
    of its own .playing waves) pulses for as long as the "tap the speaker" cue line plays (#P2-BIRD-POP-JS adds/removes .p2-cue) */
 @keyframes p2CuePulse{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
@@ -8707,25 +8717,48 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    bird, no word line (the sentence pills' own clip), no शाबाश line, no idle repeat of the instruction ([P6-PROMPT-IDLE] is
    stopped for good through its own __spkTapped flag on the page's .q-row), and no hand-over to the engine's correct branch. The
    wrong taps, the reveal itself (hand, guide-pulse, disabled decoys, [GUIDED-EASY-TAP]) and the first-try correct tap are as
-   shipped; the revealed answer is still recorded as before (answer_revealed at the reveal, slide_completed success:false). */
+   shipped; the revealed answer is still recorded as before (answer_revealed at the reveal, slide_completed success:false).
+   [G1-P4-SFX-1S] (2026-10-16, user request) the same eight pages (G1 = ?slide=3 ... P4 = ?slide=10): the correct tap's sound effect
+   and the animation synced with it last 1 s instead of 2 s, and the sound is 10% quieter. hold_ms 2000 -> 1000 on every page, so
+   the tap is handed over (first try) or ends the page (the guided tap) 1 s after it; the sound itself - every file is a 2.0 s
+   cut - is stopped at that moment, faded out over its last SFX_FADE_MS (150 ms) so it does not click, where it used to run out
+   with the hold; the recall picture's pop on pages G2, G4, P2, P4 is 1 s (p2BirdPop1s in #P2-BIRD-POP-CSS; POP_MS 2000 -> 1000).
+   Volume x 0.9 on each page's level: the default VOL 0.7 -> 0.63, page P1's 0.1225 -> 0.11025, page P3's 0.21 -> 0.189. The
+   files, the wrong taps, the ding, the confetti and everything after the hold are untouched. */
 (function(){ "use strict";
-  var VOL = 0.7, POP_MS = 2000;
+  var VOL = 0.63, POP_MS = 1000, SFX_FADE_MS = 150;                       // [G1-P4-SFX-1S] VOL was 0.7 and POP_MS 2000
   // slide index -> {src, hold_ms, pop?, vol?} (the user counts pages from the landing page: ?slide=N is page N+2); vol defaults to VOL
+  // [G1-P4-SFX-1S] (2026-10-16) every hold_ms 2000 -> 1000 (the sound is stopped then) and every level x 0.9
   var CORRECT_SFX_BY_SLIDE = {
-    3: { src: "assets/Audio/sfx_children.wav",       hold_ms: 2000 },                                    // page 5: the children playing with the ball - the page-8 cut of the user's 'freesound_community-children-74190.mp3' ([P5-READ-ALOUD] rev 3, 2026-10-01; sfx_cat_drinking.mp3 is gone)
-    4: { src: "assets/Audio/sfx_drinking_water.wav", hold_ms: 2000, pop: "#slideHost .story-q-thumb" },  // page 6: the boy drinking water
-    5: { src: "assets/Audio/sfx_newspaper.wav",      hold_ms: 2000 },                                    // page 7: mom reading the newspaper
-    6: { src: "assets/Audio/sfx_children.wav",       hold_ms: 2000, pop: "#slideHost .story-q-thumb" },  // page 8: children sitting in the field
-    7: { src: "assets/Audio/sfx_hand_pump.wav",      hold_ms: 2000, vol: 0.1225 },                       // page 9: the boy filling water at the pump (0.7 -> 0.42 -> 0.25 -> 0.175 -> 0.1225: cuts of 40%, 40%, 30%, 30% asked by the user)
-    8: { src: "assets/Audio/sfx_grazing.wav",        hold_ms: 2000, pop: "#slideHost .story-q-thumb" },  // page 10: the goat eating grass
-    9: { src: "assets/Audio/sfx_kitten_snore.wav",   hold_ms: 2000, vol: 0.21 },                         // page 11: the cat sleeping (70% quieter than the 0.7 default, asked by the user)
-   10: { src: "assets/Audio/sfx_bird_feeder.wav",    hold_ms: 2000, pop: "#slideHost .story-q-thumb" }   // page 12: the bird pecking grain
+    3: { src: "assets/Audio/sfx_children.wav",       hold_ms: 1000 },                                    // page 5: the children playing with the ball - the page-8 cut of the user's 'freesound_community-children-74190.mp3' ([P5-READ-ALOUD] rev 3, 2026-10-01; sfx_cat_drinking.mp3 is gone)
+    4: { src: "assets/Audio/sfx_drinking_water.wav", hold_ms: 1000, pop: "#slideHost .story-q-thumb" },  // page 6: the boy drinking water
+    5: { src: "assets/Audio/sfx_newspaper.wav",      hold_ms: 1000 },                                    // page 7: mom reading the newspaper
+    6: { src: "assets/Audio/sfx_children.wav",       hold_ms: 1000, pop: "#slideHost .story-q-thumb" },  // page 8: children sitting in the field
+    7: { src: "assets/Audio/sfx_hand_pump.wav",      hold_ms: 1000, vol: 0.11025 },                      // page 9: the boy filling water at the pump (0.7 -> 0.42 -> 0.25 -> 0.175 -> 0.1225 -> 0.11025: cuts of 40%, 40%, 30%, 30%, 10% asked by the user)
+    8: { src: "assets/Audio/sfx_grazing.wav",        hold_ms: 1000, pop: "#slideHost .story-q-thumb" },  // page 10: the goat eating grass
+    9: { src: "assets/Audio/sfx_kitten_snore.wav",   hold_ms: 1000, vol: 0.189 },                        // page 11: the cat sleeping (70% quieter than the 0.7 default, asked by the user; then 10% quieter again: 0.21 -> 0.189)
+   10: { src: "assets/Audio/sfx_bird_feeder.wav",    hold_ms: 1000, pop: "#slideHost .story-q-thumb" }   // page 12: the bird pecking grain
   };
-  var holding = false, passthrough = false, timer = null, sfx = null;
+  var holding = false, passthrough = false, timer = null, sfx = null, fadeTimer = null;
   function cancel(){
     if(timer){ clearTimeout(timer); timer = null; }
+    if(fadeTimer){ clearTimeout(fadeTimer); fadeTimer = null; }
     if(sfx){ try{ sfx.pause(); }catch(e){} sfx = null; }
     holding = false;
+  }
+  // [G1-P4-SFX-1S] the sound is cut at the end of the hold: its volume ramps to 0 over ms (16 ms steps), then it is paused
+  // (the pause also releases the music bed's duck, [BGM-DUCK]); a sound already over or replaced is left alone
+  function fadeOut(a, ms){
+    if(!a) return;
+    var v0 = a.volume, t0 = Date.now();
+    (function step(){
+      fadeTimer = null;
+      if(a !== sfx || a.paused || a.ended) return;
+      var k = ms > 0 ? Math.min(1, (Date.now() - t0) / ms) : 1;
+      try{ a.volume = Math.max(0, v0 * (1 - k)); }catch(e){}
+      if(k < 1){ fadeTimer = setTimeout(step, 16); return; }
+      try{ a.pause(); }catch(e){}
+    })();
   }
   function correctOption(slide){
     var opts = slide && slide.data && slide.data.options || [];
@@ -8767,8 +8800,12 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     }
     if(cfg.pop) popEl(document.querySelector(cfg.pop));
     try{ sfx = new Audio(cfg.src); sfx.volume = (cfg.vol != null) ? cfg.vol : VOL; sfx.play().catch(function(){}); }catch(x){}
+    if(fadeTimer){ clearTimeout(fadeTimer); fadeTimer = null; }
+    (function(a){ fadeTimer = setTimeout(function(){ fadeTimer = null; fadeOut(a, SFX_FADE_MS); }, Math.max(0, cfg.hold_ms - SFX_FADE_MS)); })(sfx);   // [G1-P4-SFX-1S] the sound ends with the hold (1 s), not with its 2 s file
     timer = setTimeout(function(){
       timer = null; holding = false;
+      if(fadeTimer){ clearTimeout(fadeTimer); fadeTimer = null; }             // [G1-P4-SFX-1S] the hold is over: what is left of the fade is cut here, before the
+      if(sfx){ try{ sfx.pause(); }catch(x){} }                               // hand-over's confetti can delay its last steps - the sound ends with the hold
       if(!cell.isConnected || state.idx !== idx) return;                     // the page was left during the hold
       if(guided){                                                             // [G1-P4-REVEAL-QUIET] (2026-10-09, user request): the guided tap ends the page with the ding + confetti alone
         try{ setSwMood("talk"); }catch(x){}                                   // the header bird back to its resting face (no happy animation)
