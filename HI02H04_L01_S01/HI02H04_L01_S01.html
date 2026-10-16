@@ -7608,8 +7608,9 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   };
   // slide index -> the explanation that follows the FIRST hearing of the sentence, once per page open ([VO-BATCH])
   var EXPLAIN_BY_SLIDE = {
-    0: "vo_t1_explain",                                                                  // page 2: चित्र में लड़का पेड़ के नीचे बैठा है। ... इसलिए यह सही वाक्य है।
-    1: "vo_t2_explain"                                                                   // page 3: हाँ! यह वाक्य सही है। ...
+    0: "vo_t1_explain"                                                                   // page 2: चित्र में लड़का पेड़ के नीचे बैठा है। ... इसलिए यह सही वाक्य है।
+    // page 3 spoke "vo_t2_explain" (हाँ! यह वाक्य सही है। ...) here until [T2-INTRO] rev 4 (2026-10-16, user request): the entry is gone,
+    // so the mic tap's sentence (with its words lit) is the page's last line and आगे comes NAV_AFTER_MS after it
   };
   // slide index -> ms of inactivity (no tap, nothing speaking) after which the cue plays again, from the scheduled cue point on ([P2-CUE-IDLE])
   var CUE_IDLE_BY_SLIDE = {
@@ -10179,9 +10180,11 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
               line, the same cue (line + pulse) again after every CUE_IDLE_MS = 7 s of inactivity - no tap anywhere and nothing
               speaking; any tap restarts the count - until the mic is tapped or आगे has appeared
            -> the mic tap and everything after it are the page's own, untouched ([P2-READ-ALOUD] / [T1-T3-REC-PER-WORD]: the 5 s
-              read-aloud beat with the words pacing, then the sentence vo_sent_girl_cycle with its words lit, the explanation
-              vo_t2_explain, आगे NAV_AFTER_MS later, the mic disabled for good; [MIC-TAP-SFX]; the bird's and the feet chip's replay of
-              vo_t2_instr).
+              read-aloud beat with the words pacing, then the sentence vo_sent_girl_cycle with its words lit, आगे NAV_AFTER_MS
+              later, the mic disabled for good; [MIC-TAP-SFX]; the bird's and the feet chip's replay of vo_t2_instr). Rev 4
+              (2026-10-16, user request): the explanation vo_t2_explain ("हाँ! यह वाक्य सही है। ...") that followed the sentence is no
+              longer spoken - its EXPLAIN_BY_SLIDE entry in #P2-BIRD-POP-JS is gone - so आगे comes straight after the sentence;
+              vo_t2_explain.wav stays in assets/Audio and in the card, unspoken on this page.
    GONE FROM PAGE 3: the opening narration vo_t2_instr as the page's first line, the picture's pop with the bicycle-bell SFX, the
    silent first pulse at the cue point ([T2-T3-SILENT-CUE]) and the old cue line vo_tap_speaker_sentence_story (the new line is the
    cue, at the cue point and on every repeat). Every other page is untouched (everything here is keyed on PLAN); page 4 joined
