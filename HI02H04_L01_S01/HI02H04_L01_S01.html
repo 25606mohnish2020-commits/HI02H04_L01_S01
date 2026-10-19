@@ -6,6 +6,127 @@
 <title>SwiftPAL · HI02H04_L01_S01 · चित्र-वाक्य मिलान</title>
 <!-- inline favicon: stops the browser asking for /favicon.ico and logging a 404 -->
 <link rel="icon" href="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+<script id="ASSET-WARM-JS">
+/* [ASSET-WARM] (2026-10-19, user request: "on the Vercel link the images and animations take a little long to load"). Opened from
+   disk every file is there at once; online each one was downloaded only when it was first shown, and at boot about 8 MB that the
+   title page does not show (the two transition birds, the celebration sheets, the end mascot, the T1-T3 voice lines and the first
+   megabytes of the 46 MB music bed) raced the title's own art - at 10 Mbit/s the title Swiftie (1.8 MB) was complete only after
+   ~9 s, and each later page's pictures arrived a second or more after the page had opened. Nothing on screen, no sound and no
+   timing of the lesson changes; only WHEN each file is fetched:
+   1. TITLE FIRST. window.__afterTitle(fn) holds the early extras (the gate birds' blobs, the gate <img>, the T1-T3 line preloads)
+      until the window's load event, i.e. until the title page's own pictures are in (TITLE_CAP_MS at most). The boot loader still
+      fades at 2 s, or when the title art is in if that is later (never after TITLE_CAP_MS), so page 1 never opens half drawn.
+   2. THEN EVERY PAGE'S ART, IN PAGE ORDER. Once the gate birds are in (GATE_WAIT_MS at most) a quiet background queue (QUEUE_CONC
+      at a time, low fetch priority) loads each page's pictures and sprite sheets: WARM below (recorded page by page in Chrome,
+      plus the feedback animations and P6's coach pictures that only appear on an answer) and the picture ids in each slide's card
+      data (so a picture swapped in the card later is fetched ahead too). It always takes the page on screen and the pages after it
+      first. The Image objects are kept (window.__warm.imgs), so when a page opens its pictures come from memory.
+   3. The music bed reads ahead once the title, the gate birds and T1's art are in (window.__afterPage(0, fn); it was read from
+      load, racing the title), so it still has the gate's seconds to buffer before T1 opens. LAST, once the queue is empty
+      (window.__afterWarm): the celebration sheets (__celWarm; 1.5 s after load before).
+   4. The header Swiftie's celebrate animation is fetched once into a blob, and setSwMood shows it through window.__freshUrl: one
+      fresh blob: URL per page, exactly where it used a new ?r= address per page (state.slideStart). The animation still restarts
+      on every page's correct answer, but no longer re-downloads 0.39 MB first. Under file:// (local preview) fetch() is refused,
+      so the ?r= address is used as before.
+   The two deferred <img>s (the gate bird, the end-screen mascot) carry data-warm-src + data-warm="title" instead of src: they get
+   their src with the gate wave, long before either is shown. */
+(function(){ "use strict";
+  var TITLE_CAP_MS = 7000, GATE_WAIT_MS = 6000, QUEUE_CONC = 3, ITEM_GUARD_MS = 20000;
+  // [slide index, file] - in page order; "*" marks a file kept as a blob (see 4.)
+  var WARM = [
+    [0, "assets/UI/btn-play.svg"], [0, "assets/Images/pic_boy_sit.webp"], [0, "assets/UI/start_mascot.webp"],
+    [0, "assets/UI/btn-next-disabled-pill.svg"], [0, "assets/UI/btn-next-disabled-arrow.svg"], [0, "assets/UI/btn-next-pill.svg"], [0, "assets/UI/btn-next-arrow.svg"],
+    [1, "assets/Images/pic_girl_cycle.webp"],
+    [2, "assets/Images/pic_girl_pick_flowers.webp"], [2, "assets/Images/pic_girl_water_plants.webp"], [2, "assets/Images/pic_girl_play_ball.webp"],
+    [2, "*assets/UI/sw_head_celebrate_anim.webp"], [2, "assets/UI/sw_head_tryagain_anim.webp"], [2, "assets/UI/sw_head_hint_anim.webp"],
+    [2, "assets/UI/sw_lg_tryagain.webp"], [2, "assets/UI/sw_lg_hint.webp"], [2, "assets/UI/hint_active.webp"],
+    [3, "assets/Images/pic_children_run_gry.webp"], [3, "assets/Images/pic_children_circle_opt_gry.webp"], [3, "assets/Images/pic_bird_tree_gry.webp"],
+    [4, "assets/Images/pic_boy_drink_water_gry.webp"],
+    [5, "assets/Images/pic_mom_water_plants_gry.webp"], [5, "assets/Images/pic_girl_read_book_gry.webp"], [5, "assets/Images/pic_mom_read_gry.webp"],
+    [6, "assets/Images/pic_children_circle_gry.webp"],
+    [7, "assets/Images/pic_boy_fill_water_gry.webp"], [7, "assets/Images/pic_boy_eat_gry.webp"], [7, "assets/Images/pic_boy_drink_water_sq_gry.webp"],
+    [8, "assets/Images/pic_goat_eat_gry.webp"],
+    [9, "assets/Images/pic_cat_sleep_gry.webp"], [9, "assets/Images/pic_cat_drink_sq_gry.webp"], [9, "assets/Images/pic_cat_eat_gry.webp"],
+    [10, "assets/Images/pic_bird_peck_gry.webp"],
+    [11, "assets/Images/rail_figma.webp"], [11, "assets/Images/train_figma.webp"], [11, "assets/Images/train_wheel_f1.webp"], [11, "assets/Images/train_wheel_f2.webp"],
+    [11, "assets/Images/train_cargo_cat.webp"], [11, "assets/Images/train_cargo_goat.webp"], [11, "assets/Images/train_cargo_bird.webp"],
+    [12, "assets/Images/pic_dog_ball_wht.webp"], [12, "assets/Images/pic_children_kite_wht.webp"], [12, "assets/Images/pic_grandpa_newspaper_wht.webp"],
+    [12, "assets/Images/train_cargo_dog.webp"], [12, "assets/Images/train_cargo_grandpa2.webp"], [12, "assets/Images/train_cargo_kite.webp"],
+    [13, "assets/UI/end_screen.webp"], [13, "assets/UI/bgdeco_star.svg"], [13, "assets/UI/bgdeco_star_o.svg"], [13, "assets/UI/bgdeco_spark.svg"]
+  ];
+  var ONLINE = location.protocol !== "file:";
+  var titleDone = false, warmDone = false, onTitle = [], onWarm = [], gateWave = [];
+  var items = [], seen = {}, imgs = [], blobs = {}, fresh = {}, active = 0, started = false;
+  function call(fn){ try{ var r = fn(); if(r && typeof r.then === "function") gateWave.push(r); }catch(e){} }
+  window.__afterTitle = function(fn){ if(titleDone) call(fn); else onTitle.push(fn); };
+  window.__afterWarm = function(fn){ if(warmDone){ try{ fn(); }catch(e){} } else onWarm.push(fn); };
+  var pageHooks = [];                                            // 3.: fn once every queued file of pages 0..n is in (or the learner is past page n)
+  window.__afterPage = function(n, fn){ pageHooks.push({ n: n, fn: fn }); if(started) hooks(); };
+  function hooks(){ pageHooks = pageHooks.filter(function(h){
+    var ok = warmDone || cur() > h.n || items.every(function(it){ return it.s > h.n || it.st === 2; });
+    if(ok){ try{ h.fn(); }catch(e){} } return !ok; }); }
+  window.__freshUrl = function(path, key){                      // 4.: same key = same URL (as the same ?r= was), new key = new URL
+    var b = blobs[path]; if(!b) return null;
+    var f = fresh[path]; if(f && f.key === key) return f.url;
+    if(f){ try{ URL.revokeObjectURL(f.url); }catch(e){} }
+    try{ var u = URL.createObjectURL(b); fresh[path] = { key: key, url: u }; return u; }catch(e){ return null; }
+  };
+  function attach(when){                                        // deferred <img data-warm-src data-warm="title">
+    var l = document.querySelectorAll('img[data-warm-src][data-warm="' + when + '"]');
+    for(var i = 0; i < l.length; i++){ if(!l[i].getAttribute("src")) l[i].setAttribute("src", l[i].getAttribute("data-warm-src")); }
+  }
+  function add(slide, path){ var blob = path.charAt(0) === "*"; if(blob) path = path.slice(1);
+    if(seen[path]) return; seen[path] = 1; items.push({ s: slide, p: path, blob: blob, st: 0 }); }
+  function build(){
+    WARM.forEach(function(w){ add(w[0], w[1]); });
+    try{                                                         // the card's own picture ids, page by page
+      var ext = (typeof IMG_EXT !== "undefined" && IMG_EXT) || "webp", re = /^(pic|train|rail)_[a-z0-9_]+$/;
+      CARD.slides.forEach(function(sl, i){
+        (function walk(v, k){
+          if(typeof v === "string"){ if(re.test(v) && !/signal/i.test(k || "")) add(i, "assets/Images/" + v + "." + ext); }
+          else if(Array.isArray(v)) v.forEach(function(x){ walk(x, k); });
+          else if(v && typeof v === "object") Object.keys(v).forEach(function(kk){ walk(v[kk], kk); });
+        })(sl.data || {}, "");
+      });
+    }catch(e){}
+    items.sort(function(a, b){ return a.s - b.s; });            // stable: page order, WARM's order within a page
+  }
+  function cur(){ try{ var g = document.getElementById("startGate");
+    if(typeof state !== "undefined" && state && g && g.classList.contains("hidden")) return state.idx | 0; }catch(e){} return -1; }
+  function next(){ var c = cur(), k = -1;
+    for(var i = 0; i < items.length; i++){ if(items[i].st) continue; if(items[i].s >= c) return i; if(k < 0) k = i; }
+    return k; }
+  function load(it, done){
+    var over = false, end = function(){ if(over) return; over = true; done(); };
+    setTimeout(end, ITEM_GUARD_MS);                              // a stalled file never holds the queue up
+    if(it.blob){
+      if(!ONLINE){ end(); return; }
+      try{ fetch(it.p).then(function(r){ return r.ok ? r.blob() : null; }).then(function(b){ if(b) blobs[it.p] = b; end(); }, end); }catch(e){ end(); }
+      return;
+    }
+    var im = new Image();
+    try{ im.fetchPriority = "low"; }catch(e){}
+    im.decoding = "async"; im.onload = im.onerror = end; im.src = it.p; imgs.push(im);
+  }
+  function pump(){
+    while(active < QUEUE_CONC){ var k = next(); if(k < 0) break;
+      var it = items[k]; it.st = 1; active++; load(it, (function(it){ return function(){ it.st = 2; active--; pump(); }; })(it)); }
+    if(!active && next() < 0 && !warmDone){ warmDone = true;
+      var l = onWarm; onWarm = []; l.forEach(function(fn){ try{ fn(); }catch(e){} }); }
+    hooks();
+  }
+  function start(){ if(started) return; started = true; build(); pump(); }
+  function titleIn(){
+    if(titleDone) return; titleDone = true;
+    var l = onTitle; onTitle = []; l.forEach(call); attach("title");
+    var w = gateWave.map(function(p){ return p.then(null, function(){}); });
+    Promise.all(w).then(start, start); setTimeout(start, GATE_WAIT_MS);
+  }
+  window.addEventListener("load", titleIn);
+  setTimeout(titleIn, Math.max(0, TITLE_CAP_MS - ((window.performance && performance.now) ? performance.now() : 0)));
+  window.__warm = { imgs: imgs, items: items, get title(){ return titleDone; }, get done(){ return warmDone; }, get active(){ return active; } };
+})();
+</script>
 <!-- LAYOUT: ported value-for-value from HIKGH01_L02_S03 (कहानी – तोता) — its base stylesheet, chrome markup,
      UI assets and appended layout patches. Engine 2026.07.16i-r4-unified + this lesson's card are unchanged. -->
 <style id="embedded-fonts">
@@ -949,7 +1070,7 @@ body.loaded .sg-icon{animation-play-state:running;}
 </style>
 </head>
 <body class="is-start">
-<!-- BOOT LOADER (reference parity): held 2s, then faded, then the landing VO starts -->
+<!-- BOOT LOADER (reference parity): held 2s (or until the title art is in, 7s at most: [ASSET-WARM]), then faded, then the landing VO starts -->
 <div class="boot-loader" id="bootLoader"><img src="assets/UI/loader.webp" alt=""></div>
 
 <!-- Full-viewport celebration artwork; shown only once the lesson is complete. -->
@@ -1032,7 +1153,7 @@ body.loaded .sg-icon{animation-play-state:running;}
   <div class="confetti" id="confetti"></div>
   <h1 class="end-title" id="endTitle"></h1>
   <div class="end-subtitle" id="endSubtitle"></div>
-  <img class="end-mascot" src="assets/UI/sw_lg_celebrating_anim.webp" alt="Swiftee"
+  <img class="end-mascot" data-warm-src="assets/UI/sw_lg_celebrating_anim.webp" data-warm="title" alt="Swiftee"
        onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'end-mascot',textContent:'🎉'}))">
   <!-- [END-FINISH-BTN] (2026-10-08) the reference's button, markup included: the arrow is drawn by #endBtn::after (see <style id="END-FINISH-BTN">), «आगे बढ़ें» is the accessible name only -->
   <button class="end-btn" id="endBtn" aria-label="आगे बढ़ें"></button>
@@ -1282,7 +1403,8 @@ function setSwMood(m){ swMood = m;
   const animated = expression !== "talking";
   const bust = (animated && expression === "celebrate") ? ("?r=" + ((typeof state !== "undefined" && state.slideStart) || 1)) : "";
   img.onerror = () => { img.onerror = null; img.src = "assets/UI/mascot.webp"; };
-  img.src = "assets/UI/sw_head_" + expression + (animated ? "_anim" : "") + ".webp" + bust;
+  const fresh = (bust && window.__freshUrl) ? window.__freshUrl("assets/UI/sw_head_celebrate_anim.webp", bust) : null;   // [ASSET-WARM] the warmed blob through a fresh URL per page (as the ?r= was): no re-download
+  img.src = fresh || ("assets/UI/sw_head_" + expression + (animated ? "_anim" : "") + ".webp" + bust);
 }
 /* CONFETTI BURST — reference standard (MTKGA02_L01_S02_Sorting_Objects_GOLDEN via कहानी–तोता): 100 modest
    10x10 pieces FALL from the top of the stage for 3s; only position, colour and start delay vary. The wrap
@@ -4763,7 +4885,7 @@ let _gateToken = 0;
 const GATE_ANIM_SRC = "assets/UI/swiftee_transition.webp";
 const GATE_BEAK_MS = 1200, GATE_MS = 4000;
 let gateAnimBlob = null;
-if(location.protocol !== "file:") try{ fetch(GATE_ANIM_SRC).then(r=> r.ok ? r.blob() : null).then(b=>{ if(b) gateAnimBlob = b; }).catch(()=>{}); }catch(e){}
+if(location.protocol !== "file:") (window.__afterTitle || (f=> f()))(()=>{ try{ return fetch(GATE_ANIM_SRC).then(r=> r.ok ? r.blob() : null).then(b=>{ if(b) gateAnimBlob = b; }).catch(()=>{}); }catch(e){} });   // [ASSET-WARM] once the title art is in
 function phaseBlurTransition(cb, toPhase){
   const tok = ++_gateToken;
   stopNudge(); stopAudio();
@@ -5010,7 +5132,7 @@ function boot(){
       playLanding();
       setTimeout(()=>{ if(bl.parentNode) bl.remove(); }, 440);
     };
-    setTimeout(ready, 2000);
+    setTimeout(()=> (window.__afterTitle || (f=> f()))(ready), 2000);   // [ASSET-WARM] 2 s as before, or once the title art is in if that is later (7 s at most)
   })();
   // A tap on Page 1 plays the VO where the browser refused to start it by itself (desktop browsers before the first
   // click). A tap during the LOADING SCREEN must not start it early: playLanding waits for Page 1, and that tap only
@@ -5104,7 +5226,7 @@ boot();
 </script>
 
 <!-- PHASE-TRANSITION GATE: body-level full-viewport (a fixed element inside the scaled stage would not cover the viewport) -->
-<div class="phase-gate" id="phaseGate"><div class="pg-title" id="phaseGateTitle"></div><img id="phaseGateImg" src="assets/UI/swiftee_transition.webp" alt=""></div>
+<div class="phase-gate" id="phaseGate"><div class="pg-title" id="phaseGateTitle"></div><img id="phaseGateImg" data-warm-src="assets/UI/swiftee_transition.webp" data-warm="title" alt=""></div>
 <style id="UIFIX-CONSIST">
 /* speaker/audio chips: no zoom/hover/pulse — wave bars only */
 .audio-chip,.audio-chip.playing,.mascot-wrap .audio-chip,.mascot-wrap .audio-chip.playing,.sg-vo,.sg-vo.playing,.tut-audio,.tut-audio.playing{animation:none !important;transform:none !important;}
@@ -9612,7 +9734,8 @@ html.rotated body.station-page::before{inset:auto;left:50%;top:50%;width:100vh;h
     if(oStop) P.stop = function(when){ var r = oStop.apply(this, arguments); try{ if(nodes.has(this)){ nodes.set(this, at(this, when) + 120); update(); } }catch(e){} return r; };
   });
   // ---- the bed ----
-  try{ el = new Audio(SRC); el.loop = true; el.preload = "auto"; apply(); }catch(e){ el = null; }
+  try{ el = new Audio(); el.loop = true; el.preload = "none"; el.src = SRC; apply(); }catch(e){ el = null; }
+  if(el) (window.__afterPage || function(n, f){ f(); })(0, function(){ try{ el.preload = "auto"; }catch(e){} });   // [ASSET-WARM] the 46 MB bed reads ahead once the title, the gate birds and T1's art are in (it was "auto" from load, racing the title)
   function armTap(){ if(tapArmed) return; tapArmed = true;
     var once = function(){ document.removeEventListener("pointerdown", once, true); document.removeEventListener("keydown", once, true); tapArmed = false; if(wanted) start(); };
     document.addEventListener("pointerdown", once, true); document.addEventListener("keydown", once, true); }
@@ -9850,8 +9973,8 @@ html.rotated body.station-page::before{inset:auto;left:50%;top:50%;width:100vh;h
     })();
   }
   /* warm the three sheets during the lesson, so the end screen never opens on an empty box */
-  setTimeout(()=>{ try { const A = CARD && CARD.end_anim; if(A && A.shabaash){
-    window.__celWarm = [A.shabaash.src, A.talk.src, A.idle.src].map(u => { const i = new Image(); i.src = u; if(i.decode) i.decode().catch(()=>{}); return i; }); } } catch(e){} }, 1500);
+  (window.__afterWarm || (f=> setTimeout(f, 1500)))(()=>{ try { const A = CARD && CARD.end_anim; if(A && A.shabaash){   // [ASSET-WARM] after every page's art (was 1.5 s after load, racing the title)
+    window.__celWarm = [A.shabaash.src, A.talk.src, A.idle.src].map(u => { const i = new Image(); i.src = u; if(i.decode) i.decode().catch(()=>{}); return i; }); } } catch(e){} });
 })();
 </script>
 <style id="G1-P4-REVEAL-DISABLED-CSS">
@@ -9959,7 +10082,7 @@ html.no-anim .phase-gate.pg-ref #phaseGateImg,html.no-anim .phase-gate.pg-ref .p
   var GATE_CAPTION_AT_MS = { tutorial: 3660, guided: 3940, practice: 1120 };   // ms into vo_pt_tutorial / vo_pt_guided / vo_pt_practice at which the headline's words begin (silence analysis of the recordings: the last clause / after "वाह!")
   var SINK_MS = 340;
   var gateRefBlob = null;
-  if(location.protocol !== "file:") try{ fetch(GATE_REF_SRC).then(function(r){ return r.ok ? r.blob() : null; }).then(function(b){ if(b) gateRefBlob = b; }).catch(function(){}); }catch(e){}
+  if(location.protocol !== "file:") (window.__afterTitle || function(f){ f(); })(function(){ try{ return fetch(GATE_REF_SRC).then(function(r){ return r.ok ? r.blob() : null; }).then(function(b){ if(b) gateRefBlob = b; }).catch(function(){}); }catch(e){} });   // [ASSET-WARM] once the title art is in
   function fitGateTitle(){
     try{
       var t = $("phaseGateTitle"), im = $("phaseGateImg"), g = $("phaseGate");
@@ -10689,7 +10812,7 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
       return r;
     };
   }
-  Object.keys(PLAN).forEach(function(k){ var p = PLAN[k]; [p.lineA, p.lineB, p.lineC, p.cue, p.pick && p.pick.line].forEach(function(s){ if(!s) return; try{ var a = new Audio(); a.preload = "auto"; a.src = s; }catch(e){} }); });   // warm the files so each beat lands with its line
+  (window.__afterTitle || function(f){ f(); })(function(){ Object.keys(PLAN).forEach(function(k){ var p = PLAN[k]; [p.lineA, p.lineB, p.lineC, p.cue, p.pick && p.pick.line].forEach(function(s){ if(!s) return; try{ var a = new Audio(); a.preload = "auto"; a.src = s; }catch(e){} }); }); });   // warm the files so each beat lands with its line ([ASSET-WARM] once the title art is in)
   // a direct ?slide=N load mounted the page (and started its narration) before this block ran
   try{
     var gate = $id("startGate");
