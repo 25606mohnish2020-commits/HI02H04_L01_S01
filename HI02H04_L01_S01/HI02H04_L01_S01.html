@@ -10756,7 +10756,9 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
             im.addEventListener("animationend", function(e){ if(e.target === im && e.animationName === "p4MarkPop") im.classList.remove("p4-pop"); }, { once:true });
             timers.push(setTimeout(function(){ im.classList.remove("p4-pop"); }, MARK_POP_MS + 250));
           }
-          var finish = function(){ ctl.hold = false; quiet(function(){ after(NAV_AFTER_MS, function(){ if(typeof window.setNavActive === "function") window.setNavActive(true); }); }); };
+          // rev 3: the hold lifts with this activation, not at the tap - with no line after the tap, an engine activation due within
+          // NAV_AFTER_MS of the pick line's end would otherwise pass and show आगे while the correct sound still plays
+          var finish = function(){ quiet(function(){ after(NAV_AFTER_MS, function(){ ctl.hold = false; if(typeof window.setNavActive === "function") window.setNavActive(true); }); }); };
           if(pk.ok) say(srcOf(pk.ok), finish); else finish();
         } else {
           if(typeof stdSfx === "function") stdSfx("incorrect");          // [STD-SFX] the incorrect sound
@@ -10823,6 +10825,117 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
       open(state.idx);
     }
   }catch(e){}
+})();
+</script>
+<style id="TAB-PAUSE-CSS">
+/* [TAB-PAUSE] (2026-10-21, user request) while the tab is hidden (body.tab-away, see <script id="TAB-PAUSE-JS">) every CSS animation
+   holds its frame, so a highlight, pulse or pop timed to a line is still with it when the line runs on. The :not(#...) links give the
+   rule ID-level weight, so it also outranks the rules here that force animation-play-state (the landing icons' running !important);
+   taking the class off hands every animation back to its own rules. */
+html:not(#tp-a) body.tab-away:not(#tp-b) *:not(#tp-c),
+html:not(#tp-a) body.tab-away:not(#tp-b) *:not(#tp-c)::before,
+html:not(#tp-a) body.tab-away:not(#tp-b) *:not(#tp-c)::after{animation-play-state:paused !important;}
+</style>
+<script id="TAB-PAUSE-JS">
+/* [TAB-PAUSE] (2026-10-21, user request) EVERY page: when the child switches to another browser tab (or minimises the window, or the
+   app goes to the background - the document turns hidden) the lesson pauses where it is - the music bed, the voice line speaking and
+   any sound effect - and when the tab is shown again everything carries on from the same point.
+   HOW, without touching any caller: a sound is FROZEN, not paused - its element's playbackRate (and defaultPlaybackRate, which a new
+   src would load back into it) goes to 0 and it is muted. A real pause() would read as "the line was cut" to the flows (the "pause"
+   listeners of the cue / pick / read-aloud beats, the word sync's paused check, [BGM-DUCK]'s sounding set) and would reject a play()
+   still pending, which play() takes for a failed file (the 1.2 s beat: the line skipped). Frozen, an element stays "playing": no pause
+   or ended event, its play() promise runs its course, its clock stands still - so every chain waiting for a line's end simply waits.
+   On return the saved rates and mute come back and the line runs on from the same word.
+   - which elements: HTMLMediaElement.prototype.play is wrapped here (outermost: after [BGM-DUCK] and STORY-INTRO's door 2) to keep the
+     set of elements sounding now (each dropped at its ended / pause / error or a refused play()); the bed (window.__bgm.el), which
+     [BGM-DUCK] starts through its own saved play, is frozen directly. An element asked to play while the tab is hidden (an idle
+     repeat's timer, the next line of a chain) is frozen before it starts: it waits silently at 0 and speaks from its start on return.
+   - WebAudio (the engine's _tone taps and dings, the animation kit's sky-burst): every context a source node starts on is noted;
+     hidden, the running ones are suspended and a resume() asked for meanwhile is held; on return they resume.
+   - CSS animations hold their frame (#TAB-PAUSE-CSS).
+   - [VO-SHIELD]'s 15 s safety ceiling kept counting while a line was frozen: the body class change on return makes it check again,
+     so a line still speaking is shielded again as before.
+   Silent timers (a gap between two lines, a highlight held in silence) are not stopped - the browser slows them in a hidden tab - so
+   a flow halts at its next sound. With the tab in view nothing changes. */
+(function(){ "use strict";
+  if(typeof document.hidden === "undefined") return;
+  var sounding = new Set(), frozen = new Map(), ctxs = new Set(), held = new Set(), away = false;
+  function freeze(m){
+    if(!m || frozen.has(m)) return;
+    frozen.set(m, { rate: m.playbackRate, def: m.defaultPlaybackRate, muted: m.muted });
+    try{ m.defaultPlaybackRate = 0; }catch(e){}
+    try{ m.playbackRate = 0; }catch(e){}
+    try{ m.muted = true; }catch(e){}
+  }
+  function thaw(){
+    frozen.forEach(function(s, m){
+      try{ m.defaultPlaybackRate = s.def || 1; }catch(e){}
+      try{ m.playbackRate = s.rate || 1; }catch(e){}
+      try{ m.muted = s.muted; }catch(e){}
+    });
+    frozen.clear();
+  }
+  // ---- media elements ----
+  if(typeof HTMLMediaElement !== "undefined" && HTMLMediaElement.prototype.play){
+    var oPlay = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function(){
+      var m = this;
+      if(away) freeze(m);                                                    // hidden: starts frozen, speaks on return
+      if(!sounding.has(m)){ sounding.add(m);
+        var off = function(){ sounding.delete(m); m.removeEventListener("ended", off); m.removeEventListener("pause", off); m.removeEventListener("error", off); };
+        m.addEventListener("ended", off); m.addEventListener("pause", off); m.addEventListener("error", off); }
+      var r = oPlay.apply(this, arguments);
+      if(r && typeof r.then === "function") r.then(null, function(){ sounding.delete(m); });   // refused: nothing sounds
+      return r;
+    };
+  }
+  // ---- WebAudio ----
+  var AC = window.AudioContext || window.webkitAudioContext;
+  var oSuspend = AC && AC.prototype.suspend, oResume = AC && AC.prototype.resume;
+  function hold(c){
+    if(!c || !oSuspend || c.state !== "running") return;
+    held.add(c);
+    try{ var p = oSuspend.call(c); if(p && p.catch) p.catch(function(){}); }catch(e){}
+  }
+  if(oResume){
+    AC.prototype.resume = function(){                                        // _ac() / FLNMotion.audio() resume a suspended context before each sound
+      ctxs.add(this);
+      if(away){ held.add(this); return Promise.resolve(); }
+      return oResume.apply(this, arguments);
+    };
+  }
+  var SN = window.AudioScheduledSourceNode;
+  var protos = (SN && SN.prototype && SN.prototype.start) ? [SN.prototype]
+    : [window.OscillatorNode, window.AudioBufferSourceNode].filter(function(C){ return C && C.prototype && C.prototype.start; }).map(function(C){ return C.prototype; });
+  protos.forEach(function(P){
+    var oStart = P.start;
+    P.start = function(){ try{ var c = this.context; if(c){ ctxs.add(c); if(away) hold(c); } }catch(e){} return oStart.apply(this, arguments); };
+  });
+  // ---- away / back ----
+  function goAway(){
+    if(away) return;
+    away = true;
+    sounding.forEach(freeze);
+    var bed = window.__bgm && window.__bgm.el; if(bed) freeze(bed);          // playing or not: a start while hidden stays silent
+    try{ if(typeof _juiceAC !== "undefined" && _juiceAC) ctxs.add(_juiceAC); }catch(e){}
+    ctxs.forEach(hold);
+    document.body.classList.add("tab-away");
+    try{ if(document.getAnimations) document.getAnimations(); else void document.body.offsetWidth; }catch(e){}   // restyle now: a hidden tab restyles lazily
+  }
+  function comeBack(){
+    if(!away) return;
+    away = false;
+    thaw();
+    held.forEach(function(c){
+      if(c.state === "closed") return;
+      try{ var p = oResume.call(c); if(p && p.catch) p.catch(function(){}); }catch(e){}
+    });
+    held.clear();
+    document.body.classList.remove("tab-away");                              // also wakes [VO-SHIELD]'s check (it observes body's class)
+  }
+  function sync(){ if(document.hidden) goAway(); else comeBack(); }
+  document.addEventListener("visibilitychange", sync);
+  sync();                                                                    // opened in a background tab: away from the start
 })();
 </script>
 </body>
