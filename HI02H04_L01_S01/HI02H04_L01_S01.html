@@ -10489,7 +10489,9 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
               "correct"), the page's own green ring + pop on it and the fade of the other (.p4-mark / .p4-pop / .p4-dim - what markFor
               drew), the hand goes, pick.ok = vo_t3_explain ("इस वाक्य के लिए यह चित्र सही है।") speaks with the pop, and आगे NAV_AFTER_MS
               after it (door 3 holds the engine's earlier activations - [P2-NAV-HIDE]'s, after the pick line - until then; its hand
-              nudge stays off, [P2-QUIET-AFTER-NAV]).
+              nudge stays off, [P2-QUIET-AFTER-NAV]). Rev 3 (2026-10-21, user request): that line is no longer spoken - pick.ok is
+              null - so the correct tap brings only the correct sound (0.85 s) with the ring + pop, and आगे NAV_AFTER_MS after the tap;
+              vo_t3_explain.wav stays in assets/Audio and in the card, unspoken on this page.
    GONE FROM PAGE 4: the opening narration vo_t3_instr as the page's first line, the silent first pulse at the cue point
    ([T2-T3-SILENT-CUE]) and the old cue line vo_tap_speaker_sentence_story (vo_t3_cue is the cue, at the cue point and on every
    repeat), the follow-up line straight after the sentence with the automatic ring ([P2-FOLLOW] / [P4-TAP-ONLY] / [P4-MARK-POP]: the
@@ -10526,7 +10528,7 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
          cue: "assets/Audio/vo_t2_cue.wav", cueIdleMs: 7000,                                                                       // = CUE_IDLE_BY_SLIDE[1]
          sfx: /sfx_bicycle_bell\.[a-z0-9]+$/i },
     2: { cue: "assets/Audio/vo_t3_cue.wav", cueIdleMs: 7000,                                                                       // [T3-PICK] page 4: no picture beat - the pill + mic rise in at once, then this cue (cueIdleMs = CUE_IDLE_BY_SLIDE[2])
-         pick: { follow: "vo_t3_explain", line: "assets/Audio/vo_t3_pick.wav", idleMs: 7000, correct: 1, ok: "vo_t3_explain" } }   // correct = MARK_BY_SLIDE[2].mark (image_ids[1], the girl watering the plants)
+         pick: { follow: "vo_t3_explain", line: "assets/Audio/vo_t3_pick.wav", idleMs: 7000, correct: 1, ok: null } }   // correct = MARK_BY_SLIDE[2].mark (image_ids[1], the girl watering the plants); ok: null since rev 3 (was "vo_t3_explain")
   };
   var LINE_B_MS = 2400;                                        // page 2's line b length when its element cannot tell (2.36 s)
   var GAP_MS = 300, SENT_IN_MS = 450, SYNC_FALLBACK_MS = 400, NAV_AFTER_MS = 1000;   // NAV_AFTER_MS as in #P2-BIRD-POP-JS
