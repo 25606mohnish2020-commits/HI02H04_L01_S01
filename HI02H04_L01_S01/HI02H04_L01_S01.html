@@ -9646,7 +9646,15 @@ html.rotated body.station-page::before{inset:auto;left:50%;top:50%;width:100vh;h
    train_cargo_goat.webp were re-cut to train_cargo_bird.webp's 1370x643, so all three show 235.2 x 110.4px. Nothing was cut from
    either: the plain background was extended outward (mirrored edge bands of sky / floor / grass) - the cat at its sides only, the
    goat also above and below so its tail tip and hooves clear the 3px grey stroke - and the canvas scaled to 1370x643. No rule here
-   changed; P6's pictures are untouched. */
+   changed; P6's pictures are untouched.
+   [P6-CARGO-BOX] (2026-10-21, user request) on P6 a landed picture fills its drop box exactly (245.8 x 110.4px, the dashed
+   placeholder's size): until now each showed at its own width (grandpa 185.3, kite 179.8, dog 198.7px), so once the dashes went
+   the placeholder seemed to shrink. train_cargo_grandpa2 / _kite / _dog.webp were re-cut to the box's own shape (cargo_box
+   236 x 106 -> 1416x636) with nothing cut from them: the plain background was extended outward (the wall, the table running on to
+   the left; the sky and ground; the sky and the tiled floor) - by mirroring a clean edge band where one is wide enough, else from
+   small patches of the picture's own background, matched and feathered - with sky / wall added above each and floor under the dog,
+   so the kite, the grandpa's head and the dog's tail and ball clear the grey stroke. No rule here changed (width auto at the box's
+   height now IS the box's width); the cards under the train (pic_*_wht) are untouched. */
 .stage.ref-figma .ref-panel .ref-cargo.ref-fit .ref-cargo-img,.stage.ref-figma .ref-panel .ref-cargo-img.ref-fit{width:auto;max-width:245.8px;translate:-50% 0;}
 .stage.ref-figma .ref-panel .ref-cargo.ref-fit .ref-cargo-img:nth-child(1){left:384.8px;}
 .stage.ref-figma .ref-panel .ref-cargo.ref-fit .ref-cargo-img:nth-child(2){left:674.3px;}
