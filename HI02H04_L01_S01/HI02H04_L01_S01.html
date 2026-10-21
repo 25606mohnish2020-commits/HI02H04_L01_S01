@@ -9641,7 +9641,12 @@ html.rotated body.station-page::before{inset:auto;left:50%;top:50%;width:100vh;h
    own width (the train_cargo_* files are trimmed of empty sky / floor only: cat 215.8, goat 188.7, bird 235.2, dog 198.7, kite 179.8,
    grandpa 185.4px wide), centred on the box (left = its centre, translate -50%; the translate property, so the pop-in and the bounce,
    which animate transform, are untouched), never wider than the box. The filled box keeps no dashes (.ref-filled above), so the
-   coach's white window shows either side. P5's three ride in at mount; P6's are placed on landing by the module (inline left/width) */
+   coach's white window shows either side. P5's three ride in at mount; P6's are placed on landing by the module (inline left/width).
+   [P5-CARGO-EQUAL] (2026-10-21, user request) P5's three pictures are one size, the bird's: train_cargo_cat.webp and
+   train_cargo_goat.webp were re-cut to train_cargo_bird.webp's 1370x643, so all three show 235.2 x 110.4px. Nothing was cut from
+   either: the plain background was extended outward (mirrored edge bands of sky / floor / grass) - the cat at its sides only, the
+   goat also above and below so its tail tip and hooves clear the 3px grey stroke - and the canvas scaled to 1370x643. No rule here
+   changed; P6's pictures are untouched. */
 .stage.ref-figma .ref-panel .ref-cargo.ref-fit .ref-cargo-img,.stage.ref-figma .ref-panel .ref-cargo-img.ref-fit{width:auto;max-width:245.8px;translate:-50% 0;}
 .stage.ref-figma .ref-panel .ref-cargo.ref-fit .ref-cargo-img:nth-child(1){left:384.8px;}
 .stage.ref-figma .ref-panel .ref-cargo.ref-fit .ref-cargo-img:nth-child(2){left:674.3px;}
