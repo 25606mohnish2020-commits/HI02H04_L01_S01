@@ -10043,6 +10043,7 @@ body.vo-playing #audioChip,body.vo-playing .mascot-wrap .audio-chip{pointer-even
     var src = (typeof audioFor === "function") ? audioFor(slide, "prompt") : null; if(!src) return;   // no instruction line: the engine's handler
     e.stopImmediatePropagation(); e.preventDefault();
     if(document.body.classList.contains("vo-playing") || state.hintActive) return;                      // a line speaks / a beat runs: ignored
+    if(document.body.classList.contains("vo-pending")) return;                                           // [SPK-AFTER-VO] the page's lines are not over yet: ignored
     state.audioReplays = (state.audioReplays | 0) + 1;
     try{ SwiftPAL.emit("audio_replay", { slide_id: slide.id, phase: slide.phase, count: state.audioReplays, src: "header_chip" }); }catch(x){}
     play(src, function(){});
@@ -10272,6 +10273,7 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
     chip.addEventListener("click", function(e){
       e.stopPropagation();
       if(document.body.classList.contains("vo-playing")) return;                                  // a line speaks: ignored (the reference's convention)
+      if(document.body.classList.contains("vo-pending")) return;                                  // [SPK-AFTER-VO] the page's lines are not over yet: ignored
       if(document.querySelector("#slideHost .tut-audio.p2-rec")) return;                        // the read-aloud beat runs: ignored
       if(typeof state !== "object" || !state) return;
       var slide = (typeof CARD === "object" && CARD && CARD.slides) ? CARD.slides[state.idx] : null; if(!slide) return;
@@ -10555,6 +10557,11 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
   function still(){ return !!(window.FLNMotion && FLNMotion.still && FLNMotion.still()); }
   function cur(){ return (typeof currentAudio !== "undefined") ? currentAudio : null; }
   function has(idx){ return Object.prototype.hasOwnProperty.call(PLAN, idx); }
+  // ---- [SPK-AFTER-VO] (2026-10-23, user request) the speaker chip at the bird's feet waits until this page's own lines are over
+  // (<script id="SPK-AFTER-VO-JS">, at the end of the body): intro() holds "story" at the mount, done() releases it - page 2 (T1) when
+  // the sentence (and any explanation) has been read, pages 3-4 (T2 / T3) when the first cue line has ended; page 4's pictures' line
+  // after the sentence holds "pick" meanwhile; cancel() drops both. Looked up at call time: that block loads after this one.
+  function spkGate(fn, name){ try{ var g = window.__spkGate; if(g && typeof g[fn] === "function") g[fn](name); }catch(e){} }
   // ---- [T2-MIC-HAND] (2026-10-23, user request) PAGE 3 (T2 = ?slide=1; the user's "page 2 T2") ONLY: the hand nudge of the
   // reference lesson hi-02-h11-l02-s02-dev-handoff.vercel.app (its reading page: pointNudgeAt(mic) the moment the reminder line
   // «इस बटन पर टैप करिए» starts on the live, pulsing mic; the hand stays until the mic is tapped) comes with this page's mic cue:
@@ -10608,6 +10615,7 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
   function cancel(){
     run++; live = null; cueCtl = null; timers.forEach(function(t){ clearTimeout(t); }); timers = []; wordStop();
     micHandHide();                                                                                    // [T2-MIC-HAND] the page is left with the hand on the mic
+    spkGate("release", "story"); spkGate("release", "pick");                                                // [SPK-AFTER-VO] the page is left mid-sequence: its holds go (the next page sets its own)
     if(pickCtl && pickCtl.hand){ try{ if(typeof stopNudge === "function") stopNudge(); }catch(e){} }   // [T3-PICK] the page is left with the hand on the picture
     pickCtl = null;
   }
@@ -10681,6 +10689,7 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
     if(frame) frame.__spkTapped = true;                                      // no old cue, no old idle repeat (startCue / idleArm / idleFire bow out)
     if(!frame || !img || !pill){ stage.classList.remove("story-intro"); return; }   // not the story page expected: show it as it is
     pill.__p2Rec = true;                                                     // the bird waits while the intro's own lines run
+    spkGate("hold", "story");                                                   // [SPK-AFTER-VO] the feet speaker waits until this page's own lines are over (done() below)
     var ok = function(){ return tok === run && frame.isConnected && typeof state === "object" && state && state.idx === idx; };
     var after = function(ms, fn){ timers.push(setTimeout(function(){ if(ok()) fn(); }, ms)); };
     var quiet = function(fn){ (function poll(){ if(!ok()) return; if(document.body.classList.contains("vo-playing")){ timers.push(setTimeout(poll, 200)); return; } fn(); })(); };
@@ -10755,7 +10764,8 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
       if(typeof window.setNavActive === "function") window.setNavActive(false);
       if(typeof play !== "function") return;
       play(sent, function(){
-        if(exp && !pill.__p2Explained && pill.isConnected){ pill.__p2Explained = true; play(exp, function(){}); }
+        if(exp && !pill.__p2Explained && pill.isConnected){ pill.__p2Explained = true; play(exp, function(){ spkGate("done"); }); }   // [SPK-AFTER-VO] the page's last line: the speaker is live from here
+        else spkGate("done");
       });
       var words = pill.__p2Words || Array.prototype.slice.call(pill.querySelectorAll(".p2-word"));
       wordSync(cur(), words, cfg.auto.times);
@@ -10786,7 +10796,7 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
       if(cueOver()){ cueCtl = null; micHandHide(); return; }
       if(!still()) pill.classList.add("p2-cue");
       if(cfg.micHand) micHandShow(chip || host.querySelector(".story-caption .tut-audio"), cueOver);   // [T2-MIC-HAND] the hand lands on the mic as the cue line starts, with the chip's pulse
-      say(cfg.cue, function(){ settle(); cueArm(); });
+      say(cfg.cue, function(){ spkGate("done"); settle(); cueArm(); });               // [SPK-AFTER-VO] the cue line's end: the page's opening lines are over (a no-op on the repeats)
       var a = cur(); if(a) a.addEventListener("pause", function(){ settle(); }, { once:true });   // cut (a bird replay): the pulse settles; the count runs from the quiet
     };
     var cueLoop = function(){ cueCtl = { arm: cueArm }; speakCue(); };
@@ -10849,8 +10859,10 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
           o.addEventListener("click", function(){ onPick(o, j); });
         });
         lock(true);                                                       // no tap while the line speaks
+        spkGate("hold", "pick");                                             // [SPK-AFTER-VO] the pictures' line follows the sentence: the speaker waits for it
         quiet(function(){
           say(pk.line, function(){
+            spkGate("release", "pick");                                      // [SPK-AFTER-VO] the pictures' line is over
             if(answered) return;
             lock(false); pics.forEach(function(o){ o.classList.remove("si-pic-in"); });   // (the rise-in's held end state would outrank the press-down)
             cueCtl = { arm: pickArm }; pickArm();                         // any tap restarts the count (the document pointerdown listener)
@@ -11002,6 +11014,105 @@ html:not(#tp-a) body.tab-away:not(#tp-b) *:not(#tp-c)::after{animation-play-stat
   function sync(){ if(document.hidden) goAway(); else comeBack(); }
   document.addEventListener("visibilitychange", sync);
   sync();                                                                    // opened in a background tab: away from the start
+})();
+</script>
+<style id="SPK-AFTER-VO-CSS">
+/* [SPK-AFTER-VO] (2026-10-23, user request) EVERY page from T1 (?slide=0, the user's "page 1 T1") to the end: the speaker chip -
+   the one at the standing bird's feet on the tutorial pages (.tut-spk, [FEET-SPEAKER]) and the one beside the bird in the title
+   bar on pages G1-P6 (#audioChip, [HDR-SPEAKER]) - is enabled only once ALL the lines the page speaks by itself are over. Until
+   then it is grey and takes no tap, exactly as it is while a line speaks (the body.vo-playing rules of #HDR-SPEAKER-CSS and
+   #FEET-SPEAKER-CSS, value for value: grayscale(1) brightness(1.2) at opacity .5, pointer-events none): body.vo-pending is on from
+   the page's mount through its whole opening sequence, the silent gaps included - the story pages' highlight beats, the pill's
+   rise-in, the train's arrival before its instruction - and again whenever a line is still to come (the read-aloud beat before the
+   sentence, a wrong tap's beat before its line, the read-out, the pictures' line after page 4's sentence, a correct answer's praise).
+   Set and cleared by <script id="SPK-AFTER-VO-JS"> below. The wave arcs blink only while a line speaks, as before; the mic chip,
+   the title page's chip (#sgVo, enabled with the play button as shipped) and every tap flow are untouched. */
+body.vo-pending #audioChip,body.vo-pending .mascot-wrap .audio-chip{pointer-events:none !important;opacity:.5 !important;filter:grayscale(1) brightness(1.2) !important;transition:none !important;}
+body.vo-pending .tut-card .tut-spk{pointer-events:none !important;opacity:.5 !important;filter:grayscale(1) brightness(1.2) !important;}
+</style>
+<script id="SPK-AFTER-VO-JS">
+/* [SPK-AFTER-VO] (2026-10-23, user request) see <style id="SPK-AFTER-VO-CSS"> above. body.vo-pending is on while any HOLD is set:
+   - "mount": set by the outermost mountSlide wrapper here, before the page is built, so the chip is never live between the mount and
+     the first line. Released (done()) when the page's opening sequence is over: for the pages the engine narrates at the mount (the
+     question pages G1-P4: autoPlayChain, its one request for the sentence skipped by [P5-TAP-ONLY]; the celebration) at that chain's
+     end; for the pages that speak their own instruction later (the train pages P5 / P6: vo_p5_instr / vo_p6_instr once the train has
+     stopped) at the end of the first play() of the card's prompt line; for the story pages T1-T3 by <script id="STORY-INTRO-JS">,
+     which knows their sequence (see "story").
+   - "story": set by STORY-INTRO's intro() at the mount and released by its done() - page 2 (T1) when the sentence (and any
+     explanation) has been read, pages 3-4 (T2 / T3) when the first cue line has ended; so the 3 s highlight silences and the pill's
+     rise-in never show a live chip. "pick" (T3): from the sentence's end, while the pictures' line vo_t3_pick is still to come.
+   - "hint" / "rec" / "locked", mirrored every 100 ms: state.hintActive (a wrong tap's beat before its line, the [P6-REVIEW] read-out,
+     the engine's hint popup); the read-aloud beat (#slideHost .tut-audio.p2-rec: the sentence follows it); state.locked after a
+     correct answer (its praise line and the page's end follow) - but not the reveal's wait for the guided tap (an .opt-guided cell
+     is on screen then; the chip stays live there as before).
+   - a safety ceiling: 30 s of VISIBLE time after a mount (a hidden tab freezes the lines, [TAB-PAUSE]) drops "mount", "story" and
+     "pick" - belt and braces, every path above clears its own hold; the longest opening sequence (T1) is ~15 s.
+   The tap handlers of both chips also bow out while body.vo-pending is on (one guard each in #HDR-SPEAKER-JS / #FEET-SPEAKER-JS;
+   pointer-events already stops the tap). A direct ?slide=N load mounted its page before this block ran: the holds are set then from
+   what is on screen (the story intro running, the instruction already speaking). Nothing else on any page changes. */
+(function(){ "use strict";
+  var CEIL_MS = 30000, TICK_MS = 100;
+  var holds = {}, mounting = false, visibleMs = 0;
+  function $id(id){ return document.getElementById(id); }
+  function tail(p){ return String(p || "").split("/").pop(); }
+  function apply(){ var on = false; for(var k in holds){ if(holds[k]){ on = true; break; } } document.body.classList.toggle("vo-pending", on); }
+  function hold(name){ if(!holds[name]){ holds[name] = true; apply(); } }
+  function release(name){ if(holds[name]){ holds[name] = false; apply(); } }
+  function done(){ release("mount"); release("story"); }                     // the page's opening sequence is over
+  function reset(){ holds = {}; visibleMs = 0; apply(); }
+  window.__spkGate = { hold: hold, release: release, done: done };
+  function promptSrc(){                                                      // the current page's instruction line (card audio.prompt), by file name
+    try{ var sl = CARD.slides[state.idx]; var s = sl ? audioFor(sl, "prompt") : null; return s ? tail(s) : ""; }catch(e){ return ""; }
+  }
+  // ---- the mount: everything held from here
+  var origMount = window.mountSlide;
+  if(typeof origMount === "function"){
+    window.mountSlide = function(){
+      reset(); hold("mount");
+      mounting = true;
+      try{ return origMount.apply(this, arguments); } finally { mounting = false; }
+    };
+  }
+  // ---- the engine's automatic chain asked for AT the mount (question pages, celebration): its end is the opening's end
+  var origChain = window.autoPlayChain;
+  if(typeof origChain === "function"){
+    window.autoPlayChain = function(slide, onDone){
+      if(!mounting) return origChain.apply(this, arguments);
+      var cb = onDone;
+      return origChain.call(this, slide, function(){ done(); if(typeof cb === "function") return cb.apply(this, arguments); });
+    };
+  }
+  // ---- the instruction line's end while the opening is still held (the train pages speak theirs once the train has stopped)
+  var origPlay = window.play;
+  if(typeof origPlay === "function"){
+    window.play = function(src, onEnd){
+      var ps = holds.mount && src ? promptSrc() : "";
+      if(ps && tail(src) === ps){
+        var cb = onEnd;
+        return origPlay.call(this, src, function(){ done(); if(typeof cb === "function") return cb.apply(this, arguments); });
+      }
+      return origPlay.apply(this, arguments);
+    };
+  }
+  // ---- the tick: the beats where a line is still to come, and the ceiling
+  setInterval(function(){
+    var st = (typeof state === "object" && state) ? state : null;
+    if(st && st.hintActive) hold("hint"); else release("hint");
+    if(document.querySelector("#slideHost .tut-audio.p2-rec")) hold("rec"); else release("rec");
+    if(st && st.locked && !document.querySelector("#slideHost .opt-cell.opt-guided")) hold("locked"); else release("locked");
+    if(!document.hidden) visibleMs += TICK_MS;
+    if(visibleMs > CEIL_MS){ release("mount"); release("story"); release("pick"); }
+  }, TICK_MS);
+  // ---- a direct ?slide=N load mounted the page before this block ran
+  try{
+    var gate = $id("startGate"), stage = $id("stage");
+    if(gate && gate.classList.contains("hidden") && typeof state === "object" && state && CARD.slides[state.idx]){
+      hold("mount");
+      if(stage && stage.classList.contains("story-intro")) hold("story");  // STORY-INTRO's intro is running: its done() ends both
+      var a = (typeof currentAudio !== "undefined") ? currentAudio : null;  // the instruction already speaking (a question page): its end
+      if(a && promptSrc() && tail(a.src) === promptSrc()) a.addEventListener("ended", done, { once:true });
+    }
+  }catch(e){}
 })();
 </script>
 </body>
