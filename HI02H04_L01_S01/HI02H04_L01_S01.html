@@ -9080,25 +9080,29 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    once nothing speaks, [GUIDED-EASY-TAP]) and the page waits for the child's tap on that pill. From that moment the [P6-PROMPT-IDLE]
    repeat - इस चित्र के लिए सही वाक्य चुनिए। after every 5 s of inactivity with the recall picture's pop (.p6-pop, popWithCue) - no longer
    comes: the page's .q-row gets its __spkTapped stop flag at the reveal (the flag [G1-P4-REVEAL-QUIET] sets at the guided tap, on
-   which startCue / idleArm / idleFire bow out; a count already running ends at its next check). Instead, after REVEAL_IDLE_MS = 5 s
-   of inactivity - no tap anywhere, nothing speaking, counted from the end of the reveal's beat (the card's vo_reveal has no file:
-   the engine's silent 1.2 s beat) - the RIGHT pill's own line (the card option with correct:true, its audio: vo_sent_boy_drink_ok /
-   vo_sent_children_sit_ok / vo_sent_goat_ok / vo_sent_bird_peck_ok) speaks ONCE through play(), its words lit one by one in dark
-   orange by the [P6-OPT-WORDS] sync in the play() wrapper of #P2-BIRD-POP-JS (the pill itself does not lift; nothing else moves; the
-   hand stays); then nothing more until the tap. Any pointerdown restarts the count; a count that runs out while a line speaks (the
-   child replaying the instruction from a speaker) starts over from that line's end; the guided tap (the pill loses .opt-guided) or
-   leaving the page (mountSlide) drops it, so the line is never spoken once the pill has been tapped. None of the play() wrapper's
-   gates touch this line after the reveal (state.locked, scaffoldLevel 3: wrongWordOff / okSentOff / isReviewLine / okAfterRevealOff
-   all stand down). The wrong taps, the reveal itself (hand, guide-pulse, disabled pills), the guided tap's beat
-   ([G1-P4-REVEAL-QUIET]) and every other page are untouched. Hooked on showRevealHand (the engine calls it at the reveal; this
-   wrapper sits outside [GUIDED-EASY-TAP]'s and calls through; the count is armed on the next tick, as that block places its hand,
-   because the engine's play(vo_reveal) comes right after the call) and keyed on REVEAL_IDLE_BY_SLIDE, so no other page changes. */
+   which startCue / idleArm / idleFire bow out; a count already running ends at its next check). Instead the RIGHT pill's own line
+   (the card option with correct:true, its audio: vo_sent_boy_drink_ok / vo_sent_children_sit_ok / vo_sent_goat_ok /
+   vo_sent_bird_peck_ok) speaks ONCE through play(), its words lit one by one in dark orange by the [P6-OPT-WORDS] sync in the play()
+   wrapper of #P2-BIRD-POP-JS (the pill itself does not lift; nothing else moves; the hand stays) - rev 2 (2026-10-26, later, user
+   request): AS SOON AS THE HAND APPEARS. Rev 1 spoke it after 5 s of inactivity counted from the end of the reveal's beat; now the
+   block watches for the hand of THIS reveal (a .reveal-hand in .slide-stage that is not the one there at the call, if any:
+   [GUIDED-EASY-TAP] has showRevealHand make it once nothing speaks, so the reveal's silent 1.2 s beat - the card's vo_reveal has no
+   file - is over by then; polled every POLL_MS = 50 ms from the next tick, as that block polls) and speaks the line the moment it
+   is there, if nothing speaks (a replay the child started would be waited for). Then nothing more until the tap; while the line
+   speaks the tap waits, as under every line ([VO-SHIELD]). The guided tap (the pill loses .opt-guided) or leaving the page
+   (mountSlide) drops the watch, so the line is never spoken once the pill has been tapped. None of the play() wrapper's gates touch
+   this line after the reveal (state.locked, scaffoldLevel 3: wrongWordOff / okSentOff / isReviewLine / okAfterRevealOff all stand
+   down). The wrong taps, the reveal itself (hand, guide-pulse, disabled pills), the guided tap's beat ([G1-P4-REVEAL-QUIET]) and every
+   other page are untouched. Hooked on showRevealHand (the engine calls it at the reveal; this wrapper sits outside
+   [GUIDED-EASY-TAP]'s and calls through; the watch starts on the next tick because the engine's play(vo_reveal) comes right after
+   the call) and keyed on REVEAL_SENT_BY_SLIDE, so no other page changes. */
 (function(){ "use strict";
-  var REVEAL_IDLE_BY_SLIDE = { 4: 5000, 6: 5000, 8: 5000, 10: 5000 };   // = PROMPT_IDLE_BY_SLIDE on these pages: the count the repeat had
-  var POLL_MS = 200;
-  var ctl = null;                                                        // the running wait: {idx, cell, ms, timer}
+  var REVEAL_SENT_BY_SLIDE = { 4: true, 6: true, 8: true, 10: true };
+  var POLL_MS = 50;
+  var ctl = null;                                                        // the running watch: {idx, cell, prev, timer}
   function speaking(){ return document.body.classList.contains("vo-playing"); }
   function hinting(){ return !!(typeof state === "object" && state && state.hintActive); }
+  function handOf(c){ var h = document.querySelector(".slide-stage .reveal-hand"); return (h && h !== c.prev) ? h : null; }   // this reveal's hand, once [GUIDED-EASY-TAP] has made it
   function srcOf(id){ var c = (typeof CARD === "object" && CARD) ? CARD : null; return (c && c.assets && c.assets.audio && c.assets.audio[id]) || ("assets/Audio/" + id + "." + (typeof AUDIO_EXT === "string" ? AUDIO_EXT : "wav")); }
   function correctSrc(idx){
     var sl = (typeof CARD === "object" && CARD && CARD.slides) ? CARD.slides[idx] : null;
@@ -9108,15 +9112,10 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   }
   function cancel(){ if(!ctl) return; if(ctl.timer){ clearTimeout(ctl.timer); ctl.timer = null; } ctl = null; }
   function live(c){ return !!(c && ctl === c && typeof state === "object" && state && state.idx === c.idx && c.cell.isConnected && c.cell.classList.contains("opt-guided")); }
-  function arm(c){
+  function watch(c){
     if(!live(c)){ if(ctl === c) cancel(); return; }
     if(c.timer){ clearTimeout(c.timer); c.timer = null; }
-    if(speaking() || hinting()){ c.timer = setTimeout(function(){ c.timer = null; arm(c); }, POLL_MS); return; }   // a line speaks (the reveal's beat, a replay): count from its end
-    c.timer = setTimeout(function(){ c.timer = null; fire(c); }, c.ms);
-  }
-  function fire(c){
-    if(!live(c)){ if(ctl === c) cancel(); return; }
-    if(speaking() || hinting()){ arm(c); return; }
+    if(!handOf(c) || speaking() || hinting()){ c.timer = setTimeout(function(){ c.timer = null; watch(c); }, POLL_MS); return; }   // the hand is not up yet (the reveal's beat, or a replay, still speaks)
     var src = correctSrc(c.idx);
     cancel();                                                            // once: nothing more until the tap
     if(src && typeof play === "function") play(src, function(){});       // the play() wrapper ([P6-OPT-WORDS]) lights the pill's words with the line
@@ -9124,19 +9123,18 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   var origHand = window.showRevealHand;
   if(typeof origHand === "function"){
     window.showRevealHand = function(grid, cell){
-      var r = origHand.apply(this, arguments);
       var idx = (typeof state === "object" && state) ? state.idx : -1;
-      var ms = REVEAL_IDLE_BY_SLIDE[idx];
-      if(ms && cell){
+      var prev = (REVEAL_SENT_BY_SLIDE[idx] === true) ? document.querySelector(".slide-stage .reveal-hand") : null;   // a hand left from before, if any: not this reveal's
+      var r = origHand.apply(this, arguments);
+      if(REVEAL_SENT_BY_SLIDE[idx] === true && cell){
         var fr = document.querySelector("#slideHost .q-row"); if(fr) fr.__spkTapped = true;   // [P6-PROMPT-IDLE]'s repeat (the line + the picture's pop) ends here for good
         cancel();
-        var c = ctl = { idx: idx, cell: cell, ms: ms, timer: null };
-        setTimeout(function(){ if(ctl === c) arm(c); }, 0);      // the engine's play(vo_reveal) follows this call: from the next tick on, arm() sees its beat and counts from its end
+        var c = ctl = { idx: idx, cell: cell, prev: prev, timer: null };
+        setTimeout(function(){ if(ctl === c) watch(c); }, 0);            // the engine's play(vo_reveal) follows this call: from the next tick on, watch() sees its beat
       }
       return r;
     };
   }
-  document.addEventListener("pointerdown", function(){ if(ctl) arm(ctl); }, true);   // any tap restarts the count
   var origMount = window.mountSlide;
   if(typeof origMount === "function"){
     window.mountSlide = function(){ cancel(); return origMount.apply(this, arguments); };
