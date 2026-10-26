@@ -10413,15 +10413,26 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
 .stage.tut.story-intro .story-frame-pair.t3-locked .story-img{pointer-events:none !important;cursor:default;}
 .stage.tut.story-intro .story-frame-pair .story-img.t3-wrong{animation:wgNo .4s ease-in-out 1;}
 .stage.tut.story-intro .story-frame-pair .story-img.t3-off,.stage.tut.story-intro .story-frame-pair .story-img.p4-dim{opacity:.45;pointer-events:none !important;cursor:default;transition:opacity .4s ease;}
-/* [T2-MIC-CENTRE] (2026-10-26, user request) PAGE 3 (T2 = ?slide=1; the user's "page 2 T2") ONLY: the mic chip is centred on the
-   sentence pill by its VISIBLE art, not by its box. The chip is the reference's 88 x 86 box with the 58 x 60 art fitted inside it
-   ([MIC-REF-L03]: meet, 86/60 per unit); the art's ring spans y = 0..52 of the 60-unit viewBox, so the ring's centre lies 26 x 86/60
-   = 37.27 px below the box's top - 5.73 px above the box's centre - and the shared margin-top:-43px (the box's half-height) left the
-   ring that much above the pill's centre line (measured: ring centre 477.9 vs pill centre 483.8 at --scale 1). -37.27px puts the
-   ring's centre on that line; `right` (the 26 px gap to the pill) is untouched, so the mic stands exactly as far from the pill as
-   before. Keyed on this page's plain .story-scene: page 4's pill (the same chip) sits in .story-scene-pair and keeps the shared
-   rule, page 2 has no chip. The hand nudge ([T2-MIC-HAND]) is placed off the chip's box, so it follows the chip down with it. */
-.stage.tut.story-intro .story-scene:not(.story-scene-pair) .story-caption.has-chip .tut-audio{margin-top:-37.27px;}
+/* [T2-MIC-CENTRE] (2026-10-26, user request) PAGE 3 (T2 = ?slide=1; the user's "page 2 T2") and, since rev 2 later the same day
+   (user request), PAGE 4 (T3 = ?slide=2; the user's "page 3 T3"): the mic chip is centred on the sentence pill by its VISIBLE art,
+   not by its box. The chip is the reference's 88 x 86 box with the 58 x 60 art fitted inside it ([MIC-REF-L03]: meet, 86/60 per
+   unit); the art's ring spans y = 0..52 of the 60-unit viewBox, so the ring's centre lies 26 x 86/60 = 37.27 px below the box's top
+   - 5.73 px above the box's centre - and the shared margin-top:-43px (the box's half-height) left the ring that much above the
+   pill's centre line (measured: ring centre 477.9 vs pill centre 483.8 at --scale 1). -37.27px puts the ring's centre on that line;
+   `right` (the 26 px gap to the pill) is untouched, so the mic stands exactly as far from the pill as before. Keyed on .story-intro
+   and the chip's pill, so it reaches pages 3 and 4 alike (page 2 has no chip; rev 1 was keyed on page 3's plain .story-scene); the
+   sentence pages' chip (.sq-sentence-box) keeps the shared rule. Page 3's hand nudge ([T2-MIC-HAND]) is placed off the chip's box,
+   so it follows the chip down with it. */
+.stage.tut.story-intro .story-caption.has-chip .tut-audio{margin-top:-37.27px;}
+/* [T3-CORRECT-GLOW] (2026-10-26, user request) PAGE 4 (T3 = ?slide=2; the user's "page 3 T3") ONLY: the picture the child taps
+   correctly no longer gets the green stroke ([P4-MARK-POP]'s .p4-mark look: 6px #22B14C, radius 14px) - its stroke stays the resting
+   grey (3px #DADADA, radius 18px, [GREY-STROKE]) and a light-green glow eases in around its boundary instead: a 6px light-green tint
+   ring plus a soft blur in the lesson's correct green (--correct #00B132), the shape the [T1-INTRO] yellow highlight had, 0.35 s in.
+   The pop-and-hold (.p4-pop), the fade of the other picture (.p4-dim), the correct sound and आगे's timing are untouched; the glow
+   stays until the page is left, as the ring did. Keyed on .story-intro + the picture pair, so no other page's .p4-mark changes; the
+   .t3-opt press-down transition is restated so the marked picture keeps it. */
+.stage.tut.story-intro .story-frame-pair .story-img.p4-mark{outline:3px solid #DADADA;outline-offset:-3px;border-radius:18px;
+  box-shadow:0 0 0 6px rgba(128,226,160,.55),0 0 28px 8px rgba(0,177,50,.45);transition:transform .12s ease,box-shadow .35s ease;}
 </style>
 <script id="STORY-INTRO-JS">
 /* [T1-INTRO] (2026-10-16, user request) PAGE 2 (T1 = ?slide=0, the boy under the tree). Asked: take the mic button and the
@@ -10501,7 +10512,7 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
               (the kit's wgNo) and is disabled for good (.t3-off: faded, not tappable), and the hand nudge (the engine's pointNudgeAt,
               #nudgeHand) taps on the correct picture until it is tapped; no line
            -> the CORRECT tap (the girl watering the plants, pick.correct = MARK_BY_SLIDE[2].mark): the correct sound (stdSfx
-              "correct"), the page's own green ring + pop on it and the fade of the other (.p4-mark / .p4-pop / .p4-dim - what markFor
+              "correct"), the page's own pop on it - with a light-green glow in place of the green ring since [T3-CORRECT-GLOW], 2026-10-26 - and the fade of the other (.p4-mark / .p4-pop / .p4-dim - what markFor
               drew), the hand goes, pick.ok = vo_t3_explain ("इस वाक्य के लिए यह चित्र सही है।") speaks with the pop, and आगे NAV_AFTER_MS
               after it (door 3 holds the engine's earlier activations - [P2-NAV-HIDE]'s, after the pick line - until then; its hand
               nudge stays off, [P2-QUIET-AFTER-NAV]). Rev 3 (2026-10-21, user request): that line is no longer spoken - pick.ok is
