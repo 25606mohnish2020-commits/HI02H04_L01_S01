@@ -10370,38 +10370,29 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
      then rises in (siSentIn, 0.45 s; the script takes .si-sent-in off again at the animation's end, so the cue's .p2-cue - whose
      rule sets animation:none on the pill, [SPK-ONLY-CUE] - going on and off never replays the rise-in: [T2-INTRO] rev 2);
    - the old pop beat's class (.p2-pop) still reaches the frame for 2 s while that chain fizzles (see the script): no motion here. */
+/* [NO-YELLOW-HL] (2026-10-26, user request) pages 2 and 3 (T1 = ?slide=0 and T2 = ?slide=1; the user's "page 1 T1" / "page 2 T2"):
+   the yellow is gone from the highlight - the picture's stroke stays its resting grey (4px #DADADA, [GREY-STROKE]) and no glow
+   breathes around it. The siHl54 / siHl30 keyframes below now carry only the pop-and-hold (1.03: in by the same point, held to the
+   same point, back to rest over the same last ~0.4 s), so the beat's length, the lines under it and everything else are as before.
+   The script still puts .si-hl on with the run's length as an inline animation-duration and takes it off at animationend. */
 .stage.tut.story-intro .story-frame.p2-pop{animation:none !important;}
 .stage.tut.story-intro .story-img{opacity:0;}
 .stage.tut.story-intro .story-img.si-shown{opacity:1;}
 @keyframes siPicIn{0%{opacity:0;transform:scale(.90);}100%{opacity:1;transform:scale(1);}}
 .stage.tut.story-intro .story-img.si-pic-in{animation:siPicIn .9s cubic-bezier(.2,.8,.3,1) 1 both;transform-origin:50% 50%;will-change:transform,opacity;}
-@keyframes siHl54{   /* page 2 - percentages of a nominal 5.4 s (2.4 s line + 3 s): in by 0.32 s, a breath every ~0.86 s (5 of them), held to 91.1 %, back to rest over the last 0.48 s */
-  0%{outline-color:#DADADA;outline-width:4px;outline-offset:-4px;box-shadow:0 0 0 0 rgba(255,224,102,0),0 0 0 0 rgba(255,214,0,0);transform:scale(1);animation-timing-function:cubic-bezier(.2,.8,.3,1);}
-  5.9%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
-  13.9%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  21.9%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  29.8%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  37.8%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  45.7%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  53.7%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  61.7%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  69.6%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  77.6%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  85.6%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  91.1%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
-  100%{outline-color:#DADADA;outline-width:4px;outline-offset:-4px;box-shadow:0 0 0 0 rgba(255,224,102,0),0 0 0 0 rgba(255,214,0,0);transform:scale(1);}
+@keyframes siHl54{   /* page 2 - percentages of a nominal 5.4 s (2.4 s line + 3 s): the pop in by 0.32 s, held to 91.1 %, back to rest over the last 0.48 s ([NO-YELLOW-HL]: the yellow stroke and the breathing glow that rode these keyframes are gone) */
+  0%{transform:scale(1);animation-timing-function:cubic-bezier(.2,.8,.3,1);}
+  5.9%{transform:scale(1.03);animation-timing-function:ease-in-out;}
+  91.1%{transform:scale(1.03);animation-timing-function:ease-in-out;}
+  100%{transform:scale(1);}
 }
-@keyframes siHl30{   /* page 3 - percentages of a nominal 3 s: in by 0.32 s, a breath every ~0.86 s (2 of them), held to 84.0 %, back to rest over the last 0.48 s */
-  0%{outline-color:#DADADA;outline-width:4px;outline-offset:-4px;box-shadow:0 0 0 0 rgba(255,224,102,0),0 0 0 0 rgba(255,214,0,0);transform:scale(1);animation-timing-function:cubic-bezier(.2,.8,.3,1);}
-  10.7%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
-  25.0%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  39.3%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  53.7%{box-shadow:0 0 0 3px rgba(255,224,102,.22),0 0 14px 2px rgba(255,214,0,.28);transform:scale(1.03);}
-  68.0%{box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);}
-  84.0%{outline-color:#FFE066;outline-width:6px;outline-offset:-6px;box-shadow:0 0 0 6px rgba(255,224,102,.45),0 0 28px 6px rgba(255,214,0,.55);transform:scale(1.03);animation-timing-function:ease-in-out;}
-  100%{outline-color:#DADADA;outline-width:4px;outline-offset:-4px;box-shadow:0 0 0 0 rgba(255,224,102,0),0 0 0 0 rgba(255,214,0,0);transform:scale(1);}
+@keyframes siHl30{   /* page 3 - percentages of a nominal 3 s: the pop in by 0.32 s, held to 84.0 %, back to rest over the last 0.48 s ([NO-YELLOW-HL]: as above) */
+  0%{transform:scale(1);animation-timing-function:cubic-bezier(.2,.8,.3,1);}
+  10.7%{transform:scale(1.03);animation-timing-function:ease-in-out;}
+  84.0%{transform:scale(1.03);animation-timing-function:ease-in-out;}
+  100%{transform:scale(1);}
 }
-.stage.tut.story-intro .story-img.si-hl{animation:siHl54 5.4s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform,box-shadow;}
+.stage.tut.story-intro .story-img.si-hl{animation:siHl54 5.4s ease-in-out 1 both;transform-origin:50% 50%;will-change:transform;}
 .stage.tut.story-intro .story-img.si-hl.si-hl-3{animation-name:siHl30;animation-duration:3s;}
 .stage.tut.story-intro .story-caption{opacity:0;visibility:hidden;}
 .stage.tut.story-intro .story-caption.si-shown{opacity:1;visibility:visible;}
@@ -10422,6 +10413,15 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
 .stage.tut.story-intro .story-frame-pair.t3-locked .story-img{pointer-events:none !important;cursor:default;}
 .stage.tut.story-intro .story-frame-pair .story-img.t3-wrong{animation:wgNo .4s ease-in-out 1;}
 .stage.tut.story-intro .story-frame-pair .story-img.t3-off,.stage.tut.story-intro .story-frame-pair .story-img.p4-dim{opacity:.45;pointer-events:none !important;cursor:default;transition:opacity .4s ease;}
+/* [T2-MIC-CENTRE] (2026-10-26, user request) PAGE 3 (T2 = ?slide=1; the user's "page 2 T2") ONLY: the mic chip is centred on the
+   sentence pill by its VISIBLE art, not by its box. The chip is the reference's 88 x 86 box with the 58 x 60 art fitted inside it
+   ([MIC-REF-L03]: meet, 86/60 per unit); the art's ring spans y = 0..52 of the 60-unit viewBox, so the ring's centre lies 26 x 86/60
+   = 37.27 px below the box's top - 5.73 px above the box's centre - and the shared margin-top:-43px (the box's half-height) left the
+   ring that much above the pill's centre line (measured: ring centre 477.9 vs pill centre 483.8 at --scale 1). -37.27px puts the
+   ring's centre on that line; `right` (the 26 px gap to the pill) is untouched, so the mic stands exactly as far from the pill as
+   before. Keyed on this page's plain .story-scene: page 4's pill (the same chip) sits in .story-scene-pair and keeps the shared
+   rule, page 2 has no chip. The hand nudge ([T2-MIC-HAND]) is placed off the chip's box, so it follows the chip down with it. */
+.stage.tut.story-intro .story-scene:not(.story-scene-pair) .story-caption.has-chip .tut-audio{margin-top:-37.27px;}
 </style>
 <script id="STORY-INTRO-JS">
 /* [T1-INTRO] (2026-10-16, user request) PAGE 2 (T1 = ?slide=0, the boy under the tree). Asked: take the mic button and the
@@ -10435,8 +10435,8 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
    (nothing else refers to them).
    PAGE 2 GOES (times are the recordings' lengths + GAP_MS between beats; PLAN[0] below):
      mount -> line a speaks and, the moment it is heard playing, the picture fades and grows in (0.9 s; #STORY-INTRO-CSS siPicIn)
-           -> GAP_MS -> line b speaks and, as it starts, the picture is highlighted (siHl54: light-yellow stroke, breathing glow, a
-              small pop-and-hold) for the whole line AND hlAfterMs = 3 s more after the line has ended, in silence (rev 2,
+           -> GAP_MS -> line b speaks and, as it starts, the picture is highlighted (siHl54: a small pop-and-hold - its
+              light-yellow stroke and breathing glow went with [NO-YELLOW-HL], 2026-10-26) for the whole line AND hlAfterMs = 3 s more after the line has ended, in silence (rev 2,
               2026-10-16, user request: 3 s after the line - the first cut ran the highlight 3 s from the line's start; rev 3,
               the same day: 5 s; rev 4, the same day: 7 s; rev 5, the same day, user request: 3 s again, on pages 2 and 3 alike),
               easing back to the resting look over its last ~0.4 s - the keyframes get the run's real length (the line's duration
