@@ -9073,6 +9073,76 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   }, true);
 })();
 </script>
+<script id="REVEAL-IDLE-SENT-JS">
+/* [REVEAL-IDLE-SENT] (2026-10-26, user request) pages 6, 8, 10 and 12 (G2 = ?slide=4, G4 = ?slide=6, P2 = ?slide=8, P4 = ?slide=10;
+   the user's "pages 5 G2, 7 G4, 9 P2 and 11 P4" - the four picture-to-sentence questions): the third wrong tap brings the reveal
+   (revealAnswer: the two wrong pills disabled, the green guide-pulse and the pointing hand on the right pill, state.locked; the hand
+   once nothing speaks, [GUIDED-EASY-TAP]) and the page waits for the child's tap on that pill. From that moment the [P6-PROMPT-IDLE]
+   repeat - इस चित्र के लिए सही वाक्य चुनिए। after every 5 s of inactivity with the recall picture's pop (.p6-pop, popWithCue) - no longer
+   comes: the page's .q-row gets its __spkTapped stop flag at the reveal (the flag [G1-P4-REVEAL-QUIET] sets at the guided tap, on
+   which startCue / idleArm / idleFire bow out; a count already running ends at its next check). Instead, after REVEAL_IDLE_MS = 5 s
+   of inactivity - no tap anywhere, nothing speaking, counted from the end of the reveal's beat (the card's vo_reveal has no file:
+   the engine's silent 1.2 s beat) - the RIGHT pill's own line (the card option with correct:true, its audio: vo_sent_boy_drink_ok /
+   vo_sent_children_sit_ok / vo_sent_goat_ok / vo_sent_bird_peck_ok) speaks ONCE through play(), its words lit one by one in dark
+   orange by the [P6-OPT-WORDS] sync in the play() wrapper of #P2-BIRD-POP-JS (the pill itself does not lift; nothing else moves; the
+   hand stays); then nothing more until the tap. Any pointerdown restarts the count; a count that runs out while a line speaks (the
+   child replaying the instruction from a speaker) starts over from that line's end; the guided tap (the pill loses .opt-guided) or
+   leaving the page (mountSlide) drops it, so the line is never spoken once the pill has been tapped. None of the play() wrapper's
+   gates touch this line after the reveal (state.locked, scaffoldLevel 3: wrongWordOff / okSentOff / isReviewLine / okAfterRevealOff
+   all stand down). The wrong taps, the reveal itself (hand, guide-pulse, disabled pills), the guided tap's beat
+   ([G1-P4-REVEAL-QUIET]) and every other page are untouched. Hooked on showRevealHand (the engine calls it at the reveal; this
+   wrapper sits outside [GUIDED-EASY-TAP]'s and calls through; the count is armed on the next tick, as that block places its hand,
+   because the engine's play(vo_reveal) comes right after the call) and keyed on REVEAL_IDLE_BY_SLIDE, so no other page changes. */
+(function(){ "use strict";
+  var REVEAL_IDLE_BY_SLIDE = { 4: 5000, 6: 5000, 8: 5000, 10: 5000 };   // = PROMPT_IDLE_BY_SLIDE on these pages: the count the repeat had
+  var POLL_MS = 200;
+  var ctl = null;                                                        // the running wait: {idx, cell, ms, timer}
+  function speaking(){ return document.body.classList.contains("vo-playing"); }
+  function hinting(){ return !!(typeof state === "object" && state && state.hintActive); }
+  function srcOf(id){ var c = (typeof CARD === "object" && CARD) ? CARD : null; return (c && c.assets && c.assets.audio && c.assets.audio[id]) || ("assets/Audio/" + id + "." + (typeof AUDIO_EXT === "string" ? AUDIO_EXT : "wav")); }
+  function correctSrc(idx){
+    var sl = (typeof CARD === "object" && CARD && CARD.slides) ? CARD.slides[idx] : null;
+    var opts = (sl && sl.data && Array.isArray(sl.data.options)) ? sl.data.options : [];
+    for(var i = 0; i < opts.length; i++){ if(opts[i] && opts[i].correct === true && opts[i].audio) return srcOf(opts[i].audio); }
+    return null;
+  }
+  function cancel(){ if(!ctl) return; if(ctl.timer){ clearTimeout(ctl.timer); ctl.timer = null; } ctl = null; }
+  function live(c){ return !!(c && ctl === c && typeof state === "object" && state && state.idx === c.idx && c.cell.isConnected && c.cell.classList.contains("opt-guided")); }
+  function arm(c){
+    if(!live(c)){ if(ctl === c) cancel(); return; }
+    if(c.timer){ clearTimeout(c.timer); c.timer = null; }
+    if(speaking() || hinting()){ c.timer = setTimeout(function(){ c.timer = null; arm(c); }, POLL_MS); return; }   // a line speaks (the reveal's beat, a replay): count from its end
+    c.timer = setTimeout(function(){ c.timer = null; fire(c); }, c.ms);
+  }
+  function fire(c){
+    if(!live(c)){ if(ctl === c) cancel(); return; }
+    if(speaking() || hinting()){ arm(c); return; }
+    var src = correctSrc(c.idx);
+    cancel();                                                            // once: nothing more until the tap
+    if(src && typeof play === "function") play(src, function(){});       // the play() wrapper ([P6-OPT-WORDS]) lights the pill's words with the line
+  }
+  var origHand = window.showRevealHand;
+  if(typeof origHand === "function"){
+    window.showRevealHand = function(grid, cell){
+      var r = origHand.apply(this, arguments);
+      var idx = (typeof state === "object" && state) ? state.idx : -1;
+      var ms = REVEAL_IDLE_BY_SLIDE[idx];
+      if(ms && cell){
+        var fr = document.querySelector("#slideHost .q-row"); if(fr) fr.__spkTapped = true;   // [P6-PROMPT-IDLE]'s repeat (the line + the picture's pop) ends here for good
+        cancel();
+        var c = ctl = { idx: idx, cell: cell, ms: ms, timer: null };
+        setTimeout(function(){ if(ctl === c) arm(c); }, 0);      // the engine's play(vo_reveal) follows this call: from the next tick on, arm() sees its beat and counts from its end
+      }
+      return r;
+    };
+  }
+  document.addEventListener("pointerdown", function(){ if(ctl) arm(ctl); }, true);   // any tap restarts the count
+  var origMount = window.mountSlide;
+  if(typeof origMount === "function"){
+    window.mountSlide = function(){ cancel(); return origMount.apply(this, arguments); };
+  }
+})();
+</script>
 <style id="LANDING-START-AFTER-VO">
 /* ===== Page 1: शुरू करें appears only AFTER the landing VO has played once =====
    The button is kept out of the page (display:none) until the engine adds .ready - [P1-NO-BIRD-CUE] (2026-10-05): that is
