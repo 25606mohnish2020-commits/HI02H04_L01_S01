@@ -11110,14 +11110,26 @@ html:not(#tp-a) body.tab-away:not(#tp-b) *:not(#tp-c)::after{animation-play-stat
    - which elements: HTMLMediaElement.prototype.play is wrapped here (outermost: after [BGM-DUCK] and STORY-INTRO's door 2) to keep the
      set of elements sounding now (each dropped at its ended / pause / error or a refused play()); the bed (window.__bgm.el), which
      [BGM-DUCK] starts through its own saved play, is frozen directly. An element asked to play while the tab is hidden (an idle
-     repeat's timer, the next line of a chain) is frozen before it starts: it waits silently at 0 and speaks from its start on return.
+     repeat's timer, the next line of a chain) waits silently and speaks from its start on return (frozen before it started until
+     [TAB-ECHO-FIX] below; held now).
    - WebAudio (the engine's _tone taps and dings, the animation kit's sky-burst): every context a source node starts on is noted;
      hidden, the running ones are suspended and a resume() asked for meanwhile is held; on return they resume.
    - CSS animations hold their frame (#TAB-PAUSE-CSS).
    - [VO-SHIELD]'s 15 s safety ceiling kept counting while a line was frozen: the body class change on return makes it check again,
      so a line still speaking is shielded again as before.
    Silent timers (a gap between two lines, a highlight held in silence) are not stopped - the browser slows them in a hidden tab - so
-   a flow halts at its next sound. With the tab in view nothing changes. */
+   a flow halts at its next sound. With the tab in view nothing changes.
+   [TAB-ECHO-FIX] (2026-11-03, user report: back on the tab after a long time among other tabs, a loud echo) the "frozen before it
+   starts" rule above was the cause. Chrome pauses a media element that STARTS muted in a hidden tab and rejects its play() (AbortError);
+   play() took that for a failed file, so after its 1.2 s beat the chain went on in the background - the next line, the next idle
+   repeat - each one again paused by Chrome and left behind; on return Chrome resumed every one of them and the thaw unmuted them, so
+   the stacked lines started together (measured in a real hidden Chrome tab: G2's instruction 2-3 times at once after 20 s away; T1's
+   lines b, c and the sentence together after 25 s). The longer away, the more copies. Now a sound that is not already playing is not
+   started while the tab is hidden: its play() is HELD - an unsettled promise, the element untouched - and started on return, from its
+   start, in the order asked; nothing runs ahead meanwhile (the line's end is what every chain waits for). A held sound that is cut
+   before it began (the next play()'s stopAudio calls its pause()) is dropped for good and its "pause" listeners are told, exactly as for
+   a line cut while in view. What was already playing when the tab was hidden (the line, an SFX, the bed) is frozen as before - Chrome
+   leaves those alone - and runs on from the same word on return. */
 (function(){ "use strict";
   if(typeof document.hidden === "undefined") return;
   var sounding = new Set(), frozen = new Map(), ctxs = new Set(), held = new Set(), away = false;
@@ -11137,16 +11149,33 @@ html:not(#tp-a) body.tab-away:not(#tp-b) *:not(#tp-c)::after{animation-play-stat
     frozen.clear();
   }
   // ---- media elements ----
+  var deferred = new Map();                                                  // [TAB-ECHO-FIX] element -> its held play() {promise, resolve, reject}, in call order
   if(typeof HTMLMediaElement !== "undefined" && HTMLMediaElement.prototype.play){
-    var oPlay = HTMLMediaElement.prototype.play;
-    HTMLMediaElement.prototype.play = function(){
-      var m = this;
-      if(away) freeze(m);                                                    // hidden: starts frozen, speaks on return
+    var oPlay = HTMLMediaElement.prototype.play, oPause = HTMLMediaElement.prototype.pause;
+    var start = function(m, args){
       if(!sounding.has(m)){ sounding.add(m);
         var off = function(){ sounding.delete(m); m.removeEventListener("ended", off); m.removeEventListener("pause", off); m.removeEventListener("error", off); };
         m.addEventListener("ended", off); m.addEventListener("pause", off); m.addEventListener("error", off); }
-      var r = oPlay.apply(this, arguments);
+      var r = oPlay.apply(m, args || []);
       if(r && typeof r.then === "function") r.then(null, function(){ sounding.delete(m); });   // refused: nothing sounds
+      return r;
+    };
+    HTMLMediaElement.prototype.play = function(){
+      var m = this;
+      if(away && m.paused){                                                  // [TAB-ECHO-FIX] hidden: a sound not yet playing is HELD, not started (see the note)
+        var d = deferred.get(m);
+        if(!d){ d = {}; d.promise = new Promise(function(res, rej){ d.resolve = res; d.reject = rej; }); deferred.set(m, d); }
+        return d.promise;
+      }
+      if(away) freeze(m);                                                    // (one already playing, asked again: frozen as before)
+      return start(m, arguments);
+    };
+    if(oPause) HTMLMediaElement.prototype.pause = function(){
+      var m = this, r = oPause.apply(this, arguments);
+      if(deferred.has(m)){                                                   // [TAB-ECHO-FIX] a held sound cut before it began (the next line's stopAudio): it never starts, its
+        deferred.delete(m);                                                  // play() stays unsettled - the cut line's chain ends there, as a cut line's does - and its "pause"
+        try{ m.dispatchEvent(new Event("pause")); }catch(e){}                // listeners hear the cut as they would have with the tab in view
+      }
       return r;
     };
   }
@@ -11187,6 +11216,12 @@ html:not(#tp-a) body.tab-away:not(#tp-b) *:not(#tp-c)::after{animation-play-stat
     if(!away) return;
     away = false;
     thaw();
+    var waiting = Array.from(deferred); deferred.clear();                    // [TAB-ECHO-FIX] the held sounds start now, from their start, in the order asked
+    waiting.forEach(function(e){
+      var m = e[0], d = e[1], r;
+      try{ r = start(m); }catch(x){ d.reject(x); return; }
+      if(r && typeof r.then === "function") r.then(d.resolve, d.reject); else d.resolve();
+    });
     held.forEach(function(c){
       if(c.state === "closed") return;
       try{ var p = oResume.call(c); if(p && p.catch) p.catch(function(){}); }catch(e){}
