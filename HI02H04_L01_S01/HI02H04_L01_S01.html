@@ -10536,6 +10536,12 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
    run, as it is during the read-aloud beat), the feet speaker chip ([FEET-SPEAKER], same replay), the sentence's words and
    timings, आगे's timing after the last line and its quiet, the VO shield, the music bed's ducking (the explanation went at rev 6,
    see above; vo_t1_explain.wav stays in assets/Audio and in the card, unspoken on this page).
+   [T1-SPK-SENT] (2026-11-03, user request) PAGE 2 (T1; the user's "page 1 T1") ONLY: the feet speaker chip ([FEET-SPEAKER]), once
+   [SPK-AFTER-VO] has enabled it, no longer replays the instruction vo_t1_instr - a tap reads the box's sentence vo_sent_boy_sit
+   ("लड़का पेड़ के नीचे बैठा है।") with its words lit exactly as at the page's own reading (wordSync, PLAN[0].auto.times), on every tap.
+   Keyed on PLAN[0].spkSent; the tap is caught on its way down (a capture listener on the document, below intro()), so the chip's
+   own handler and state.replayAudio are not reached. The bird's tap (still vo_t1_instr), आगे, the chip's grey look and its guards
+   and every other page are untouched.
    [T2-INTRO] (2026-10-16, later, user request) PAGE 3 (T2 = ?slide=1, the girl on the bicycle) opens the same way, by the table
    (PLAN[1]); its two lines are the user's audio_4/5.wav, copied as assets/Audio/vo_t2_intro_a.wav (2.80 s, "चलिए, एक और चित्र
    देखते हैं") and vo_t2_cue.wav (3.32 s, "अब इस बटन पर टैप करिए और वाक्य को पढ़िए"), approximate wording as above:
@@ -10613,10 +10619,11 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
   // inactivity. sfx: the old pop beat's SFX file of that page (PLAN_BY_SLIDE in #P2-BIRD-POP-JS), silenced while the page is open.
   // pick (page 4, [T3-PICK]): the picture choice after the sentence - follow: the engine's follow-up line (id) door 1b takes over;
   // line: the pictures' line; idleMs: its repeat after that much inactivity; correct: the index of the right picture; ok: the line
-  // (id) spoken on the correct tap, or null.
+  // (id) spoken on the correct tap, or null. spkSent (page 2, [T1-SPK-SENT]): the feet speaker reads auto.sent with its words lit.
   var PLAN = {
     0: { lineA: "assets/Audio/vo_t1_intro_a.wav", lineB: "assets/Audio/vo_t1_intro_b.wav", hlAfterMs: 3000, lineC: "assets/Audio/vo_t1_intro_c.wav",
          noMic: true, auto: { sent: "vo_sent_boy_sit", explain: null, times: [0.29, 0.90, 1.25, 1.42, 1.79, 2.12, 2.27] },   // times = WORD_TIMES_BY_SLIDE[0] (vo_sent_boy_sit, 2.64 s); explain: null since rev 6 (was "vo_t1_explain")
+         spkSent: true,                                                                                                            // [T1-SPK-SENT] the feet speaker = the sentence, not vo_t1_instr
          sfx: /sfx_morning_birds\.[a-z0-9]+$/i },
     1: { lineA: "assets/Audio/vo_t2_intro_a.wav", hlMs: 3000,
          cue: "assets/Audio/vo_t2_cue.wav", cueIdleMs: 7000,                                                                       // = CUE_IDLE_BY_SLIDE[1]
@@ -10628,7 +10635,7 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
   var LINE_B_MS = 2400;                                        // page 2's line b length when its element cannot tell (2.36 s)
   var GAP_MS = 300, SENT_IN_MS = 450, SYNC_FALLBACK_MS = 400, NAV_AFTER_MS = 1000;   // NAV_AFTER_MS as in #P2-BIRD-POP-JS
   var MARK_POP_MS = 3400, WRONG_BUZZ_MS = 400;                 // [T3-PICK] the correct picture's pop-and-hold (= p4MarkPop, as MARK_POP_MS there); the wrong picture's buzz (= wgNo)
-  var live = null, mounting = -1, run = 0, timers = [], wordRaf = 0, wordEls = null, cueCtl = null, pickCtl = null;
+  var live = null, mounting = -1, run = 0, timers = [], wordRaf = 0, wordEls = null, cueCtl = null, pickCtl = null, spkCtl = null;
   function $id(id){ return document.getElementById(id); }
   function tail(p){ return String(p || "").split("/").pop(); }
   function srcOf(id){ var c = (typeof CARD === "object" && CARD) ? CARD : null; return (c && c.assets && c.assets.audio && c.assets.audio[id]) || ("assets/Audio/" + id + "." + (typeof AUDIO_EXT === "string" ? AUDIO_EXT : "wav")); }
@@ -10692,7 +10699,7 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
   }
   function micHandHide(){ micHandWatchOff(); if(micHandEl) micHandEl.classList.remove("show"); }
   function cancel(){
-    run++; live = null; cueCtl = null; timers.forEach(function(t){ clearTimeout(t); }); timers = []; wordStop();
+    run++; live = null; cueCtl = null; spkCtl = null; timers.forEach(function(t){ clearTimeout(t); }); timers = []; wordStop();
     micHandHide();                                                                                    // [T2-MIC-HAND] the page is left with the hand on the mic
     spkGate("release", "story"); spkGate("release", "pick");                                                // [SPK-AFTER-VO] the page is left mid-sequence: its holds go (the next page sets its own)
     if(pickCtl && pickCtl.hand){ try{ if(typeof stopNudge === "function") stopNudge(); }catch(e){} }   // [T3-PICK] the page is left with the hand on the picture
@@ -10850,6 +10857,17 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
       wordSync(cur(), words, cfg.auto.times);
       quiet(function(){ after(NAV_AFTER_MS, function(){ if(typeof window.setNavActive === "function") window.setNavActive(true); }); });
     };
+    // [T1-SPK-SENT] page 2: the feet speaker's tap - the sentence alone with its word highlight (true: spoken; false: the chip's own replay runs)
+    if(cfg.spkSent && cfg.auto) spkCtl = { say: function(){
+      if(!ok() || !pill.__p2Heard || typeof play !== "function") return false;
+      var slide = (typeof CARD === "object" && CARD && CARD.slides) ? CARD.slides[idx] : null;
+      state.audioReplays = (state.audioReplays | 0) + 1;
+      try{ SwiftPAL.emit("audio_replay", { slide_id: slide && slide.id, phase: slide && slide.phase, count: state.audioReplays, src: "tut_chip" }); }catch(x){}
+      play(srcOf(cfg.auto.sent), function(){});
+      var words = pill.__p2Words || Array.prototype.slice.call(pill.querySelectorAll(".p2-word"));
+      wordSync(cur(), words, cfg.auto.times);
+      return true;
+    } };
     // page 3: the cue line with the mic pulse, again after cueIdleMs of inactivity, until the mic is tapped or आगे shows
     var cueTimer = null;
     var micTaken = function(){ return !!(pill.__p2Rec || pill.__p2RecDone || (chip && (chip.classList.contains("p2-rec") || chip.classList.contains("p2-rec-done")))); };
@@ -10955,6 +10973,13 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
     if(cfg.lineA) stepA(); else after(GAP_MS, stepD);                    // [T3-PICK] page 4: no picture beat - straight to the pill
   }
   document.addEventListener("pointerdown", function(){ if(cueCtl) cueCtl.arm(); }, true);   // any tap restarts page 3's cue count ([P2-CUE-IDLE]); the mic tap ends it (micTaken)
+  // [T1-SPK-SENT] page 2: the feet speaker's tap is taken here, before the chip's own handler ([FEET-SPEAKER]: state.replayAudio = vo_t1_instr)
+  document.addEventListener("click", function(e){
+    if(!spkCtl) return;
+    var chip = (e.target && e.target.closest) ? e.target.closest("#slideHost .tut-card .tut-spk") : null; if(!chip) return;
+    var b = document.body.classList; if(b.contains("vo-playing") || b.contains("vo-pending")) return;   // the chip's own guards: it ignores the tap too
+    if(spkCtl.say()) e.stopPropagation();
+  }, true);
   function open(idx){
     var stage = $id("stage"); if(!stage) return;
     stage.classList.toggle("story-intro", has(idx));
