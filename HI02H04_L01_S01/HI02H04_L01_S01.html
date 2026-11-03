@@ -7682,6 +7682,16 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
    out and hold instead. Like the P6 pop it runs to its end on its own if the line is cut by an option tap. The pictures' lock during
    the entry line, the skipped first hearing, the wrong-tap line, the hint, the reveal and the correct tap's celebration are as in
    [G1-G3-P1-P3-NO-MIC]. */
+/* [WRONG-IDLE-7S] (2026-11-03, user request) pages 5-12 (G1-P4 = ?slide=3 to ?slide=10; the user's "page 4 G1 to 11 P4"): after the
+   feedback of the FIRST and of the SECOND wrong attempt - the wiggle + try-again line, the second tap's hint (pages 5, 7, 9, 11: the
+   sentence with its box words lit) or read-out (pages 6, 8, 10, 12: the three pills) - the page's instruction line (card audio.prompt,
+   with the sentence box's / recall picture's pop as on every repeat) speaks again after 7 s of inactivity, counted from the moment
+   that feedback is over, and again after every further 7 s of it, until the next tap (WRONG_IDLE_BY_SLIDE + wrongAfter in
+   #P2-BIRD-POP-JS, re-arming the [P6-PROMPT-IDLE] count). Before this, pages 5, 7, 9, 11 ended the repeat for good at the first tap on
+   a picture, so it never came after a wrong one: now it ends at the tap that locks the page (the correct tap, or the reveal after the
+   third wrong tap), as before for those. Pages 6, 8, 10, 12 repeated after 5 s from the feedback's end: now 7 s from the first wrong
+   feedback on (the 5 s before any tap is as shipped). The feedback itself, the reveal and its guided tap, the correct tap's SFX hold +
+   celebration, the boxes' pops and every other page are untouched. */
 /* [P5-READ-ALOUD] (2026-10-01) page 5 (G1 = ?slide=3, the first sentence-box question; listed in REC_BY_SLIDE): its sentence is
    now बच्चे गेंद से खेल रहे हैं। (card data.stim_hi; audio.word_name = vo_sent_children_ball, from vo_2.wav, 2.64 s, timings in
    WORD_TIMES_BY_AUDIO) and the mic chip beside the sentence box runs the pages 2-4 read-aloud beat: the FIRST chip tap no longer
@@ -8023,13 +8033,33 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
   var PROMPT_POP_MS = 3200;                                                              // = the length of the line (vo_prompt_pic_to_sent, 3.16 s)
   // [G1-G3-P1-P3-PROMPT-IDLE] (2026-10-07) slide index -> true: on this page the idle repeat above ends FOR GOOD at the first tap on an
   // option picture (wireIdlePrompt: a pointerdown on the option grid marks the .q-row __spkTapped - startCue / idleArm / idleFire bow
-  // out on it - and drops the count at once). Pages 6, 8, 10, 12 are not listed: there the repeat goes on as shipped
+  // out on it - and drops the count at once). Pages 6, 8, 10, 12 are not listed: there the repeat goes on as shipped.
+  // [WRONG-IDLE-7S] (2026-11-03): on the pages also in WRONG_IDLE_BY_SLIDE (all four) it ends for good at the first tap that LOCKS the
+  // page - the correct tap or the reveal after the third wrong one - and no longer at a wrong tap (see WRONG_IDLE_BY_SLIDE)
   var PROMPT_IDLE_STOP_ON_TAP_BY_SLIDE = {
     3: true,                                                                             // page 5 (G1)
     5: true,                                                                             // page 7 (G3)
     7: true,                                                                             // page 9 (P1)
     9: true                                                                              // page 11 (P3)
   };
+  // [WRONG-IDLE-7S] (2026-11-03, user request) slide index -> ms: after the feedback of a WRONG attempt that does not end the question
+  // (the first and the second: its wiggle + line, the hint, the read-out - not the reveal after the third), the page's instruction line
+  // (card audio.prompt, with its box / picture pop as on every repeat) speaks again after this much inactivity, counted afresh from
+  // the moment that feedback is over, and again after every further stretch of it - the [P6-PROMPT-IDLE] repeat, re-armed by
+  // wireIdlePrompt's wrongAfter. On pages 5, 7, 9, 11 a wrong tap therefore no longer ends the repeat (PROMPT_IDLE_STOP_ON_TAP_BY_SLIDE
+  // now waits for the tap that locks the page); on pages 6, 8, 10, 12 the repeat's count is this value from the first wrong
+  // feedback on (5 s before it, as shipped). Any tap still restarts the count; the correct tap, the reveal and the rest are untouched
+  var WRONG_IDLE_BY_SLIDE = {
+    3: 7000,                                                                             // page 5 (G1)
+    4: 7000,                                                                             // page 6 (G2)
+    5: 7000,                                                                             // page 7 (G3)
+    6: 7000,                                                                             // page 8 (G4)
+    7: 7000,                                                                             // page 9 (P1)
+    8: 7000,                                                                             // page 10 (P2)
+    9: 7000,                                                                             // page 11 (P3)
+   10: 7000                                                                              // page 12 (P4)
+  };
+  var WRONG_FEEDBACK_CAP_MS = 20000;                                                     // [WRONG-IDLE-7S] a tapped option still crossed this long after the tap no longer holds the count (the longest feedback, the read-out, is ~11 s)
   // [G1-G3-P1-P3-PROMPT-IDLE] slide index -> true: while this page's instruction line (card audio.prompt) speaks - at the mount and on
   // every idle repeat - the whole blue sentence box pops out a little and HOLDS for the line's length (.q-box-pop, #G1-PROMPT-IDLE-CSS;
   // boxPop, hooked in the play() wrapper), easing back as the line ends (rev 2: a pop-and-hold, not a breathing pulse)
@@ -8616,7 +8646,19 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
     var frame = document.querySelector("#slideHost .q-row"); if(!frame || frame.__idleWired) return;
     frame.__idleWired = true;
     var cue = { src: src, pulse: "#slideHost .p6-no-pulse", pop: PROMPT_IDLE_POP_BY_SLIDE[idx] || null };   // no element breathes with the line; the picture pops ([P6-PROMPT-IDLE] rev 2)
-    if(PROMPT_IDLE_STOP_ON_TAP_BY_SLIDE[idx] === true){                       // [G1-G3-P1-P3-PROMPT-IDLE] the first tap on an option picture ends the repeat for good
+    var wgrid = WRONG_IDLE_BY_SLIDE[idx] ? document.querySelector("#slideHost .opt-grid") : null;
+    if(wgrid){                                                                 // [WRONG-IDLE-7S] each tap is judged once the engine has taken it (its cell.onclick runs before this bubble listener)
+      var before = 0;
+      wgrid.addEventListener("click", function(){ before = (typeof state === "object" && state) ? (state.attempts | 0) : 0; }, true);
+      wgrid.addEventListener("click", function(){
+        if(!frame.isConnected || typeof state !== "object" || !state || state.idx !== idx) return;
+        if(state.locked){                                                      // the correct tap or the reveal: the repeat ends for good where the first tap ended it before
+          if(PROMPT_IDLE_STOP_ON_TAP_BY_SLIDE[idx] === true){ frame.__spkTapped = true; idleCancel(); }
+          return;
+        }
+        if((state.attempts | 0) > before) wrongAfter(frame, cue, WRONG_IDLE_BY_SLIDE[idx], idx);   // a wrong attempt with its feedback (a tap the engine ignored leaves the count as the pointerdown restarted it)
+      });
+    } else if(PROMPT_IDLE_STOP_ON_TAP_BY_SLIDE[idx] === true){                // [G1-G3-P1-P3-PROMPT-IDLE] the first tap on an option picture ends the repeat for good
       var grid = document.querySelector("#slideHost .opt-grid");               // (the document's own pointerdown listener has restarted the count just before; this drops it)
       if(grid) grid.addEventListener("pointerdown", function(){ frame.__spkTapped = true; idleCancel(); }, true);
     }
@@ -8624,6 +8666,19 @@ body.gating .sg-glow,body.gating .sg-sky{display:none;}
       if(!frame.isConnected || typeof state !== "object" || !state || state.idx !== idx) return;
       idleFrame = frame; idleCue = cue; idleMs = ms; idleArm();
     });
+  }
+  // [WRONG-IDLE-7S] a wrong attempt's feedback is over once its option is back to normal (the engine's un-crossing, at the end of its
+  // line / hint / read-out) and nothing speaks, no hint beat and no read-out runs: the count starts afresh there, ms long. Not when the
+  // reveal came instead (the third wrong tap locks the page) or the repeat has ended for good
+  function wrongAfter(frame, cue, ms, idx){
+    var t0 = Date.now();
+    (function poll(){
+      if(!frame.isConnected || typeof state !== "object" || !state || state.idx !== idx || frame.__spkTapped) return;
+      var crossed = !!frame.querySelector(".opt-cell.crossed") && Date.now() - t0 < WRONG_FEEDBACK_CAP_MS;
+      if(crossed || reviewing || state.hintActive || document.body.classList.contains("vo-playing")){ timers.push(setTimeout(poll, 100)); return; }
+      if(state.locked) return;
+      idleFrame = frame; idleCue = cue; idleMs = ms; idleArm();
+    })();
   }
   // ---- [P2-WORD-SYNC] ----
   // split the pill's sentence (its first non-empty text node) into .p2-word spans, once; spaces stay as text between them
