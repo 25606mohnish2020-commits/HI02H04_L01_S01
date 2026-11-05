@@ -10649,6 +10649,14 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
    first cue and runs without a break until the mic is tapped, then settles at the end of its breath as a tap during the line did. The
    cue line itself is unchanged: once at the cue point, then again after every cueIdleMs = 7 s of inactivity until the tap. Keyed on
    PLAN[2].cuePulse; page 3's cue (pulse with the line only), the tap and everything after it are untouched.
+   [T3-HAND-QUIET] (2026-11-05, user request) PAGE 4 (T3 = ?slide=2; the user's "page 3 T3") ONLY: once the WRONG picture has been
+   tapped and the hand nudge stands on the correct one, the hand is the only thing left running until the correct picture is tapped -
+   the pictures' line vo_t3_pick no longer comes back after pick.idleMs of inactivity (before: after the wrong tap's feedback and every
+   further 7 s; a tap no longer restarts that count either), and the feet speaker chip at the bird ([FEET-SPEAKER]) stays grey and
+   untappable throughout (the [SPK-AFTER-VO] hold "pickhand", set at the wrong tap, released at the correct tap or when the page is
+   left; it is outside that block's 30 s ceiling). The hand itself (the engine's #nudgeHand via pointNudgeAt, its look and motion), the
+   wrong tap's sound / buzz / fade, the pick line before any tap with its 7 s repeat, the correct tap and आगे are untouched. Keyed on
+   PLAN[2].pick.quietHand.
    [T2-INTRO] (2026-10-16, later, user request) PAGE 3 (T2 = ?slide=1, the girl on the bicycle) opens the same way, by the table
    (PLAN[1]); its two lines are the user's audio_4/5.wav, copied as assets/Audio/vo_t2_intro_a.wav (2.80 s, "चलिए, एक और चित्र
    देखते हैं") and vo_t2_cue.wav (3.32 s, "अब इस बटन पर टैप करिए और वाक्य को पढ़िए"), approximate wording as above:
@@ -10728,6 +10736,7 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
   // line: the pictures' line; idleMs: its repeat after that much inactivity; correct: the index of the right picture; ok: the line
   // (id) spoken on the correct tap, or null. spkSent (page 2, [T1-SPK-SENT]): the feet speaker reads auto.sent with its words lit.
   // cuePulse (page 4, [T3-PULSE-ON]): the cue's mic pulse is kept on between the cue lines, until the mic is tapped.
+  // pick.quietHand (page 4, [T3-HAND-QUIET]): after the wrong tap the hand alone runs - no idle line, the feet speaker held grey.
   var PLAN = {
     0: { lineA: "assets/Audio/vo_t1_intro_a.wav", lineB: "assets/Audio/vo_t1_intro_b.wav", hlAfterMs: 3000, lineC: "assets/Audio/vo_t1_intro_c.wav",
          noMic: true, auto: { sent: "vo_sent_boy_sit", explain: null, times: [0.29, 0.90, 1.25, 1.42, 1.79, 2.12, 2.27] },   // times = WORD_TIMES_BY_SLIDE[0] (vo_sent_boy_sit, 2.64 s); explain: null since rev 6 (was "vo_t1_explain")
@@ -10739,7 +10748,8 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
          sfx: /sfx_bicycle_bell\.[a-z0-9]+$/i },
     2: { cue: "assets/Audio/vo_t3_cue.wav", cueIdleMs: 7000,                                                                       // [T3-PICK] page 4: no picture beat - the pill + mic rise in at once, then this cue (cueIdleMs = CUE_IDLE_BY_SLIDE[2])
          cuePulse: true,                                                                                                           // [T3-PULSE-ON] the mic pulses without a break from the first cue until it is tapped
-         pick: { follow: "vo_t3_explain", line: "assets/Audio/vo_t3_pick.wav", idleMs: 7000, correct: 1, ok: null } }   // correct = MARK_BY_SLIDE[2].mark (image_ids[1], the girl watering the plants); ok: null since rev 3 (was "vo_t3_explain")
+         pick: { follow: "vo_t3_explain", line: "assets/Audio/vo_t3_pick.wav", idleMs: 7000, correct: 1, ok: null,   // correct = MARK_BY_SLIDE[2].mark (image_ids[1], the girl watering the plants); ok: null since rev 3 (was "vo_t3_explain")
+                 quietHand: true } }                                                                                     // [T3-HAND-QUIET] after the wrong tap: the hand alone - no idle line, the feet speaker grey - until the correct tap
   };
   var LINE_B_MS = 2400;                                        // page 2's line b length when its element cannot tell (2.36 s)
   var GAP_MS = 300, SENT_IN_MS = 450, SYNC_FALLBACK_MS = 400, NAV_AFTER_MS = 1000;   // NAV_AFTER_MS as in #P2-BIRD-POP-JS
@@ -10810,7 +10820,7 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
   function cancel(){
     run++; live = null; cueCtl = null; spkCtl = null; timers.forEach(function(t){ clearTimeout(t); }); timers = []; wordStop();
     micHandHide();                                                                                    // [T2-MIC-HAND] the page is left with the hand on the mic
-    spkGate("release", "story"); spkGate("release", "pick");                                                // [SPK-AFTER-VO] the page is left mid-sequence: its holds go (the next page sets its own)
+    spkGate("release", "story"); spkGate("release", "pick"); spkGate("release", "pickhand");               // [SPK-AFTER-VO] the page is left mid-sequence: its holds go (the next page sets its own; "pickhand": [T3-HAND-QUIET])
     if(pickCtl && pickCtl.hand){ try{ if(typeof stopNudge === "function") stopNudge(); }catch(e){} }   // [T3-PICK] the page is left with the hand on the picture
     pickCtl = null;
   }
@@ -11030,14 +11040,15 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
       var ctl = { follow: pk.follow, started: false, hold: true, hand: false, start: null };
       var pickTimer = null, answered = false;
       var lock = function(on){ frame.classList.toggle("t3-locked", !!on); };
+      var handQuiet = function(){ return !!(pk.quietHand && ctl.hand); };   // [T3-HAND-QUIET] the hand is on the correct picture: no idle line
       var pickArm = function(){                                             // the line again after idleMs of inactivity (no tap, nothing speaking)
         if(pickTimer){ clearTimeout(pickTimer); pickTimer = null; }
-        if(!ok() || answered) return;
+        if(!ok() || answered || handQuiet()) return;
         pickTimer = setTimeout(pickFire, pk.idleMs); timers.push(pickTimer);
       };
       var pickFire = function(){
         pickTimer = null;
-        if(!ok() || answered) return;
+        if(!ok() || answered || handQuiet()) return;
         if(document.body.classList.contains("vo-playing")){ quiet(pickArm); return; }   // a line speaks (a replay): count again from its end
         say(pk.line, pickArm);
       };
@@ -11048,6 +11059,7 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
         if(k === pk.correct){
           answered = true; cueCtl = null; lock(true);
           if(ctl.hand){ ctl.hand = false; try{ if(typeof stopNudge === "function") stopNudge(); }catch(x){} }
+          spkGate("release", "pickhand");                                // [T3-HAND-QUIET] the hand goes: the feet speaker is as it was before the change from here
           if(typeof stdSfx === "function") stdSfx("correct");            // [STD-SFX] the correct sound, on its own element
           pics.forEach(function(o, j){ o.classList.remove("si-pic-in", "t3-wrong"); o.classList.toggle("p4-mark", j === k); o.classList.toggle("p4-dim", j !== k); });
           if(!still()){                                                   // the page's own pop-and-hold with the line ([P4-MARK-POP])
@@ -11070,7 +11082,10 @@ body.vo-playing .tut-card .tut-spk .wv2{animation:wv2 1.2s steps(1) infinite;}
           im.classList.add("t3-off"); im.setAttribute("aria-disabled", "true");   // disabled for good
           var right = pics[pk.correct];
           if(right && typeof pointNudgeAt === "function"){ ctl.hand = true; pointNudgeAt(right); }   // the hand taps on the correct picture
-          pickArm();
+          if(ctl.hand && pk.quietHand){                                   // [T3-HAND-QUIET] with the hand up: no idle line, the feet speaker held grey, until the correct tap
+            cueCtl = null;                                                // a tap no longer restarts the pick line's count
+            spkGate("hold", "pickhand");
+          } else pickArm();
         }
       };
       ctl.start = function(){
@@ -11306,6 +11321,8 @@ body.vo-pending .tut-card .tut-spk{pointer-events:none !important;opacity:.5 !im
    - "story": set by STORY-INTRO's intro() at the mount and released by its done() - page 2 (T1) when the sentence (and any
      explanation) has been read, pages 3-4 (T2 / T3) when the first cue line has ended; so the 3 s highlight silences and the pill's
      rise-in never show a live chip. "pick" (T3): from the sentence's end, while the pictures' line vo_t3_pick is still to come.
+     "pickhand" (T3, [T3-HAND-QUIET] 2026-11-05): from the wrong picture's tap, while the hand nudge stands on the correct one, until
+     the correct tap (or the page is left) - not dropped by the ceiling below.
    - "hint" / "rec" / "locked", mirrored every 100 ms: state.hintActive (a wrong tap's beat before its line, the [P6-REVIEW] read-out,
      the engine's hint popup); the read-aloud beat (#slideHost .tut-audio.p2-rec: the sentence follows it); state.locked after a
      correct answer (its praise line and the page's end follow) - but not the reveal's wait for the guided tap (an .opt-guided cell
