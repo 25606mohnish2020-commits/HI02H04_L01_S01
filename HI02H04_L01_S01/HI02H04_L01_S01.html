@@ -11369,7 +11369,13 @@ body.vo-pending .tut-card .tut-spk{pointer-events:none !important;opacity:.5 !im
    - "hint" / "rec" / "locked", mirrored every 100 ms: state.hintActive (a wrong tap's beat before its line, the [P6-REVIEW] read-out,
      the engine's hint popup); the read-aloud beat (#slideHost .tut-audio.p2-rec: the sentence follows it); state.locked after a
      correct answer (its praise line and the page's end follow) - but not the reveal's wait for the guided tap (an .opt-guided cell
-     is on screen then; the chip stays live there as before).
+     is on screen then; the chip stays live there as before - except on G1-P4, "reveal" below).
+   - "reveal" ([REVEAL-SPK-OFF] 2026-11-06, user request), mirrored every 100 ms: pages 4 G1 - 11 P4 (?slide=3..10, the user's page
+     numbers), after the THIRD wrong tap - the engine's reveal (state.locked + the .opt-guided answer) with the pointing hand
+     (.reveal-hand) - the title-bar speaker stays grey and takes no tap for that whole wait, until the child taps the guided answer;
+     from that tap on "locked" above holds it to the page's end, as after any correct answer. Before: the chip was blue and a tap
+     replayed the page's instruction while the hand pointed. The reveal itself, the hand, the guided tap and its flow, the correct
+     pill's line at the hand on G2/G4/P2/P4 ([REVEAL-IDLE-SENT]) and every other page are untouched; not dropped by the ceiling.
    - a safety ceiling: 30 s of VISIBLE time after a mount (a hidden tab freezes the lines, [TAB-PAUSE]) drops "mount", "story" and
      "pick" - belt and braces, every path above clears its own hold; the longest opening sequence (T1) is ~15 s.
    The tap handlers of both chips also bow out while body.vo-pending is on (one guard each in #HDR-SPEAKER-JS / #FEET-SPEAKER-JS;
@@ -11377,6 +11383,7 @@ body.vo-pending .tut-card .tut-spk{pointer-events:none !important;opacity:.5 !im
    what is on screen (the story intro running, the instruction already speaking). Nothing else on any page changes. */
 (function(){ "use strict";
   var CEIL_MS = 30000, TICK_MS = 100;
+  var REVEAL_HOLD_BY_SLIDE = { 3: true, 4: true, 5: true, 6: true, 7: true, 8: true, 9: true, 10: true };   // [REVEAL-SPK-OFF] G1-P4: the speaker is held through the reveal's hand
   var holds = {}, mounting = false, visibleMs = 0;
   function $id(id){ return document.getElementById(id); }
   function tail(p){ return String(p || "").split("/").pop(); }
@@ -11425,6 +11432,7 @@ body.vo-pending .tut-card .tut-spk{pointer-events:none !important;opacity:.5 !im
     if(st && st.hintActive) hold("hint"); else release("hint");
     if(document.querySelector("#slideHost .tut-audio.p2-rec")) hold("rec"); else release("rec");
     if(st && st.locked && !document.querySelector("#slideHost .opt-cell.opt-guided")) hold("locked"); else release("locked");
+    if(st && st.locked && REVEAL_HOLD_BY_SLIDE[st.idx] === true && document.querySelector("#slideHost .opt-cell.opt-guided")) hold("reveal"); else release("reveal");   // [REVEAL-SPK-OFF] the reveal's hand waits for the guided tap
     if(!document.hidden) visibleMs += TICK_MS;
     if(visibleMs > CEIL_MS){ release("mount"); release("story"); release("pick"); }
   }, TICK_MS);
