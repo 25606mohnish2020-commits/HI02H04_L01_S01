@@ -1,4 +1,4 @@
-﻿Section,Item,Checkbox (TRUE = matches),Result,What HI02H04_L01_S01 does,To match the checklist
+﻿Section,Item,Checkbox (TRUE = matches),Result,What HI02H04_L02_S01 does,To match the checklist
 ,,,,,
 ,The user should see a loading screen before a title screen. ,TRUE,✓,"A solid boot loader holds 2 s before the title card (auto-dismiss, r4 rule).",
 Title Screen,The standard Play button is used with size 140 × 140 px,TRUE,✓,"140×140 box (style LANDING-PLAY-BTN, line 9934); the art is byte-identical to “Standard play button.svg”.",
